@@ -826,7 +826,11 @@ function pickLeast(arr,excl=[]){
 // REGLAS DE MODA
 // =============================================
 function isPattern(g){
-  return !!(g.material&&g.material.toLowerCase().includes('estampado'));
+  const patternWords = ['estampado','estampada','lunares','cuadrillé','cuadrille','cuadros','rayas','flores','floral','animal print','animalprint','leopardo','cebra','serpiente','snake','tartán','tartan','pata de gallo','tweed','tie dye','tiedye','geométrico','geometrico','abstracto','tropical'];
+  const mat = (g.material||'').toLowerCase();
+  const notes = (g.notes||'').toLowerCase();
+  const type = (g.type||'').toLowerCase();
+  return patternWords.some(w => mat.includes(w) || notes.includes(w) || type.includes(w));
 }
 function hasPattern(pieces){
   return pieces.some(p=>isPattern(p));
@@ -858,8 +862,10 @@ function getCompatibleColors(baseColor, schemeKey){
 
     case 'monocromatico':
       // SOLO colores del mismo grupo monocromático, SOLO prendas lisas
+      // Los neutros base (blanco/negro/gris) van con todo dentro de su gama
       return c=>{
         if(isNeutral(baseColor)&&isNeutral(c)) return true;
+        if(isNeutral(c)) return true; // neutros siempre pueden acompañar
         return monoCompatible(baseColor.name, c.name);
       };
 
@@ -944,11 +950,13 @@ function pickCompatible(arr, baseColor, schemeKey, excl=[], currentPieces=[]){
   const byScheme=available.filter(g=>rule(g.colorPrimary));
   if(byScheme.length) return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
 
-  // 2° fallback: neutros
+  // 2° fallback: neutros (siempre combinan)
   const neutrals=available.filter(g=>isNeutral(g.colorPrimary));
   if(neutrals.length) return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
 
-  // 3° último recurso: cualquier disponible
+  // 3° último recurso solo si NO es monocromático — en mono es mejor no agregar
+  // una pieza incompatible que arruinar el esquema
+  if(schemeKey==='monocromatico') return null;
   return available.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
