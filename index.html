@@ -145,6 +145,16 @@
 
   .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--charcoal); color: var(--cream); padding: 0.7rem 1.4rem; border-radius: 8px; font-size: 0.85rem; z-index: 300; transition: transform 0.3s ease; white-space: nowrap; max-width: 90vw; text-align: center; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* DETALLE PRENDA */
+  .detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 250; align-items: flex-end; justify-content: center; }
+  .detail-overlay.open { display: flex; }
+  .detail-modal { background: var(--warm-white); border-radius: 16px 16px 0 0; width: 100%; max-height: 88vh; overflow-y: auto; padding: 1.5rem 1.25rem 2rem; animation: slideUp 0.25s ease; }
+  .detail-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 10px; background: var(--light-mocha); margin-bottom: 1rem; }
+  .detail-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.75rem; background: var(--cream); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; color: var(--mocha); margin: 0.2rem; }
+  .detail-section { margin-bottom: 1rem; }
+  .detail-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mocha); font-weight: 500; margin-bottom: 0.4rem; }
+  .detail-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
 </style>
 </head>
 <body>
@@ -360,6 +370,14 @@
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="saveGarment()">Guardar prenda</button>
     </div>
+  </div>
+</div>
+
+<!-- DETALLE PRENDA -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="detail-content"></div>
   </div>
 </div>
 
@@ -771,7 +789,7 @@ function renderGarments(){
     return;
   }
   grid.innerHTML=filtered.map(g=>`
-    <div class="garment-card">
+    <div class="garment-card" onclick="openDetail(${g.id})">
       <div class="img-wrap">
         ${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}
         ${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}
@@ -953,11 +971,14 @@ function getCompatibleColors(baseColor, schemeKey){
   switch(schemeKey){
 
     case 'monocromatico':
-      // SOLO colores del mismo grupo monocromático, SOLO prendas lisas
-      // Los neutros base (blanco/negro/gris) van con todo dentro de su gama
+      // SOLO colores del mismo grupo monocromático
+      // Neutros puros (negro/blanco/gris) pueden acompañar cualquier monocromático
       return c=>{
         if(isNeutral(baseColor)&&isNeutral(c)) return true;
-        if(isNeutral(c)) return true; // neutros siempre pueden acompañar
+        // Solo neutros oscuros/claros puros como acompañantes (negro, blanco, gris)
+        const pureNeutrals=['Negro','Blanco','Gris claro','Gris','Gris oscuro','Gris perla'];
+        if(pureNeutrals.includes(c.name)) return true;
+        if(pureNeutrals.includes(baseColor.name)) return monoCompatible(baseColor.name,c.name)||isNeutral(c);
         return monoCompatible(baseColor.name, c.name);
       };
 
@@ -1235,6 +1256,44 @@ function clearAllData(){
 function updateDataSummary(){
   const el=document.getElementById('data-summary');if(!el)return;
   el.textContent=`${garments.length} prendas · ${history.length} looks registrados`;
+}
+
+function openDetail(id){
+  const g=garments.find(x=>x.id===id);
+  if(!g)return;
+  const catNames={top:'Parte superior',bottom:'Parte inferior',dress:'Vestido / Mono',outer:'Abrigo',shoes:'Calzado',bag:'Cartera',acc:'Accesorio'};
+  document.getElementById('detail-content').innerHTML=`
+    ${g.photo?`<img src="${g.photo}" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}
+    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div>
+    <div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div>
+    <div class="detail-section">
+      <div class="detail-section-title">Color</div>
+      <span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>
+      ${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}
+    </div>
+    ${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span></div>`:''}
+    <div class="detail-section">
+      <div class="detail-section-title">Temporada</div>
+      ${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Ocasión</div>
+      ${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}
+    </div>
+    ${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}
+    <div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div>
+    <div class="detail-actions">
+      <button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button>
+      <button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button>
+    </div>`;
+  document.getElementById('detail-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeDetail(e){
+  if(e&&e.target!==document.getElementById('detail-overlay'))return;
+  document.getElementById('detail-overlay').classList.remove('open');
+  document.body.style.overflow='';
 }
 
 function showToast(msg){
