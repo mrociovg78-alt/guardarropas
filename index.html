@@ -46,7 +46,9 @@
   .garment-card .card-type { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--mocha); font-weight: 500; }
   .card-color-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 3px; border: 1px solid rgba(0,0,0,0.1); vertical-align: middle; }
   .usage-badge { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.55); color: white; font-size: 0.62rem; padding: 2px 5px; border-radius: 10px; font-weight: 500; }
-  .delete-btn { position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .delete-btn { width: 22px; height: 22px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; font-size: 0.65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .card-edit-btn { width: 22px; height: 22px; background: rgba(201,168,76,0.85); color: white; border: none; border-radius: 50%; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .card-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 3px; }
 
   .empty-state { text-align: center; padding: 3rem 1rem; color: var(--mocha); }
   .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
@@ -472,6 +474,7 @@ const CAT_EMOJI = {top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'�
 let garments=[], history=[], currentFilter='all';
 let selectedColorPrimary=null, selectedColorSecondary=null;
 let currentPhotoData=null, currentPhotoBase64=null;
+let editingId=null;
 
 try{garments=JSON.parse(localStorage.getItem('mg_garments')||'[]');}catch(e){}
 try{history=JSON.parse(localStorage.getItem('mg_history')||'[]');}catch(e){}
@@ -566,7 +569,12 @@ function selectColorByName(pickerId, name){
 function togglePill(el){el.classList.toggle('selected');}
 
 function openAddModal(){resetForm();document.getElementById('modal-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  editingId=null;
+  document.querySelector('.modal-title span').textContent='Nueva prenda';
+}
 function handleOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
 function resetForm(){
@@ -712,21 +720,46 @@ function saveGarment(){
   if(!selectedColorPrimary){showToast('Seleccioná el color principal');return;}
   const seasons=[...document.querySelectorAll('#season-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
   const occasions=[...document.querySelectorAll('#occasion-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
-  garments.push({
-    id:Date.now(),cat,type,
-    style:document.getElementById('f-style').value,
-    material:document.getElementById('f-material').value,
-    colorPrimary:selectedColorPrimary,
-    colorSecondary:selectedColorSecondary||null,
-    seasons:seasons.length?seasons:['Todo'],
-    occasions:occasions.length?occasions:['Casual'],
-    notes:document.getElementById('f-notes').value,
-    photo:currentPhotoData,
-    usageCount:0,
-    addedAt:new Date().toISOString()
-  });
-  save();renderGarments();closeModal();
-  showToast('✓ Prenda guardada');updateDataSummary();
+
+  if(editingId){
+    // Modo edición: actualizar prenda existente
+    const idx=garments.findIndex(g=>g.id===editingId);
+    if(idx>=0){
+      const existing=garments[idx];
+      garments[idx]={
+        ...existing, cat, type,
+        style:document.getElementById('f-style').value,
+        material:document.getElementById('f-material').value,
+        colorPrimary:selectedColorPrimary,
+        colorSecondary:selectedColorSecondary||null,
+        seasons:seasons.length?seasons:['Todo'],
+        occasions:occasions.length?occasions:['Casual'],
+        notes:document.getElementById('f-notes').value,
+        photo:currentPhotoData||existing.photo,
+      };
+    }
+    editingId=null;
+    save();renderGarments();closeModal();
+    showToast('✓ Prenda actualizada');
+  } else {
+    // Modo nuevo
+    garments.push({
+      id:Date.now(),cat,type,
+      style:document.getElementById('f-style').value,
+      material:document.getElementById('f-material').value,
+      colorPrimary:selectedColorPrimary,
+      colorSecondary:selectedColorSecondary||null,
+      seasons:seasons.length?seasons:['Todo'],
+      occasions:occasions.length?occasions:['Casual'],
+      notes:document.getElementById('f-notes').value,
+      photo:currentPhotoData,
+      usageCount:0,
+      addedAt:new Date().toISOString()
+    });
+    save();renderGarments();closeModal();
+    showToast('✓ Prenda guardada');
+  }
+  updateDataSummary();
 }
 
 function renderGarments(){
@@ -747,7 +780,10 @@ function renderGarments(){
         <div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>
         ${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}
       </div>
-      <button class="delete-btn" onclick="deleteGarment(${g.id},event)">✕</button>
+      <div class="card-actions">
+        <button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button>
+        <button class="delete-btn" onclick="deleteGarment(${g.id},event)" title="Eliminar">✕</button>
+      </div>
     </div>`).join('');
 }
 
@@ -756,6 +792,62 @@ function deleteGarment(id,e){
   if(!confirm('¿Eliminar esta prenda?'))return;
   garments=garments.filter(g=>g.id!==id);
   save();renderGarments();updateDataSummary();showToast('Prenda eliminada');
+}
+
+function editGarment(id,e){
+  e.stopPropagation();
+  const g=garments.find(x=>x.id===id);
+  if(!g)return;
+  editingId=id;
+
+  // Reset y pre-completar formulario
+  resetForm();
+
+  // Título del modal
+  document.querySelector('.modal-title span').textContent='Editar prenda';
+
+  // Foto
+  if(g.photo){
+    currentPhotoData=g.photo;
+    currentPhotoBase64=g.photo.split(',')[1]||null;
+    document.getElementById('upload-placeholder').style.display='none';
+    const prev=document.getElementById('upload-preview');
+    prev.src=g.photo; prev.style.display='block';
+    if(getApiKey()) document.getElementById('ai-analyze-btn').classList.add('visible');
+  }
+
+  // Categoría y tipo
+  document.getElementById('f-category').value=g.cat||'';
+  updateTypeOptions(g.type||'');
+  updateStyleOptions(g.style||'');
+
+  // Material
+  const mat=document.getElementById('f-material');
+  [...mat.options].forEach(o=>{if(o.text===g.material)mat.value=o.text;});
+
+  // Colores
+  renderColorPickers();
+  setTimeout(()=>{
+    if(g.colorPrimary) selectColorByName('color-primary-picker',g.colorPrimary.name);
+    if(g.colorSecondary) selectColorByName('color-secondary-picker',g.colorSecondary.name);
+  },60);
+
+  // Temporada
+  document.querySelectorAll('#season-group .checkbox-pill').forEach(p=>{
+    p.classList.toggle('selected', (g.seasons||[]).includes(p.textContent.trim()));
+  });
+
+  // Ocasión
+  document.querySelectorAll('#occasion-group .checkbox-pill').forEach(p=>{
+    p.classList.toggle('selected', (g.occasions||[]).includes(p.textContent.trim()));
+  });
+
+  // Notas
+  document.getElementById('f-notes').value=g.notes||'';
+
+  // Abrir modal
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
 function updateTemp(){
