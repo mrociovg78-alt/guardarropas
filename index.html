@@ -117,9 +117,9 @@
   .avatar-toggle { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
   .avatar-toggle button { padding: 0.3rem 0.8rem; border-radius: 12px; border: 1px solid var(--border); background: var(--cream); color: var(--mocha); font-size: 0.72rem; cursor: pointer; font-family: 'DM Sans',sans-serif; }
   .avatar-toggle button.active { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
-  .avatar-wrap { position: relative; width: 180px; height: 380px; margin: 0 auto; }
+  .avatar-wrap { position: relative; width: 160px; height: 400px; margin: 0 auto; }
   .avatar-clothes { position: absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
-  .avatar-silhouette { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; z-index:3; mix-blend-mode:screen; pointer-events:none; }
+  .avatar-silhouette { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; z-index:3; mix-blend-mode:multiply; pointer-events:none; }
   .color-harmony-row { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.75rem; }
   .harmony-swatch { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.08); flex-shrink: 0; }
   .harmony-label { font-size: 0.7rem; color: var(--mocha); }
@@ -1352,8 +1352,8 @@ function generateOutfits(){
       </div>
       <div id="view-avatar-${uid}" style="display:none;">
         <div class="avatar-wrap">
-          <svg class="avatar-clothes" id="svg-${uid}" viewBox="0 0 180 380" xmlns="http://www.w3.org/2000/svg"></svg>
-          <img class="avatar-silhouette" src="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-04%20at%2015.12.53.jpeg" alt="silueta" crossorigin="anonymous"/>
+          <svg class="avatar-clothes" id="svg-${uid}" viewBox="0 0 160 400" xmlns="http://www.w3.org/2000/svg"></svg>
+          <img class="avatar-silhouette" src="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-04%20at%2016.03.18.jpeg" alt="silueta" crossorigin="anonymous"/>
         </div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
@@ -1415,105 +1415,110 @@ function drawAvatarSVG(svg, pieces){
   const sd = dk(sc,25);
   const skin = '#F5D5B0';
 
+  // Figura femenina: viewBox 160x400
+  // Cabeza: cx=80, cy=28, r~14x17
+  // Cuello: y45-60, Hombros: y60, ancho 50-110
+  // Torso: hasta y175, Cadera: y175, Piernas: hasta y385, Pies: y385-398
   let h = `
-    <ellipse cx="90" cy="28" rx="16" ry="20" fill="${skin}"/>
-    <rect x="84" y="46" width="12" height="12" rx="4" fill="${skin}"/>
+    <ellipse cx="80" cy="28" rx="13" ry="17" fill="${skin}"/>
+    <rect x="75" y="44" width="10" height="16" rx="4" fill="${skin}"/>
   `;
 
-  // Vestido
+  // VESTIDO
   if(dress && !bot){
     h += `
-      <path d="M58 58 Q48 68 46 88 Q43 115 42 148 Q40 185 39 225 Q37 265 36 305 Q35 335 36 370 L144 370 Q145 335 144 305 Q143 265 142 225 Q141 185 140 148 Q139 115 136 88 Q134 68 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
-      <path d="M58 58 L72 82 L90 72 L108 82 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.2"/>
-      <path d="M74 56 L90 74 L106 56" fill="none" stroke="${td}" stroke-width="1.2" opacity="0.45"/>
-      <path d="M42 148 Q90 136 140 148" fill="none" stroke="${td}" stroke-width="0.7" opacity="0.2"/>
-      <path d="M39 225 Q90 212 141 225" fill="none" stroke="${td}" stroke-width="0.6" opacity="0.15"/>
+      <path d="M50 60 Q42 70 40 90 Q37 118 36 150 Q34 188 33 228 Q31 268 30 308 Q29 342 30 385 L130 385 Q131 342 130 308 Q129 268 128 228 Q127 188 126 150 Q125 118 122 90 Q120 70 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
+      <path d="M50 60 L63 82 L80 72 L97 82 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.2"/>
+      <path d="M66 58 L80 76 L94 58" fill="none" stroke="${td}" stroke-width="1.1" opacity="0.4"/>
+      <path d="M36 150 Q80 138 126 150" fill="none" stroke="${td}" stroke-width="0.7" opacity="0.2"/>
+      <path d="M33 228 Q80 215 127 228" fill="none" stroke="${td}" stroke-width="0.6" opacity="0.15"/>
+      <path d="M30 308 Q80 294 130 308" fill="none" stroke="${td}" stroke-width="0.5" opacity="0.12"/>
     `;
   } else {
-    // Top/blazer + bottom
     const isBlz = outer || (top && ['blazer','saco','chaqueta'].some(k=>top.label.toLowerCase().includes(k)));
     if(isBlz){
       const inn='#FAFAF7';
       h += `
-        <path d="M58 58 Q48 68 46 88 Q44 110 44 155 L136 155 Q136 110 134 88 Q132 68 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
-        <path d="M58 58 L72 80 L90 72 L108 80 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.2"/>
-        <path d="M58 58 L46 72 L44 122 L62 116 L68 155 L44 155" fill="${td}" opacity="0.1"/>
-        <path d="M122 58 L134 72 L136 122 L118 116 L112 155 L136 155" fill="${td}" opacity="0.1"/>
-        <path d="M72 58 L80 80 L90 72 L100 80 L108 58 L106 52 L90 54 L74 52Z" fill="${inn}"/>
-        <path d="M80 64 L90 80 L100 64" fill="none" stroke="${tc}" stroke-width="1.2"/>
-        <circle cx="68" cy="108" r="2.5" fill="${td}" opacity="0.5"/>
-        <circle cx="68" cy="122" r="2.5" fill="${td}" opacity="0.5"/>
-        <circle cx="68" cy="136" r="2.5" fill="${td}" opacity="0.5"/>
-        <circle cx="68" cy="150" r="2.5" fill="${td}" opacity="0.5"/>
+        <path d="M50 60 Q42 70 40 90 Q38 114 38 162 L122 162 Q122 114 120 90 Q118 70 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
+        <path d="M50 60 L63 80 L80 72 L97 80 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.2"/>
+        <path d="M50 60 L40 74 L38 118 L54 112 L60 162 L38 162" fill="${td}" opacity="0.1"/>
+        <path d="M110 60 L120 74 L122 118 L106 112 L100 162 L122 162" fill="${td}" opacity="0.1"/>
+        <path d="M63 60 L71 80 L80 72 L89 80 L97 60 L95 54 L80 56 L65 54Z" fill="${inn}"/>
+        <path d="M71 66 L80 82 L89 66" fill="none" stroke="${tc}" stroke-width="1.1"/>
+        <circle cx="58" cy="110" r="2.2" fill="${td}" opacity="0.5"/>
+        <circle cx="58" cy="123" r="2.2" fill="${td}" opacity="0.5"/>
+        <circle cx="58" cy="136" r="2.2" fill="${td}" opacity="0.5"/>
+        <circle cx="58" cy="149" r="2.2" fill="${td}" opacity="0.5"/>
       `;
     } else {
       h += `
-        <path d="M58 58 Q49 66 47 84 Q45 108 45 155 L135 155 Q135 108 133 84 Q131 66 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
-        <path d="M58 58 L71 76 L90 68 L109 76 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.18"/>
-        <path d="M76 58 L90 76 L104 58" fill="none" stroke="${td}" stroke-width="1" opacity="0.5"/>
-        <line x1="90" y1="76" x2="90" y2="155" stroke="${td}" stroke-width="0.8" opacity="0.35"/>
-        <circle cx="90" cy="92" r="2" fill="${td}" opacity="0.45"/>
-        <circle cx="90" cy="106" r="2" fill="${td}" opacity="0.45"/>
-        <circle cx="90" cy="120" r="2" fill="${td}" opacity="0.45"/>
-        <circle cx="90" cy="136" r="2" fill="${td}" opacity="0.45"/>
-        <circle cx="90" cy="150" r="2" fill="${td}" opacity="0.45"/>
+        <path d="M50 60 Q42 68 40 86 Q38 110 38 162 L122 162 Q122 110 120 86 Q118 68 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
+        <path d="M50 60 L63 78 L80 70 L97 78 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.17"/>
+        <path d="M68 60 L80 76 L92 60" fill="none" stroke="${td}" stroke-width="1" opacity="0.5"/>
+        <line x1="80" y1="76" x2="80" y2="162" stroke="${td}" stroke-width="0.8" opacity="0.32"/>
+        <circle cx="80" cy="92" r="1.8" fill="${td}" opacity="0.42"/>
+        <circle cx="80" cy="106" r="1.8" fill="${td}" opacity="0.42"/>
+        <circle cx="80" cy="120" r="1.8" fill="${td}" opacity="0.42"/>
+        <circle cx="80" cy="136" r="1.8" fill="${td}" opacity="0.42"/>
+        <circle cx="80" cy="150" r="1.8" fill="${td}" opacity="0.42"/>
       `;
     }
-    // Bottom
+
+    // BOTTOM — figura femenina más estrecha en piernas
     const isJean = bot && bot.label.toLowerCase().includes('jean');
     h += `
-      <path d="M46 153 L43 262 L72 262 L90 212 L108 262 L137 262 L134 153 Z" fill="${bc}"/>
-      <path d="M43 262 L40 370 L72 370 L80 300 L90 365 L100 300 L108 370 L140 370 L137 262 Z" fill="${bc}"/>
+      <path d="M40 160 L37 272 L62 272 L80 222 L98 272 L123 272 L120 160 Z" fill="${bc}"/>
+      <path d="M37 272 L34 385 L64 385 L72 312 L80 380 L88 312 L96 385 L126 385 L123 272 Z" fill="${bc}"/>
     `;
     if(isJean){
       h += `
-        <path d="M46 153 L50 168 L130 168 L134 155" fill="${dk(bc,15)}" opacity="0.4"/>
-        <line x1="86" y1="155" x2="84" y2="260" stroke="${bd}" stroke-width="1" opacity="0.45"/>
-        <line x1="94" y1="155" x2="96" y2="260" stroke="${bd}" stroke-width="1" opacity="0.45"/>
+        <path d="M40 160 L44 174 L116 174 L120 162" fill="${dk(bc,15)}" opacity="0.4"/>
+        <line x1="76" y1="162" x2="74" y2="270" stroke="${bd}" stroke-width="1" opacity="0.42"/>
+        <line x1="84" y1="162" x2="86" y2="270" stroke="${bd}" stroke-width="1" opacity="0.42"/>
       `;
     } else {
       h += `
-        <line x1="62" y1="155" x2="60" y2="260" stroke="${bd}" stroke-width="0.6" opacity="0.3"/>
-        <line x1="118" y1="155" x2="120" y2="260" stroke="${bd}" stroke-width="0.6" opacity="0.3"/>
+        <line x1="55" y1="162" x2="53" y2="270" stroke="${bd}" stroke-width="0.6" opacity="0.28"/>
+        <line x1="105" y1="162" x2="107" y2="270" stroke="${bd}" stroke-width="0.6" opacity="0.28"/>
       `;
     }
   }
 
-  // Zapatos
+  // ZAPATOS
   const isTaco = shoe && ['zapato','bota','botín','oxford','mule'].some(k=>shoe.label.toLowerCase().includes(k));
   if(isTaco){
     h += `
-      <path d="M40 370 Q30 373 26 379 Q23 384 27 388 Q32 392 56 390 L60 370 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
-      <rect x="52" y="385" width="5" height="10" rx="1" fill="${sd}"/>
-      <path d="M120 370 Q130 373 134 379 Q137 384 133 388 Q128 392 104 390 L100 370 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
-      <rect x="123" y="385" width="5" height="10" rx="1" fill="${sd}"/>
+      <path d="M34 385 Q25 388 22 393 Q19 398 23 401 Q28 404 50 402 L54 385 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
+      <rect x="46" y="398" width="5" height="9" rx="1" fill="${sd}"/>
+      <path d="M106 385 Q115 388 118 393 Q121 398 117 401 Q112 404 90 402 L86 385 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
+      <rect x="109" y="398" width="5" height="9" rx="1" fill="${sd}"/>
     `;
   } else {
     const sx = sc==='#F5F0E8'||sc==='#FFFFFF'?'#ccc':sd;
     h += `
-      <path d="M40 370 Q28 372 23 379 Q20 384 26 388 Q34 392 60 390 L62 370 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
-      <path d="M118 370 L120 390 Q146 392 152 388 Q158 384 155 379 Q150 372 138 370 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
+      <path d="M34 385 Q23 387 19 393 Q16 398 22 401 Q30 404 54 402 L56 385 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
+      <path d="M106 385 L108 402 Q132 404 138 401 Q144 398 141 393 Q137 387 126 385 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
     `;
   }
 
-  // Cartera
+  // CARTERA
   if(bag){
     const bagC = bag.hex;
     const bagD = dk(bagC, 25);
     h += `
-      <rect x="140" y="190" width="36" height="28" rx="4" fill="${bagC}" stroke="${bagD}" stroke-width="1"/>
-      <path d="M148 190 Q158 180 170 190" fill="none" stroke="${bagD}" stroke-width="1.5"/>
-      <rect x="151" y="200" width="12" height="8" rx="2" fill="${bagD}" opacity="0.55"/>
+      <rect x="124" y="195" width="32" height="26" rx="4" fill="${bagC}" stroke="${bagD}" stroke-width="1"/>
+      <path d="M131 195 Q140 185 152 195" fill="none" stroke="${bagD}" stroke-width="1.4"/>
+      <rect x="136" y="204" width="10" height="7" rx="2" fill="${bagD}" opacity="0.5"/>
     `;
   }
 
-  // Brazos
-  const sleeveEnd = (dress && !bot) ? 280 : 200;
+  // BRAZOS — más pegados al cuerpo femenino
+  const sleeveEnd = (dress && !bot) ? 275 : 195;
   h += `
-    <path d="M46 62 Q32 100 30 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
-    <ellipse cx="30" cy="${sleeveEnd+8}" rx="8" ry="6" fill="${skin}"/>
-    <path d="M134 62 Q148 100 150 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
-    <ellipse cx="150" cy="${sleeveEnd+8}" rx="8" ry="6" fill="${skin}"/>
+    <path d="M40 64 Q28 100 26 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
+    <ellipse cx="26" cy="${sleeveEnd+7}" rx="7" ry="5" fill="${skin}"/>
+    <path d="M120 64 Q132 100 134 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
+    <ellipse cx="134" cy="${sleeveEnd+7}" rx="7" ry="5" fill="${skin}"/>
   `;
 
   svg.innerHTML = h;
