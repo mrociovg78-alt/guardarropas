@@ -982,218 +982,347 @@ function classicCompatible(c1name, c2name){
   return CLASSIC_COMBOS.some(combo=>combo.includes(c1name)&&combo.includes(c2name));
 }
 
-function getCompatibleColors(baseColor, schemeKey){
+// =============================================
+// MOTOR DE COLOR v2 — Sistema de scoring
+// Basado en: teoría cromática + paletas curadas + proporción
+// =============================================
+
+// Familias cromáticas de cada color (para reglas monocromático/análogo)
+function getColorFamily(colorName){
+  const families = {
+    azul:    ['Celeste','Azul','Azul marino','Azul petróleo'],
+    gris:    ['Gris perla','Gris claro','Gris','Gris oscuro','Negro'],
+    blanco:  ['Blanco','Crudo','Crema'],
+    tierra:  ['Beige','Camel','Marrón','Terracota','Coral','Verde oliva'],
+    rosa:    ['Rosa palo','Rosa','Bordo','Ciruela'],
+    verde:   ['Verde agua','Verde claro','Verde oliva','Verde botella'],
+    calido:  ['Naranja','Mostaza','Amarillo','Terracota','Coral'],
+    violeta: ['Lavanda','Violeta','Ciruela'],
+  };
+  for(const [fam, members] of Object.entries(families)){
+    if(members.includes(colorName)) return fam;
+  }
+  return null;
+}
+
+// Familias vecinas para análogo
+const ANALOG_NEIGHBORS = {
+  azul:    ['azul','violeta','verde'],
+  gris:    ['gris','blanco','azul'],
+  blanco:  ['blanco','gris','tierra'],
+  tierra:  ['tierra','calido','verde'],
+  rosa:    ['rosa','violeta','calido'],
+  verde:   ['verde','azul','tierra'],
+  calido:  ['calido','tierra','rosa'],
+  violeta: ['violeta','rosa','azul'],
+};
+
+// Paleta tonal tierra cerrada
+const TONAL_TIERRA = new Set(['Beige','Camel','Marrón','Terracota','Coral','Verde oliva','Crudo','Crema','Blanco','Gris perla','Gris claro']);
+
+// Neutros puros (siempre pueden acompañar en cualquier esquema)
+const PURE_NEUTRALS = new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro']);
+
+// Neutros extendidos (neutros + tierras, para neutros+acento)
+const EXTENDED_NEUTRALS = new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro','Beige','Camel','Azul marino']);
+
+// =============================================
+// SCORING POR ESQUEMA
+// Devuelve score 0-100 para un par de colores
+// =============================================
+function scoreColorPair(c1, c2, schemeKey){
+  const f1 = getColorFamily(c1.name);
+  const f2 = getColorFamily(c2.name);
+  const c1Neutral = PURE_NEUTRALS.has(c1.name);
+  const c2Neutral = PURE_NEUTRALS.has(c2.name);
+  const c1ExtNeutral = EXTENDED_NEUTRALS.has(c1.name);
+  const c2ExtNeutral = EXTENDED_NEUTRALS.has(c2.name);
+
   switch(schemeKey){
 
-    case 'monocromatico':
-      // ESTRICTO: solo colores del mismo grupo monocromático
-      // Neutros puros (Negro, Blanco, Gris) como únicos acompañantes permitidos fuera del grupo
-      // Beige, Camel, Crema NO son neutros válidos para monocromático
-      return c=>{
-        const strictNeutrals=['Negro','Blanco','Gris claro','Gris','Gris oscuro','Gris perla'];
-        // Si ambos son neutros estrictos: ok
-        if(strictNeutrals.includes(baseColor.name)&&strictNeutrals.includes(c.name)) return true;
-        // Si el acompañante es neutro estricto: siempre ok
-        if(strictNeutrals.includes(c.name)) return true;
-        // Si la base es neutro estricto: acepta del grupo mono o neutros
-        if(strictNeutrals.includes(baseColor.name)) return monoCompatible(baseColor.name,c.name);
-        // Caso general: mismo grupo monocromático obligatorio
-        return monoCompatible(baseColor.name, c.name);
-      };
+    case 'monocromatico': {
+      // max_familias_color = 1, neutros puros permitidos, estampados prohibidos
+      if(c1Neutral && c2Neutral) return 85; // neutros entre sí: muy bien
+      if(c2Neutral) return 80;              // neutro puro acompaña siempre
+      if(!f1 || !f2) return 0;
+      if(f1 === f2) return 100;             // misma familia: perfecto
+      // Mismo grupo monocromático (MONO_GROUPS)
+      const mg1 = getMonoGroup(c1.name);
+      const mg2 = getMonoGroup(c2.name);
+      if(mg1 && mg2 && mg1.some(c=>mg2.includes(c))) return 95;
+      return 0; // diferente familia: no permitido
+    }
 
-    case 'neutro_acento':
-      // Base neutra + UN acento. Si base es neutra, permite neutros y UN acento
-      if(isNeutral(baseColor)) return c=>isNeutral(c)||c.cat==='accent'||c.cat==='earth';
-      // Si base es acento, el resto debe ser neutro
-      return c=>isNeutral(c);
+    case 'neutro_acento': {
+      // min_neutros=2, max_acentos=1
+      if(c1ExtNeutral && c2ExtNeutral) return 90; // dos neutros: excelente base
+      if(c1ExtNeutral && !c2ExtNeutral) return 85; // neutro + acento: correcto
+      if(!c1ExtNeutral && c2ExtNeutral) return 85;
+      if(!c1ExtNeutral && !c2ExtNeutral) return 10; // dos acentos: mal
+      return 60;
+    }
 
-    case 'analogo':
-      // Colores vecinos (±50°) + neutros siempre
-      return c=>{
-        if(isNeutral(c)) return true;
-        if(isNeutral(baseColor)) return true;
-        const d=Math.abs(c.hue-baseColor.hue);
-        return Math.min(d,360-d)<=55;
-      };
+    case 'analogo': {
+      // colores vecinos en rueda ±1 familia
+      if(c2Neutral) return 75;
+      if(c1Neutral) return 75;
+      if(!f1 || !f2) return 40;
+      if(f1 === f2) return 100;
+      const neighbors = ANALOG_NEIGHBORS[f1] || [];
+      if(neighbors.includes(f2)) return 88;
+      // Verificar por hue también
+      const hueDiff = Math.abs(c1.hue - c2.hue);
+      const minDiff = Math.min(hueDiff, 360-hueDiff);
+      if(minDiff <= 55) return 80;
+      if(minDiff <= 80) return 50;
+      return 15;
+    }
 
-    case 'complementario':
-      // Opuesto apagado (±45° del complementario) + neutros
-      return c=>{
-        if(isNeutral(c)) return true;
-        if(isNeutral(baseColor)) return true;
-        const comp=(baseColor.hue+180)%360;
-        const d=Math.abs(c.hue-comp);
-        return Math.min(d,360-d)<=45;
-      };
+    case 'complementario': {
+      // 1 dominante + opuesto suavizado, resto neutros
+      if(c2Neutral) return 80;
+      if(c1Neutral) return 80;
+      const hueDiff = Math.abs(c1.hue - c2.hue);
+      const minDiff = Math.min(hueDiff, 360-hueDiff);
+      if(minDiff >= 150 && minDiff <= 210) return 95; // complementario real
+      if(minDiff >= 120 && minDiff <= 240) return 70; // near-complementario
+      if(f1 === f2) return 20; // misma familia en complementario: no
+      return 30;
+    }
 
-    case 'tonal':
-      // Familia tierra: earth + neutral
-      return c=>['neutral','earth'].includes(c.cat);
+    case 'triadico': {
+      // 3 familias a ~120° de distancia
+      if(c2Neutral) return 75;
+      if(c1Neutral) return 75;
+      const hueDiff = Math.abs(c1.hue - c2.hue);
+      const minDiff = Math.min(hueDiff, 360-hueDiff);
+      if(minDiff >= 100 && minDiff <= 140) return 90; // triádico real
+      if(minDiff >= 80 && minDiff <= 160) return 70;
+      if(f1 === f2) return 30;
+      return 40;
+    }
 
-    case 'neutro_oscuro':
-      return c=>isNeutral(c);
+    case 'tonal': {
+      // Solo paleta tierra curada
+      const c1Tonal = TONAL_TIERRA.has(c1.name);
+      const c2Tonal = TONAL_TIERRA.has(c2.name);
+      if(c1Tonal && c2Tonal) return 100;
+      if(c2Tonal) return 85;
+      if(c2Neutral) return 70;
+      return 5;
+    }
 
-    case 'triadico':
-      // Tres colores a 120° entre sí + neutros
-      return c=>{
-        if(isNeutral(c)) return true;
-        if(isNeutral(baseColor)) return true;
-        const t1=(baseColor.hue+120)%360;
-        const t2=(baseColor.hue+240)%360;
-        const d1=Math.abs(c.hue-t1); const d2=Math.abs(c.hue-t2);
-        return Math.min(d1,360-d1)<=40||Math.min(d2,360-d2)<=40;
-      };
+    case 'clasicos': {
+      // Catálogo de combinaciones aprobadas
+      if(classicCompatible(c1.name, c2.name)) return 100;
+      if(c2Neutral && c1ExtNeutral) return 85;
+      if(c2Neutral) return 75;
+      return 20;
+    }
 
-    case 'clasicos':
-      // Combinaciones predefinidas que siempre funcionan
-      return c=>{
-        if(isNeutral(c)) return true;
-        return classicCompatible(baseColor.name, c.name);
-      };
-
-    default: return ()=>true;
+    default: return 60;
   }
 }
 
-function pickCompatible(arr, baseColor, schemeKey, excl=[], currentPieces=[]){
+// =============================================
+// SCORE TOTAL DE UN OUTFIT
+// Pesos: esquema 40% + ocasión 25% + clima 15% + equilibrio 10% + textura 10%
+// =============================================
+function scoreOutfit(pieces, schemeKey, occLabel, tempCatVal){
+  if(pieces.length < 2) return 0;
+
+  // 1. Score de esquema (40%) — promedio de pares de colores
+  let schemeScore = 0;
+  let pairs = 0;
+  for(let i=0; i<pieces.length; i++){
+    for(let j=i+1; j<pieces.length; j++){
+      schemeScore += scoreColorPair(pieces[i].colorPrimary, pieces[j].colorPrimary, schemeKey);
+      pairs++;
+    }
+  }
+  schemeScore = pairs > 0 ? schemeScore/pairs : 0;
+
+  // 2. Score de estampados — penalizar si hay más de 1
+  const patternCount = pieces.filter(p=>isPattern(p)).length;
+  const patternPenalty = patternCount > 1 ? -40 * (patternCount-1) : 0;
+
+  // 3. Score de ocasión (25%) — ya filtrado antes, pero penalizar si hay mezcla rara
+  const occScore = pieces.every(p=>{
+    const occ = p.occasions||[];
+    return occ.includes(occLabel) || (occLabel==='Trabajo'&&occ.includes('Evento formal')) || (occLabel==='Evento formal'&&occ.includes('Trabajo'));
+  }) ? 100 : 60;
+
+  // 4. Score de clima (15%) — prendas de abrigo en clima frío, sin en calor
+  let climaScore = 100;
+  const hasOuter = pieces.some(p=>p.cat==='outer');
+  if((tempCatVal==='muyfrio'||tempCatVal==='frio') && !hasOuter) climaScore = 60;
+  if((tempCatVal==='calido'||tempCatVal==='muycalido') && hasOuter) climaScore = 50;
+
+  // 5. Score de equilibrio visual (10%) — premiar variedad de luminosidad
+  const darkCount = pieces.filter(p=>p.colorPrimary.dark).length;
+  const lightCount = pieces.length - darkCount;
+  const balanceScore = (darkCount>0 && lightCount>0) ? 100 : 60;
+
+  // 6. Score de textura (10%) — premiar variedad (liso+estampado está ok si es 1)
+  const textureScore = patternCount === 1 ? 95 : patternCount === 0 ? 80 : 40;
+
+  const total = (schemeScore*0.40) + (occScore*0.25) + (climaScore*0.15) + (balanceScore*0.10) + (textureScore*0.10) + patternPenalty;
+  return Math.max(0, Math.min(100, total));
+}
+
+// =============================================
+// PICK CON SCORING
+// =============================================
+function pickBestCompatible(arr, baseColor, schemeKey, excl=[], currentPieces=[], strict=true){
   const alreadyHasPattern = hasPattern(currentPieces);
   const isMono = schemeKey==='monocromatico';
-  const rule = getCompatibleColors(baseColor, schemeKey);
 
   let available = arr.filter(g=>!excl.includes(g.id));
   if(!available.length) return null;
 
-  // REGLA 1: monocromático — solo prendas lisas
+  // REGLA ESTAMPADOS: mono=0 estampados, resto max 1
   if(isMono){
-    const lisas=available.filter(g=>!isPattern(g));
-    if(lisas.length) available=lisas;
+    const lisas = available.filter(g=>!isPattern(g));
+    if(lisas.length) available = lisas;
+    else if(strict) return null;
+  } else if(alreadyHasPattern){
+    const noPattern = available.filter(g=>!isPattern(g));
+    if(noPattern.length) available = noPattern;
   }
 
-  // REGLA 2: máximo 1 estampado por look
-  if(alreadyHasPattern){
-    const noPattern=available.filter(g=>!isPattern(g));
-    if(noPattern.length) available=noPattern;
+  // Calcular score para cada candidato
+  const scored = available.map(g=>{
+    const s = scoreColorPair(baseColor, g.colorPrimary, schemeKey);
+    return { g, score: s };
+  });
+
+  // Ordenar por score desc, luego por menor uso
+  scored.sort((a,b)=> b.score-a.score || a.g.usageCount-b.g.usageCount);
+
+  // En modo estricto, no aceptar score 0
+  if(strict){
+    const best = scored.find(x=>x.score>0);
+    return best ? best.g : null;
   }
 
-  // REGLA 3: si hay estampado en la base, priorizar sus colores
-  // (esto se maneja a través del color asignado a la prenda estampada)
-
-  // 1° prioridad: color compatible con el esquema
-  const byScheme=available.filter(g=>rule(g.colorPrimary));
-  if(byScheme.length) return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
-
-  // 2° fallback: neutros (siempre combinan)
-  const neutrals=available.filter(g=>isNeutral(g.colorPrimary));
-  if(neutrals.length) return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
-
-  // 3° último recurso solo si NO es monocromático — en mono es mejor no agregar
-  // una pieza incompatible que arruinar el esquema
-  if(schemeKey==='monocromatico') return null;
-  return available.sort((a,b)=>a.usageCount-b.usageCount)[0];
+  return scored[0]?.g || null;
 }
 
 function generateOutfits(){
-  const temp=parseInt(document.getElementById('temp-slider').value);
-  const occ=document.getElementById('outfit-occasion').value;
-  const occLabel=OCC_MAP[occ];
-  const season=getSeason(temp);
-  const cat=tempCat(temp);
-  const schemeKey=document.getElementById('outfit-scheme').value;
-  const schemeNames={neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',neutro_oscuro:'Neutros elegantes',tonal:'Tonal tierra',complementario:'Complementario',triadico:'Triádico',clasicos:'Clásicos infalibles'};
-  const scheme={key:schemeKey,name:schemeNames[schemeKey]||schemeKey};
+  const temp = parseInt(document.getElementById('temp-slider').value);
+  const occ = document.getElementById('outfit-occasion').value;
+  const occLabel = OCC_MAP[occ];
+  const season = getSeason(temp);
+  const cat = tempCat(temp);
+  const schemeKey = document.getElementById('outfit-scheme').value;
+  const schemeNames = {
+    neutro_acento:'Neutros + acento', analogo:'Análogo', monocromatico:'Monocromático',
+    neutro_oscuro:'Neutros elegantes', tonal:'Tonal tierra', complementario:'Complementario',
+    triadico:'Triádico', clasicos:'Clásicos infalibles'
+  };
+  const scheme = {key:schemeKey, name:schemeNames[schemeKey]||schemeKey};
 
   if(garments.length<2){
     document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">👗</div><p>Necesitás al menos 2 prendas registradas.</p></div>';
     return;
   }
 
-  function get(role){let r=getByRole(role,season,occLabel,true);if(!r.length)r=getByRole(role,season,occLabel,false);return r;}
-
-  const tops=get('top');
-  const bottoms=get('bottom');
-  const dresses=get('dress');
-  const outers=(cat!=='calido'&&cat!=='muycalido')?get('outer'):[];
-  const shoes=get('shoes');
-  const bags=get('bag');
-
-  const outfits=[];const usedKeys=new Set();
-
-  for(let i=0;i<3;i++){
-    let pieces=[];let baseColor=null;
-    const excl=outfits.flatMap(o=>o.pieces.map(p=>p.id));
-
-    // Monocromático y clásicos: forzar base lisa
-    const forceSmooth = scheme.key==='monocromatico'||scheme.key==='clasicos';
-
-    if(dresses.length&&(i===1||Math.random()>0.55)){
-      const dressCandidates=forceSmooth?dresses.filter(g=>!isPattern(g)):dresses;
-      const pool=dressCandidates.length?dressCandidates:dresses;
-      const d=pickLeast(pool,excl);
-      if(d){
-        baseColor=d.colorPrimary;pieces=[d];
-        if(outers.length){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
-        if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
-        if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
-      }
+  // Filtrar por ocasión ESTRICTO — no usar fallback para ocasión
+  function getStrict(role){
+    // Primero: temporada + ocasión estrictos
+    let r = garments.filter(g=>{
+      if(g.cat!==role) return false;
+      const sAll = g.seasons.includes('Todo')||g.seasons.includes('Todo el año');
+      if(!sAll&&!g.seasons.includes(season)) return false;
+      return occasionCompatible(g.occasions||[], occLabel);
+    });
+    // Fallback solo de temporada (no de ocasión)
+    if(!r.length){
+      r = garments.filter(g=>{
+        if(g.cat!==role) return false;
+        return occasionCompatible(g.occasions||[], occLabel);
+      });
     }
+    return r;
+  }
 
-    if(pieces.length<2&&tops.length&&bottoms.length){
-      // Para mono y clásicos: base lisa primero
-      const topCandidates=forceSmooth
-        ?tops.filter(g=>!isPattern(g)&&!excl.includes(g.id))
-        :tops.filter(g=>!excl.includes(g.id));
-      const topPool=topCandidates.length?topCandidates:tops.filter(g=>!excl.includes(g.id));
+  const tops    = getStrict('top');
+  const bottoms = getStrict('bottom');
+  const dresses = getStrict('dress');
+  const outers  = (cat!=='calido'&&cat!=='muycalido') ? getStrict('outer') : [];
+  const shoes   = getStrict('shoes');
+  const bags    = getStrict('bag');
 
-      // En monocromático: probar cada top hasta encontrar uno que tenga bottom compatible
-      // Si ningún top tiene bottom compatible, no armar el look (mejor ninguno que uno mal etiquetado)
-      let top=null, bot=null;
-      const isMono=scheme.key==='monocromatico';
-      const sortedTops=topPool.sort((a,b)=>a.usageCount-b.usageCount);
+  // Generar candidatos: top+bottom o dress
+  // Para monocromático y clásicos: solo prendas lisas como base
+  const forceSmooth = schemeKey==='monocromatico'||schemeKey==='clasicos';
 
-      if(isMono){
-        // En monocromático: ordenar tops por cuántos bottoms compatibles tienen
-        // Prioridad: más pares disponibles primero, luego menor uso
-        const topsWithScore=sortedTops.map(t=>({
-          top:t,
-          score:bottoms.filter(b=>!excl.includes(b.id)&&pickCompatible([b],t.colorPrimary,scheme.key,[],[t])!==null).length
-        }));
-        topsWithScore.sort((a,b)=>b.score-a.score||a.top.usageCount-b.top.usageCount);
-        for(const {top:candidate} of topsWithScore){
-          if(candidate.score===0) break; // ningún bottom compatible, no tiene sentido seguir
-          const testBot=pickCompatible(bottoms,candidate.colorPrimary,scheme.key,[candidate.id,...excl],[candidate]);
-          if(testBot){top=candidate;bot=testBot;break;}
-        }
-      } else {
-        top=sortedTops[0];
-        if(top) bot=pickCompatible(bottoms,top.colorPrimary,scheme.key,[top.id,...excl],[top]);
-      }
+  // Armar pool de combos posibles con score
+  const combos = [];
 
-      if(top&&bot){
-        baseColor=top.colorPrimary;
-        pieces=[top,bot];
-        if(outers.length&&!pieces.find(p=>p.cat==='outer')){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
-        if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
-        if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
-      }
-    }
-
-    if(pieces.length>=2){
-      const key=pieces.map(p=>p.id).sort().join('-');
-      if(!usedKeys.has(key)){usedKeys.add(key);outfits.push({pieces,scheme});}
+  // Combos dress-based
+  const dressPool = forceSmooth ? dresses.filter(g=>!isPattern(g)) : dresses;
+  for(const d of dressPool){
+    const pieces = [d];
+    if(outers.length){ const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true); if(o) pieces.push(o); }
+    if(shoes.length){  const s=pickBestCompatible(shoes, d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(s) pieces.push(s); }
+    if(bags.length){   const b=pickBestCompatible(bags,  d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(b) pieces.push(b); }
+    if(pieces.length>=1){
+      const sc = scoreOutfit(pieces,schemeKey,occLabel,cat);
+      combos.push({pieces:[...pieces],score:sc,scheme});
     }
   }
 
-  if(!outfits.length){
-    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles. Intentá con otro esquema de color u ocasión, o agregá más prendas.</p></div>';
+  // Combos top+bottom
+  const topPool = forceSmooth ? tops.filter(g=>!isPattern(g)) : tops;
+  for(const top of topPool){
+    const bot = pickBestCompatible(bottoms, top.colorPrimary, schemeKey, [top.id], [top], true);
+    if(!bot) continue;
+    const pieces = [top, bot];
+    if(outers.length){ const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true); if(o&&o.cat==='outer') pieces.push(o); }
+    if(shoes.length){  const s=pickBestCompatible(shoes, top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(s) pieces.push(s); }
+    if(bags.length){   const b=pickBestCompatible(bags,  top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(b) pieces.push(b); }
+    const sc = scoreOutfit(pieces,schemeKey,occLabel,cat);
+    combos.push({pieces:[...pieces],score:sc,scheme});
+  }
+
+  if(!combos.length){
+    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles para esta ocasión y esquema. Intentá cambiar el esquema o agregá más prendas.</p></div>';
     return;
   }
 
-  document.getElementById('outfit-result').innerHTML=outfits.map((o,i)=>{
+  // Ordenar por score y tomar top 3 sin repetir piezas principales
+  combos.sort((a,b)=>b.score-a.score);
+  const chosen = [];
+  const usedMains = new Set(); // ids de tops/bottoms/dresses ya usados
+
+  for(const combo of combos){
+    if(chosen.length>=3) break;
+    const mainPieces = combo.pieces.filter(p=>['top','bottom','dress'].includes(p.cat));
+    const mainKey = mainPieces.map(p=>p.id).sort().join('-');
+    if(usedMains.has(mainKey)) continue;
+    usedMains.add(mainKey);
+    chosen.push(combo);
+  }
+
+  if(!chosen.length){
+    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles. Intentá con otro esquema u ocasión.</p></div>';
+    return;
+  }
+
+  document.getElementById('outfit-result').innerHTML=chosen.map((o,i)=>{
     const colors=o.pieces.map(p=>p.colorPrimary).filter((c,idx,arr)=>arr.findIndex(x=>x.hex===c.hex)===idx);
+    const scoreBar = Math.round(o.score);
     return`<div class="outfit-card">
       <div class="outfit-header">
-        <div><div class="outfit-number">Look ${i+1} · ${temp}°C</div><div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">${occLabel}</div></div>
-        <span class="outfit-scheme-label">${o.scheme.name}</span>
+        <div>
+          <div class="outfit-number">Look ${i+1} · ${temp}°C</div>
+          <div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">${occLabel}</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="outfit-scheme-label">${o.scheme.name}</span>
+          <div style="font-size:0.65rem;color:var(--mocha);margin-top:3px;">score ${scoreBar}/100</div>
+        </div>
       </div>
       <div class="color-harmony-row">
         ${colors.map(c=>`<div class="harmony-swatch" style="background:${c.hex}" title="${c.name}"></div>`).join('')}
