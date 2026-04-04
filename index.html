@@ -1284,12 +1284,20 @@ function generateOutfits(){
   // Combos top+bottom
   const topPool = forceSmooth ? tops.filter(g=>!isPattern(g)) : tops;
   for(const top of topPool){
-    const bot = pickBestCompatible(bottoms, top.colorPrimary, schemeKey, [top.id], [top], true);
+    // Si el top es estampado, forzar bottom liso — regla dura
+    const bottomPool = isPattern(top)
+      ? bottoms.filter(g=>!isPattern(g))
+      : bottoms;
+    if(!bottomPool.length && isPattern(top)) continue;
+    const bot = pickBestCompatible(bottomPool, top.colorPrimary, schemeKey, [top.id], [top], true);
     if(!bot) continue;
     const pieces = [top, bot];
     if(outers.length){ const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true); if(o&&o.cat==='outer') pieces.push(o); }
     if(shoes.length){  const s=pickBestCompatible(shoes, top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(s) pieces.push(s); }
     if(bags.length){   const b=pickBestCompatible(bags,  top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(b) pieces.push(b); }
+    // Rechazar combo si tiene 2+ estampados — regla dura final
+    const patternPieces = pieces.filter(p=>isPattern(p));
+    if(patternPieces.length > 1) continue;
     const sc = scoreOutfit(pieces,schemeKey,occLabel,cat);
     combos.push({pieces:[...pieces],score:sc,scheme});
   }
@@ -1302,14 +1310,21 @@ function generateOutfits(){
   // Ordenar por score y tomar top 3 sin repetir piezas principales
   combos.sort((a,b)=>b.score-a.score);
   const chosen = [];
-  const usedMains = new Set(); // ids de tops/bottoms/dresses ya usados
+  const usedMains = new Set();
+  const usedIds = new Set(); // ids de cualquier prenda ya usada en looks elegidos
 
   for(const combo of combos){
     if(chosen.length>=3) break;
     const mainPieces = combo.pieces.filter(p=>['top','bottom','dress'].includes(p.cat));
     const mainKey = mainPieces.map(p=>p.id).sort().join('-');
     if(usedMains.has(mainKey)) continue;
+    // Para el 2° y 3° look, al menos el top debe ser diferente
+    if(chosen.length > 0){
+      const topId = mainPieces.find(p=>p.cat==='top'||p.cat==='dress')?.id;
+      if(topId && usedIds.has(topId)) continue;
+    }
     usedMains.add(mainKey);
+    combo.pieces.forEach(p=>usedIds.add(p.id));
     chosen.push(combo);
   }
 
