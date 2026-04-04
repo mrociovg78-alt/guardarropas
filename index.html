@@ -113,13 +113,42 @@
   .piece-label { font-size: 0.66rem; text-align: center; color: var(--mocha); font-weight: 500; }
   .outfit-tip { font-size: 0.8rem; color: var(--mocha); font-style: italic; padding: 0.7rem 0.9rem; background: var(--cream); border-radius: 6px; border-left: 3px solid var(--gold); margin-bottom: 0.75rem; }
 
-  /* AVATAR */
+  /* AVATAR / COLLAGE */
   .avatar-toggle { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
   .avatar-toggle button { padding: 0.3rem 0.8rem; border-radius: 12px; border: 1px solid var(--border); background: var(--cream); color: var(--mocha); font-size: 0.72rem; cursor: pointer; font-family: 'DM Sans',sans-serif; }
   .avatar-toggle button.active { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
-  .avatar-wrap { position: relative; width: 160px; height: 400px; margin: 0 auto; }
-  .avatar-clothes { position: absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
-  .avatar-silhouette { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; z-index:3; mix-blend-mode:multiply; pointer-events:none; }
+
+  /* COLLAGE BOARD */
+  .collage-board {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #EEEAE4;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  .collage-piece {
+    position: absolute;
+    overflow: visible;
+  }
+  .collage-piece img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+  }
+  .collage-label {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.58rem;
+    color: var(--mocha);
+    white-space: nowrap;
+    font-weight: 500;
+  }
   .color-harmony-row { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.75rem; }
   .harmony-swatch { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.08); flex-shrink: 0; }
   .harmony-label { font-size: 0.7rem; color: var(--mocha); }
@@ -871,6 +900,9 @@ function editGarment(id,e){
     const prev=document.getElementById('upload-preview');
     prev.src=g.photo; prev.style.display='block';
     if(getApiKey()) document.getElementById('ai-analyze-btn').classList.add('visible');
+  } else {
+    document.getElementById('upload-placeholder').style.display='flex';
+    document.getElementById('upload-preview').style.display='none';
   }
 
   // Categoría y tipo
@@ -1410,8 +1442,8 @@ function generateOutfits(){
         <span class="harmony-label">${o.scheme.name.toLowerCase()}</span>
       </div>
       <div class="avatar-toggle">
-        <button class="active" onclick="toggleView('prendas','${uid}',this)">Prendas</button>
-        <button onclick="toggleView('avatar','${uid}',this)">Avatar</button>
+        <button class="active" onclick="toggleSketch('foto','${uid}',this)">Prendas</button>
+        <button onclick="showCollage('${uid}',this)">Collage</button>
       </div>
       <div id="view-prendas-${uid}">
         <div class="avatar-toggle" style="margin-bottom:0.6rem;">
@@ -1444,11 +1476,8 @@ function generateOutfits(){
           </div>
         </div>
       </div>
-      <div id="view-avatar-${uid}" style="display:none;">
-        <div class="avatar-wrap">
-          <svg class="avatar-clothes" id="svg-${uid}" viewBox="0 0 160 400" xmlns="http://www.w3.org/2000/svg"></svg>
-          <img class="avatar-silhouette" src="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-04%20at%2016.03.18.jpeg" alt="silueta" crossorigin="anonymous"/>
-        </div>
+      <div id="view-collage-${uid}" style="display:none;">
+        <div class="collage-board" id="collage-board-${uid}"></div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
       <button class="btn-use" onclick="useOutfit(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
@@ -1464,11 +1493,94 @@ function generateOutfits(){
 
 function toggleSketch(view, uid, btn){
   const fotos = document.getElementById(`sketch-fotos-${uid}`);
-  const sketches = document.getElementById(`sketch-view-${uid}`);
+  const collage = document.getElementById(`view-collage-${uid}`);
   btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  if(view==='foto'){ fotos.style.display='block'; sketches.style.display='none'; }
-  else { fotos.style.display='none'; sketches.style.display='block'; }
+  fotos.style.display = 'block';
+  if(collage) collage.style.display = 'none';
+}
+
+function showCollage(uid, btn){
+  const fotos = document.getElementById(`sketch-fotos-${uid}`);
+  const collage = document.getElementById(`view-collage-${uid}`);
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(fotos) fotos.style.display = 'none';
+  if(collage){
+    collage.style.display = 'block';
+    const board = document.getElementById(`collage-board-${uid}`);
+    if(board && !board.innerHTML.trim()){
+      // Buscar piezas del outfit en el DOM
+      const card = btn.closest('.outfit-card');
+      const pieces = [];
+      card.querySelectorAll('.outfit-piece').forEach(p=>{
+        const img = p.querySelector('img');
+        const label = p.querySelector('.piece-label')?.textContent||'';
+        const strip = p.querySelector('.piece-color-strip');
+        const color = strip ? strip.style.background : '#aaa';
+        const photo = img ? img.src : null;
+        const cat = getCatFromLabel(label);
+        pieces.push({photo, label, color, cat});
+      });
+      renderCollage(board, pieces);
+    }
+  }
+}
+
+function getCatFromLabel(label){
+  const l = label.toLowerCase();
+  if(['blazer','saco','chaqueta','campera','parka','tapado','trench','piloto','poncho','sobretodo'].some(k=>l.includes(k))) return 'outer';
+  if(['vestido','mono','jardinero','body'].some(k=>l.includes(k))) return 'dress';
+  if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k))) return 'bottom';
+  if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k))) return 'shoes';
+  if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k))) return 'bag';
+  if(['gafas','lentes','anteojos','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k))) return 'acc';
+  return 'top';
+}
+
+function renderCollage(board, pieces){
+  const W = board.offsetWidth || 260;
+  const H = board.offsetHeight || 346;
+
+  // Layouts predefinidos por combinación de categorías
+  // Posiciones relativas (% del ancho/alto del board)
+  const layouts = {
+    // top + bottom + shoes + bag
+    default: [
+      {cat:'outer',  x:0.02, y:0.02, w:0.52, h:0.48, rot:-3},
+      {cat:'top',    x:0.40, y:0.00, w:0.46, h:0.40, rot:3},
+      {cat:'dress',  x:0.12, y:0.02, w:0.55, h:0.62, rot:1},
+      {cat:'bottom', x:0.22, y:0.38, w:0.52, h:0.58, rot:1.5},
+      {cat:'shoes',  x:0.02, y:0.72, w:0.55, h:0.26, rot:-2},
+      {cat:'bag',    x:0.65, y:0.52, w:0.32, h:0.30, rot:4},
+      {cat:'acc',    x:0.62, y:0.03, w:0.34, h:0.22, rot:5},
+    ]
+  };
+
+  const template = layouts.default;
+  let html = '';
+
+  // Asignar cada pieza a su slot
+  pieces.forEach(p=>{
+    const slot = template.find(s=>s.cat===p.cat);
+    if(!slot) return;
+    const x = Math.round(slot.x * W);
+    const y = Math.round(slot.y * H);
+    const w = Math.round(slot.w * W);
+    const h = Math.round(slot.h * H);
+    const rot = slot.rot || 0;
+    const zMap = {outer:3, top:2, dress:2, bottom:1, shoes:4, bag:4, acc:5};
+    const z = zMap[p.cat]||1;
+
+    if(p.photo){
+      html += `<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg);z-index:${z};">
+        <img src="${p.photo}" alt="${p.label}"/>
+        <span class="collage-label">${p.label}</span>
+      </div>`;
+    }
+  });
+
+  board.innerHTML = html;
 }
 
 function toggleView(view, uid, btn){
