@@ -370,6 +370,14 @@
     </div>
 
     <div class="form-group">
+      <label>Textura *</label>
+      <div class="checkbox-group" id="texture-group">
+        <span class="checkbox-pill selected" onclick="selectTexture(this,'liso')">Liso</span>
+        <span class="checkbox-pill" onclick="selectTexture(this,'estampado')">Estampado</span>
+      </div>
+    </div>
+
+    <div class="form-group">
       <label>Notas <span style="font-weight:300;opacity:0.6;">(opcional)</span></label>
       <textarea id="f-notes" placeholder="Ej: talle M, combina con el pantalón beige, solo para verano..."></textarea>
     </div>
@@ -594,6 +602,16 @@ function selectColorByName(pickerId, name){
 
 function togglePill(el){el.classList.toggle('selected');}
 
+function selectTexture(el, val){
+  document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function getTexture(){
+  const sel = document.querySelector('#texture-group .checkbox-pill.selected');
+  return sel ? sel.textContent.trim().toLowerCase() : 'liso';
+}
+
 function openAddModal(){resetForm();document.getElementById('modal-overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(){
   document.getElementById('modal-overlay').classList.remove('open');
@@ -620,6 +638,7 @@ function resetForm(){
   renderColorPickers();
   document.querySelectorAll('#season-group .checkbox-pill').forEach((p,i)=>p.classList.toggle('selected',i===4));
   document.querySelectorAll('#occasion-group .checkbox-pill').forEach((p,i)=>p.classList.toggle('selected',i===1));
+  document.querySelectorAll('#texture-group .checkbox-pill').forEach((p,i)=>p.classList.toggle('selected',i===0));
   document.querySelectorAll('.ai-filled').forEach(el=>el.classList.remove('ai-filled'));
 }
 
@@ -732,6 +751,16 @@ function applyAIResult(r){
       p.classList.toggle('selected',r.temporada.includes(t)||r.temporada.includes('Todo'));
     });
   }
+  // Textura desde IA — detectar si el material sugiere estampado
+  if(r.material){
+    const matLower = (r.material||'').toLowerCase();
+    const patternMats = ['estampado','flores','floral','rayas','lunares','cuadros','animal'];
+    const isPatternMat = patternMats.some(w=>matLower.includes(w));
+    document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{
+      const val = p.textContent.trim().toLowerCase();
+      p.classList.toggle('selected', isPatternMat ? val==='estampado' : val==='liso');
+    });
+  }
   if(r.notas){
     const n=document.getElementById('f-notes');
     n.value=r.notas;n.classList.add('ai-filled');
@@ -756,6 +785,7 @@ function saveGarment(){
         ...existing, cat, type,
         style:document.getElementById('f-style').value,
         material:document.getElementById('f-material').value,
+        texture:getTexture(),
         colorPrimary:selectedColorPrimary,
         colorSecondary:selectedColorSecondary||null,
         seasons:seasons.length?seasons:['Todo'],
@@ -773,6 +803,7 @@ function saveGarment(){
       id:Date.now(),cat,type,
       style:document.getElementById('f-style').value,
       material:document.getElementById('f-material').value,
+      texture:getTexture(),
       colorPrimary:selectedColorPrimary,
       colorSecondary:selectedColorSecondary||null,
       seasons:seasons.length?seasons:['Todo'],
@@ -868,6 +899,11 @@ function editGarment(id,e){
     p.classList.toggle('selected', (g.occasions||[]).includes(p.textContent.trim()));
   });
 
+  // Textura
+  document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{
+    const val = p.textContent.trim().toLowerCase();
+    p.classList.toggle('selected', (g.texture||'liso')===val);
+  });
   // Notas
   document.getElementById('f-notes').value=g.notes||'';
 
@@ -959,7 +995,28 @@ function pickLeast(arr,excl=[]){
 // REGLAS DE MODA
 // =============================================
 function isPattern(g){
-  const patternWords = ['estampado','estampada','lunares','cuadrillé','cuadrille','cuadros','rayas','flores','floral','animal print','animalprint','leopardo','cebra','serpiente','snake','tartán','tartan','pata de gallo','tweed','tie dye','tiedye','geométrico','geometrico','abstracto','tropical'];
+  // Campo explícito tiene prioridad absoluta
+  if(g.texture === 'estampado') return true;
+  if(g.texture === 'liso') return false;
+  // Fallback: buscar en notas/material para prendas cargadas antes del campo
+  const patternWords = [
+    'estampado','estampada','estampados',
+    'lunares','puntos',
+    'cuadrillé','cuadrille','cuadros','cuadrado','vichy','escocés','escoces',
+    'rayas','rayado','rayada','stripes',
+    'flores','floral','florido','florales',
+    'animal print','animalprint','leopardo','cebra','serpiente','snake','jaguar','tigre',
+    'tartán','tartan','escoces',
+    'pata de gallo','pata de gallina','houndstooth',
+    'tweed','principe de gales','príncipe de gales','glen plaid',
+    'tie dye','tiedye','batik',
+    'geométrico','geometrico','geométrica','geometrica',
+    'abstracto','abstracta',
+    'tropical','palmeras','camuflaje','camo',
+    'jacquard','broderie','encaje','brocado',
+    'paisley','damasco','argyle',
+    'a cuadros','de cuadros','de rayas','de lunares','de flores'
+  ];
   const mat = (g.material||'').toLowerCase();
   const notes = (g.notes||'').toLowerCase();
   const type = (g.type||'').toLowerCase();
@@ -1644,7 +1701,7 @@ function openDetail(id){
       <span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>
       ${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}
     </div>
-    ${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span></div>`:''}
+    ${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}
     <div class="detail-section">
       <div class="detail-section-title">Temporada</div>
       ${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}
