@@ -249,10 +249,16 @@
         <option value="sport">Sport / Fin de semana</option>
       </select>
     </div>
-    <div id="scheme-preview" class="scheme-badge" style="margin-top:0.75rem;">
-      <span class="scheme-dot"></span>
-      <span id="scheme-name">Neutros + acento</span>
-      <span style="opacity:0.5; font-size:0.68rem;">· esquema sugerido</span>
+    <div class="form-group" style="margin-top:0.75rem; margin-bottom:0;">
+      <label>Esquema de color <span id="scheme-suggested-label" style="font-weight:300;opacity:0.6;font-size:0.68rem;text-transform:none;letter-spacing:0;">· sugerido para esta ocasión</span></label>
+      <select id="outfit-scheme" onchange="onSchemeChange()">
+        <option value="neutro_acento">Neutros + acento</option>
+        <option value="analogo">Análogo</option>
+        <option value="monocromatico">Monocromático</option>
+        <option value="neutro_oscuro">Neutros elegantes</option>
+        <option value="tonal">Tonal tierra</option>
+        <option value="complementario">Complementario</option>
+      </select>
     </div>
     <button class="btn-accent" onclick="generateOutfits()" style="margin-top:0.85rem;">Generar outfits ✦</button>
   </div>
@@ -650,12 +656,19 @@ function updateTemp() {
 function updateSchemePreview() {
   const occ = document.getElementById('outfit-occasion') ? document.getElementById('outfit-occasion').value : 'casual';
   const scheme = SCHEME_BY_OCC[occ] || SCHEME_BY_OCC.casual;
-  const el = document.getElementById('scheme-name');
-  if (el) el.textContent = scheme.name;
+  const sel = document.getElementById('outfit-scheme');
+  if (sel) sel.value = scheme.key;
+  const lbl = document.getElementById('scheme-suggested-label');
+  if (lbl) lbl.textContent = '· sugerido para esta ocasión';
+}
+
+function onSchemeChange() {
+  const lbl = document.getElementById('scheme-suggested-label');
+  if (lbl) lbl.textContent = '· modificado por vos';
 }
 
 // =============================================
-// GENERAR OUTFITS — MOTOR DE COLOR
+// GENERAR OUTFITS — MOTOR DE COLOR FLEXIBLE
 // =============================================
 function tempCat(v) {
   if (v<=5) return 'muyfrio'; if (v<=12) return 'frio'; if (v<=18) return 'fresco';
@@ -666,11 +679,15 @@ function getSeason(t) {
 }
 const OCC_MAP = {trabajo:'Trabajo',casual:'Casual',salida:'Salida nocturna',evento:'Evento formal',sport:'Sport'};
 
-function garmentsByType(types, season, occLabel) {
+// Versión flexible: ignora filtro de temporada/ocasión si no hay suficientes prendas
+function garmentsByType(types, season, occLabel, strict=true) {
   return types.flatMap(t => garments.filter(g => {
     if (g.type !== t) return false;
-    if (!g.seasons.includes('Todo el año') && !g.seasons.includes(season)) return false;
-    return g.occasions.includes(occLabel) || g.occasions.includes('Casual');
+    if (strict) {
+      if (!g.seasons.includes('Todo el año') && !g.seasons.includes(season)) return false;
+      return g.occasions.includes(occLabel) || g.occasions.includes('Casual');
+    }
+    return true; // modo flexible: incluye todo
   }));
 }
 
@@ -680,15 +697,25 @@ function pickLeast(arr, excl=[]) {
   return av.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
+// Motor de color con fallback progresivo:
+// 1° intenta color compatible con el esquema
+// 2° si no hay, intenta con neutros
+// 3° si no hay, toma cualquier prenda disponible
 function pickCompatible(arr, baseColor, schemeKey, excl=[]) {
   const rule = getCompatibleColors(baseColor, schemeKey);
-  const compatible = arr.filter(g => !excl.includes(g.id) && rule(g.colorPrimary));
-  if (!compatible.length) {
-    // Fallback: cualquier prenda disponible
-    const fallback = arr.filter(g=>!excl.includes(g.id));
-    return fallback.sort((a,b)=>a.usageCount-b.usageCount)[0] || null;
-  }
-  return compatible.sort((a,b)=>a.usageCount-b.usageCount)[0];
+  const available = arr.filter(g=>!excl.includes(g.id));
+  if (!available.length) return null;
+
+  // 1° prioridad: color compatible con el esquema
+  const byScheme = available.filter(g => rule(g.colorPrimary));
+  if (byScheme.length) return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
+
+  // 2° prioridad: neutros (combinan con todo)
+  const neutrals = available.filter(g => g.colorPrimary.cat === 'neutral');
+  if (neutrals.length) return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
+
+  // 3° fallback: cualquier prenda disponible
+  return available.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
 function generateOutfits() {
@@ -697,21 +724,37 @@ function generateOutfits() {
   const occLabel = OCC_MAP[occ];
   const season = getSeason(temp);
   const cat = tempCat(temp);
-  const scheme = SCHEME_BY_OCC[occ];
 
-  if (garments.length < 3) {
-    document.getElementById('outfit-result').innerHTML = `<div class="empty-state"><div class="icon">👗</div><p>Necesitás al menos 3 prendas registradas para generar outfits.</p></div>`;
+  // Esquema: lo que eligió el usuario (o el sugerido)
+  const schemeKey = document.getElementById('outfit-scheme') ? document.getElementById('outfit-scheme').value : SCHEME_BY_OCC[occ].key;
+  const schemeObj = Object.values(SCHEME_BY_OCC).find(s=>s.key===schemeKey) || { name: schemeKey, key: schemeKey };
+  // Agregar complementario que no está en SCHEME_BY_OCC
+  const schemeNames = { neutro_acento:'Neutros + acento', analogo:'Análogo', monocromatico:'Monocromático', neutro_oscuro:'Neutros elegantes', tonal:'Tonal tierra', complementario:'Complementario' };
+  const scheme = { key: schemeKey, name: schemeNames[schemeKey] || schemeKey };
+
+  if (garments.length < 2) {
+    document.getElementById('outfit-result').innerHTML = `<div class="empty-state"><div class="icon">👗</div><p>Necesitás al menos 2 prendas registradas para generar outfits.</p></div>`;
     return;
   }
 
   const topTypes = (cat==='muyfrio'||cat==='frio') ? ['Camisa','Blazer'] :
                    (cat==='fresco') ? ['Remera','Camisa','Blazer'] : ['Remera','Camisa','Vestido'];
-  const tops    = garmentsByType(topTypes, season, occLabel);
-  const bottoms = garmentsByType(['Pantalón','Falda'], season, occLabel);
-  const dresses = garmentsByType(['Vestido'], season, occLabel);
-  const outers  = (cat!=='calido'&&cat!=='muycalido') ? garmentsByType(['Campera','Blazer'], season, occLabel) : [];
-  const shoes   = garmentsByType(['Zapatos','Zapatillas'], season, occLabel);
-  const bags    = garmentsByType(['Cartera'], season, occLabel);
+
+  // Primero intento estricto (temporada + ocasión)
+  let tops    = garmentsByType(topTypes, season, occLabel, true);
+  let bottoms = garmentsByType(['Pantalón','Falda'], season, occLabel, true);
+  let dresses = garmentsByType(['Vestido'], season, occLabel, true);
+  let outers  = (cat!=='calido'&&cat!=='muycalido') ? garmentsByType(['Campera','Blazer'], season, occLabel, true) : [];
+  let shoes   = garmentsByType(['Zapatos','Zapatillas'], season, occLabel, true);
+  let bags    = garmentsByType(['Cartera'], season, occLabel, true);
+
+  // Si no hay suficientes tops o bottoms, modo flexible (ignora temporada/ocasión)
+  if (tops.length === 0) tops = garmentsByType(topTypes, season, occLabel, false);
+  if (bottoms.length === 0) bottoms = garmentsByType(['Pantalón','Falda'], season, occLabel, false);
+  if (dresses.length === 0) dresses = garmentsByType(['Vestido'], season, occLabel, false);
+  if (outers.length === 0 && cat!=='calido'&&cat!=='muycalido') outers = garmentsByType(['Campera','Blazer'], season, occLabel, false);
+  if (shoes.length === 0) shoes = garmentsByType(['Zapatos','Zapatillas'], season, occLabel, false);
+  if (bags.length === 0) bags = garmentsByType(['Cartera'], season, occLabel, false);
 
   const outfits = [];
   const usedKeys = new Set();
@@ -720,47 +763,30 @@ function generateOutfits() {
     let pieces = [];
     let baseColor = null;
 
-    // Intentar vestido primero en look 2 o aleatoriamente
+    // Intentar vestido en look 2 o aleatoriamente
     if (dresses.length && (i===1 || Math.random()>0.6)) {
-      const dress = pickLeast(dresses, outfits.flatMap(o=>o.map(p=>p.id)));
+      const dress = pickLeast(dresses, outfits.flatMap(o=>o.pieces.map(p=>p.id)));
       if (dress) {
         baseColor = dress.colorPrimary;
         pieces = [dress];
-        if (outers.length) {
-          const o = pickCompatible(outers, baseColor, scheme.key, pieces.map(p=>p.id));
-          if (o) pieces.push(o);
-        }
-        if (shoes.length) {
-          const s = pickCompatible(shoes, baseColor, scheme.key, pieces.map(p=>p.id));
-          if (s) pieces.push(s);
-        }
-        if (bags.length) {
-          const b = pickCompatible(bags, baseColor, scheme.key, pieces.map(p=>p.id));
-          if (b) pieces.push(b);
-        }
+        if (outers.length) { const o = pickCompatible(outers, baseColor, scheme.key, pieces.map(p=>p.id)); if(o) pieces.push(o); }
+        if (shoes.length)  { const s = pickCompatible(shoes,  baseColor, scheme.key, pieces.map(p=>p.id)); if(s) pieces.push(s); }
+        if (bags.length)   { const b = pickCompatible(bags,   baseColor, scheme.key, pieces.map(p=>p.id)); if(b) pieces.push(b); }
       }
     }
 
     // Top + bottom
     if (pieces.length < 2 && tops.length && bottoms.length) {
-      const top = pickLeast(tops, outfits.flatMap(o=>o.map(p=>p.id)));
+      const excl = outfits.flatMap(o=>o.pieces.map(p=>p.id));
+      const top = pickLeast(tops, excl);
       if (top) {
         baseColor = top.colorPrimary;
-        const bot = pickCompatible(bottoms, baseColor, scheme.key, [top.id, ...outfits.flatMap(o=>o.map(p=>p.id))]);
+        const bot = pickCompatible(bottoms, baseColor, scheme.key, [top.id, ...excl]);
         if (bot) {
           pieces = [top, bot];
-          if (outers.length) {
-            const o = pickCompatible(outers, baseColor, scheme.key, pieces.map(p=>p.id));
-            if (o && o.id!==top.id) pieces.push(o);
-          }
-          if (shoes.length) {
-            const s = pickCompatible(shoes, baseColor, scheme.key, pieces.map(p=>p.id));
-            if (s) pieces.push(s);
-          }
-          if (bags.length) {
-            const b = pickCompatible(bags, baseColor, scheme.key, pieces.map(p=>p.id));
-            if (b) pieces.push(b);
-          }
+          if (outers.length) { const o = pickCompatible(outers, baseColor, scheme.key, pieces.map(p=>p.id)); if(o&&o.id!==top.id) pieces.push(o); }
+          if (shoes.length)  { const s = pickCompatible(shoes,  baseColor, scheme.key, pieces.map(p=>p.id)); if(s) pieces.push(s); }
+          if (bags.length)   { const b = pickCompatible(bags,   baseColor, scheme.key, pieces.map(p=>p.id)); if(b) pieces.push(b); }
         }
       }
     }
@@ -868,8 +894,8 @@ function showToast(msg) {
 
 // Actualizar preview de esquema al cambiar ocasión
 document.addEventListener('DOMContentLoaded', () => {
-  const sel = document.getElementById('outfit-occasion');
-  if (sel) sel.addEventListener('change', updateSchemePreview);
+  const occ = document.getElementById('outfit-occasion');
+  if (occ) occ.addEventListener('change', updateSchemePreview);
 });
 </script>
 </body>
