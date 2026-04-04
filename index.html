@@ -276,7 +276,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Categoría *</label>
-        <select id="f-category" onchange="updateTypeOptions()">
+        <select id="f-category" onchange="updateTypeOptions(); updateStyleOptions()">
           <option value="">Seleccioná</option>
           <option value="top">Parte superior</option>
           <option value="bottom">Parte inferior</option>
@@ -413,6 +413,16 @@ const SCHEME_TIPS = {
   complementario:'Colores complementarios: contraste máximo con impacto visual.',
 };
 
+const STYLES_BY_CAT = {
+  top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico'],
+  bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],
+  dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],
+  outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],
+  shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],
+  bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],
+  acc:[]
+};
+
 const CAT_EMOJI = {top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
 
 let garments=[], history=[], currentFilter='all';
@@ -460,6 +470,15 @@ function updateTypeOptions(selectedType=''){
   if(!cat){sel.innerHTML='<option value="">Primero categoría</option>';return;}
   const types=TYPES_BY_CAT[cat]||[];
   sel.innerHTML='<option value="">Seleccioná tipo</option>'+types.map(t=>`<option${t===selectedType?' selected':''}>${t}</option>`).join('');
+  updateStyleOptions();
+}
+
+function updateStyleOptions(selectedStyle=''){
+  const cat=document.getElementById('f-category').value;
+  const sel=document.getElementById('f-style');
+  const styles=STYLES_BY_CAT[cat]||[];
+  if(!styles.length){sel.innerHTML='<option value="">No aplica</option>';return;}
+  sel.innerHTML='<option value="">Seleccioná</option>'+styles.map(s=>`<option${s===selectedStyle?' selected':''}>${s}</option>`).join('');
 }
 
 function setFilter(f,el){
@@ -616,8 +635,8 @@ function applyAIResult(r){
     mat.classList.add('ai-filled');
   }
   if(r.estilo){
+    updateStyleOptions(r.estilo);
     const sty=document.getElementById('f-style');
-    [...sty.options].forEach(o=>{if(o.text===r.estilo)sty.value=o.text;});
     sty.classList.add('ai-filled');
   }
   if(r.color_nombre){
