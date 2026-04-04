@@ -112,6 +112,14 @@
   .piece-color-strip { width: 78px; height: 5px; border-radius: 3px; }
   .piece-label { font-size: 0.66rem; text-align: center; color: var(--mocha); font-weight: 500; }
   .outfit-tip { font-size: 0.8rem; color: var(--mocha); font-style: italic; padding: 0.7rem 0.9rem; background: var(--cream); border-radius: 6px; border-left: 3px solid var(--gold); margin-bottom: 0.75rem; }
+
+  /* AVATAR */
+  .avatar-toggle { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+  .avatar-toggle button { padding: 0.3rem 0.8rem; border-radius: 12px; border: 1px solid var(--border); background: var(--cream); color: var(--mocha); font-size: 0.72rem; cursor: pointer; font-family: 'DM Sans',sans-serif; }
+  .avatar-toggle button.active { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
+  .avatar-wrap { position: relative; width: 180px; height: 380px; margin: 0 auto; }
+  .avatar-clothes { position: absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
+  .avatar-silhouette { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; z-index:3; mix-blend-mode:multiply; pointer-events:none; filter: invert(1); }
   .color-harmony-row { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.75rem; }
   .harmony-swatch { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.08); flex-shrink: 0; }
   .harmony-label { font-size: 0.7rem; color: var(--mocha); }
@@ -1313,6 +1321,7 @@ function generateOutfits(){
   document.getElementById('outfit-result').innerHTML=chosen.map((o,i)=>{
     const colors=o.pieces.map(p=>p.colorPrimary).filter((c,idx,arr)=>arr.findIndex(x=>x.hex===c.hex)===idx);
     const scoreBar = Math.round(o.score);
+    const uid = `outfit-${i}-${Date.now()}`;
     return`<div class="outfit-card">
       <div class="outfit-header">
         <div>
@@ -1328,17 +1337,192 @@ function generateOutfits(){
         ${colors.map(c=>`<div class="harmony-swatch" style="background:${c.hex}" title="${c.name}"></div>`).join('')}
         <span class="harmony-label">${o.scheme.name.toLowerCase()}</span>
       </div>
-      <div class="outfit-pieces">
-        ${o.pieces.map(g=>`<div class="outfit-piece">
-          <div class="piece-img">${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div>
-          <div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div>
-          <div class="piece-label">${g.type}</div>
-        </div>`).join('')}
+      <div class="avatar-toggle">
+        <button class="active" onclick="toggleView('prendas','${uid}',this)">Prendas</button>
+        <button onclick="toggleView('avatar','${uid}',this)">Avatar</button>
+      </div>
+      <div id="view-prendas-${uid}">
+        <div class="outfit-pieces">
+          ${o.pieces.map(g=>`<div class="outfit-piece">
+            <div class="piece-img">${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div>
+            <div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div>
+            <div class="piece-label">${g.type}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div id="view-avatar-${uid}" style="display:none;">
+        <div class="avatar-wrap">
+          <svg class="avatar-clothes" id="svg-${uid}" viewBox="0 0 180 380" xmlns="http://www.w3.org/2000/svg"></svg>
+          <img class="avatar-silhouette" src="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-04%20at%2015.12.53.jpeg" alt="silueta" crossorigin="anonymous"/>
+        </div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
       <button class="btn-use" onclick="useOutfit(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
     </div>`;
   }).join('');
+
+  // Dibujar avatares
+  chosen.forEach((o,i)=>{
+    const uid = `outfit-${i}-${document.querySelector(`[id^="svg-outfit-${i}-"]`)?.id.split('-').slice(2).join('-') || ''}`;
+    const svgId = document.getElementById(`view-avatar-outfit-${i}`);
+  });
+}
+
+function toggleView(view, uid, btn){
+  const prendas = document.getElementById(`view-prendas-${uid}`);
+  const avatar = document.getElementById(`view-avatar-${uid}`);
+  const btns = btn.parentElement.querySelectorAll('button');
+  btns.forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(view==='prendas'){
+    prendas.style.display='block';
+    avatar.style.display='none';
+  } else {
+    prendas.style.display='none';
+    avatar.style.display='block';
+    // Dibujar si el SVG está vacío
+    const svg = avatar.querySelector('svg');
+    if(svg && !svg.innerHTML.trim()){
+      // Obtener piezas del outfit desde el DOM padre
+      const card = btn.closest('.outfit-card');
+      const pieces = [];
+      card.querySelectorAll('.outfit-piece').forEach(p=>{
+        const lbl = p.querySelector('.piece-label')?.textContent||'';
+        const strip = p.querySelector('.piece-color-strip');
+        const hex = strip ? strip.style.background : '#aaa';
+        pieces.push({label:lbl, hex});
+      });
+      drawAvatarSVG(svg, pieces);
+    }
+  }
+}
+
+function drawAvatarSVG(svg, pieces){
+  // Detectar tipos de prendas y colores
+  const findPiece = (keywords) => pieces.find(p=>keywords.some(k=>p.label.toLowerCase().includes(k)));
+  const top    = findPiece(['blusa','camisa','remera','top','musculosa','polera','buzo','hoodie','suéter','cárdigan','chaleco']);
+  const outer  = findPiece(['blazer','saco','chaqueta','campera','parka','tapado','poncho','trench','gabardina']);
+  const bot    = findPiece(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger']);
+  const dress  = findPiece(['vestido','mono','jardinero','body']);
+  const shoe   = findPiece(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis']);
+  const bag    = findPiece(['cartera','bolso','mochila','clutch','riñonera','tote']);
+
+  const tc = (outer||top)?.hex || '#C4957A';
+  const td = dk(tc,30);
+  const bc = bot?.hex || '#1A2E5A';
+  const bd = dk(bc,30);
+  const sc = shoe?.hex || '#1C1C1A';
+  const sd = dk(sc,25);
+  const skin = '#F5D5B0';
+
+  let h = `
+    <ellipse cx="90" cy="28" rx="16" ry="20" fill="${skin}"/>
+    <rect x="84" y="46" width="12" height="12" rx="4" fill="${skin}"/>
+  `;
+
+  // Vestido
+  if(dress && !bot){
+    h += `
+      <path d="M58 58 Q48 68 46 88 Q43 115 42 148 Q40 185 39 225 Q37 265 36 305 Q35 335 36 370 L144 370 Q145 335 144 305 Q143 265 142 225 Q141 185 140 148 Q139 115 136 88 Q134 68 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
+      <path d="M58 58 L72 82 L90 72 L108 82 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.2"/>
+      <path d="M74 56 L90 74 L106 56" fill="none" stroke="${td}" stroke-width="1.2" opacity="0.45"/>
+      <path d="M42 148 Q90 136 140 148" fill="none" stroke="${td}" stroke-width="0.7" opacity="0.2"/>
+      <path d="M39 225 Q90 212 141 225" fill="none" stroke="${td}" stroke-width="0.6" opacity="0.15"/>
+    `;
+  } else {
+    // Top/blazer + bottom
+    const isBlz = outer || (top && ['blazer','saco','chaqueta'].some(k=>top.label.toLowerCase().includes(k)));
+    if(isBlz){
+      const inn='#FAFAF7';
+      h += `
+        <path d="M58 58 Q48 68 46 88 Q44 110 44 155 L136 155 Q136 110 134 88 Q132 68 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
+        <path d="M58 58 L72 80 L90 72 L108 80 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.2"/>
+        <path d="M58 58 L46 72 L44 122 L62 116 L68 155 L44 155" fill="${td}" opacity="0.1"/>
+        <path d="M122 58 L134 72 L136 122 L118 116 L112 155 L136 155" fill="${td}" opacity="0.1"/>
+        <path d="M72 58 L80 80 L90 72 L100 80 L108 58 L106 52 L90 54 L74 52Z" fill="${inn}"/>
+        <path d="M80 64 L90 80 L100 64" fill="none" stroke="${tc}" stroke-width="1.2"/>
+        <circle cx="68" cy="108" r="2.5" fill="${td}" opacity="0.5"/>
+        <circle cx="68" cy="122" r="2.5" fill="${td}" opacity="0.5"/>
+        <circle cx="68" cy="136" r="2.5" fill="${td}" opacity="0.5"/>
+        <circle cx="68" cy="150" r="2.5" fill="${td}" opacity="0.5"/>
+      `;
+    } else {
+      h += `
+        <path d="M58 58 Q49 66 47 84 Q45 108 45 155 L135 155 Q135 108 133 84 Q131 66 122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${tc}"/>
+        <path d="M58 58 L71 76 L90 68 L109 76 L122 58 Q106 50 90 52 Q74 50 58 58Z" fill="${td}" opacity="0.18"/>
+        <path d="M76 58 L90 76 L104 58" fill="none" stroke="${td}" stroke-width="1" opacity="0.5"/>
+        <line x1="90" y1="76" x2="90" y2="155" stroke="${td}" stroke-width="0.8" opacity="0.35"/>
+        <circle cx="90" cy="92" r="2" fill="${td}" opacity="0.45"/>
+        <circle cx="90" cy="106" r="2" fill="${td}" opacity="0.45"/>
+        <circle cx="90" cy="120" r="2" fill="${td}" opacity="0.45"/>
+        <circle cx="90" cy="136" r="2" fill="${td}" opacity="0.45"/>
+        <circle cx="90" cy="150" r="2" fill="${td}" opacity="0.45"/>
+      `;
+    }
+    // Bottom
+    const isJean = bot && bot.label.toLowerCase().includes('jean');
+    h += `
+      <path d="M46 153 L43 262 L72 262 L90 212 L108 262 L137 262 L134 153 Z" fill="${bc}"/>
+      <path d="M43 262 L40 370 L72 370 L80 300 L90 365 L100 300 L108 370 L140 370 L137 262 Z" fill="${bc}"/>
+    `;
+    if(isJean){
+      h += `
+        <path d="M46 153 L50 168 L130 168 L134 155" fill="${dk(bc,15)}" opacity="0.4"/>
+        <line x1="86" y1="155" x2="84" y2="260" stroke="${bd}" stroke-width="1" opacity="0.45"/>
+        <line x1="94" y1="155" x2="96" y2="260" stroke="${bd}" stroke-width="1" opacity="0.45"/>
+      `;
+    } else {
+      h += `
+        <line x1="62" y1="155" x2="60" y2="260" stroke="${bd}" stroke-width="0.6" opacity="0.3"/>
+        <line x1="118" y1="155" x2="120" y2="260" stroke="${bd}" stroke-width="0.6" opacity="0.3"/>
+      `;
+    }
+  }
+
+  // Zapatos
+  const isTaco = shoe && ['zapato','bota','botín','oxford','mule'].some(k=>shoe.label.toLowerCase().includes(k));
+  if(isTaco){
+    h += `
+      <path d="M40 370 Q30 373 26 379 Q23 384 27 388 Q32 392 56 390 L60 370 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
+      <rect x="52" y="385" width="5" height="10" rx="1" fill="${sd}"/>
+      <path d="M120 370 Q130 373 134 379 Q137 384 133 388 Q128 392 104 390 L100 370 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
+      <rect x="123" y="385" width="5" height="10" rx="1" fill="${sd}"/>
+    `;
+  } else {
+    const sx = sc==='#F5F0E8'||sc==='#FFFFFF'?'#ccc':sd;
+    h += `
+      <path d="M40 370 Q28 372 23 379 Q20 384 26 388 Q34 392 60 390 L62 370 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
+      <path d="M118 370 L120 390 Q146 392 152 388 Q158 384 155 379 Q150 372 138 370 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
+    `;
+  }
+
+  // Cartera
+  if(bag){
+    const bagC = bag.hex;
+    const bagD = dk(bagC, 25);
+    h += `
+      <rect x="140" y="190" width="36" height="28" rx="4" fill="${bagC}" stroke="${bagD}" stroke-width="1"/>
+      <path d="M148 190 Q158 180 170 190" fill="none" stroke="${bagD}" stroke-width="1.5"/>
+      <rect x="151" y="200" width="12" height="8" rx="2" fill="${bagD}" opacity="0.55"/>
+    `;
+  }
+
+  // Brazos
+  const sleeveEnd = (dress && !bot) ? 280 : 200;
+  h += `
+    <path d="M46 62 Q32 100 30 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
+    <ellipse cx="30" cy="${sleeveEnd+8}" rx="8" ry="6" fill="${skin}"/>
+    <path d="M134 62 Q148 100 150 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
+    <ellipse cx="150" cy="${sleeveEnd+8}" rx="8" ry="6" fill="${skin}"/>
+  `;
+
+  svg.innerHTML = h;
+}
+
+function dk(hex, a){
+  let c=hex.replace('#','');
+  if(c.length===3)c=c.split('').map(x=>x+x).join('');
+  return '#'+[0,2,4].map(i=>Math.max(0,parseInt(c.substr(i,2),16)-a).toString(16).padStart(2,'0')).join('');
 }
 
 function useOutfit(ids,occasion){
