@@ -204,9 +204,10 @@
         <option value="neutro_acento">Neutros + acento</option>
         <option value="analogo">Análogo</option>
         <option value="monocromatico">Monocromático</option>
-        <option value="neutro_oscuro">Neutros elegantes</option>
-        <option value="tonal">Tonal tierra</option>
         <option value="complementario">Complementario</option>
+        <option value="triadico">Triádico</option>
+        <option value="tonal">Tonal tierra</option>
+        <option value="clasicos">Clásicos infalibles ✓</option>
       </select>
     </div>
     <button class="btn-accent" onclick="generateOutfits()" style="margin-top:0.85rem;">Generar outfits ✦</button>
@@ -374,43 +375,86 @@ const TYPES_BY_CAT = {
 };
 
 const COLORS = [
-  {name:'Blanco',hex:'#FFFFFF',hue:0,cat:'neutral'},
-  {name:'Crema',hex:'#F5F0E8',hue:40,cat:'neutral'},
-  {name:'Beige',hex:'#D4C5AA',hue:38,cat:'neutral'},
-  {name:'Negro',hex:'#1C1C1A',hue:0,cat:'neutral'},
-  {name:'Gris claro',hex:'#C0C0C0',hue:0,cat:'neutral'},
-  {name:'Gris',hex:'#7A7A7A',hue:0,cat:'neutral'},
-  {name:'Rojo',hex:'#C0392B',hue:4,cat:'accent'},
-  {name:'Rosa',hex:'#E8A0A0',hue:0,cat:'warm'},
-  {name:'Coral',hex:'#C4957A',hue:20,cat:'earth'},
-  {name:'Naranja',hex:'#E07A5F',hue:14,cat:'warm'},
-  {name:'Amarillo',hex:'#F2CB61',hue:43,cat:'warm'},
-  {name:'Verde claro',hex:'#8A9E8C',hue:130,cat:'cool'},
-  {name:'Verde',hex:'#2D6A4F',hue:150,cat:'cool'},
-  {name:'Celeste',hex:'#87CEEB',hue:200,cat:'cool'},
-  {name:'Azul',hex:'#3B6CB7',hue:218,cat:'cool'},
-  {name:'Azul marino',hex:'#1A2E5A',hue:222,cat:'dark'},
-  {name:'Violeta',hex:'#9B59B6',hue:288,cat:'accent'},
-  {name:'Bordo',hex:'#7B2D3E',hue:348,cat:'dark'},
-  {name:'Camel',hex:'#C19A6B',hue:33,cat:'earth'},
-  {name:'Marrón',hex:'#7A5230',hue:27,cat:'earth'},
+  // Neutros claros
+  {name:'Blanco',       hex:'#FFFFFF', hue:0,   cat:'neutral', dark:false},
+  {name:'Crudo',        hex:'#F0EAD6', hue:42,  cat:'neutral', dark:false},
+  {name:'Crema',        hex:'#F5F0E8', hue:40,  cat:'neutral', dark:false},
+  {name:'Beige',        hex:'#D4C5AA', hue:38,  cat:'neutral', dark:false},
+  {name:'Gris perla',   hex:'#D8D8D8', hue:0,   cat:'neutral', dark:false},
+  {name:'Gris claro',   hex:'#C0C0C0', hue:0,   cat:'neutral', dark:false},
+  // Neutros oscuros
+  {name:'Gris',         hex:'#7A7A7A', hue:0,   cat:'neutral', dark:true},
+  {name:'Gris oscuro',  hex:'#444444', hue:0,   cat:'neutral', dark:true},
+  {name:'Negro',        hex:'#1C1C1A', hue:0,   cat:'neutral', dark:true},
+  {name:'Azul marino',  hex:'#1A2E5A', hue:222, cat:'neutral', dark:true},
+  // Tierras / cálidos neutros
+  {name:'Camel',        hex:'#C19A6B', hue:33,  cat:'earth',   dark:false},
+  {name:'Marrón',       hex:'#7A5230', hue:27,  cat:'earth',   dark:true},
+  {name:'Terracota',    hex:'#C0674A', hue:15,  cat:'earth',   dark:false},
+  {name:'Coral',        hex:'#C4957A', hue:20,  cat:'earth',   dark:false},
+  {name:'Verde oliva',  hex:'#6B7A3A', hue:72,  cat:'earth',   dark:true},
+  // Cálidos
+  {name:'Rojo',         hex:'#C0392B', hue:4,   cat:'accent',  dark:true},
+  {name:'Bordo',        hex:'#7B2D3E', hue:348, cat:'accent',  dark:true},
+  {name:'Ciruela',      hex:'#6D2B4A', hue:330, cat:'accent',  dark:true},
+  {name:'Rosa palo',    hex:'#E8C4C4', hue:0,   cat:'warm',    dark:false},
+  {name:'Rosa',         hex:'#E8A0A0', hue:0,   cat:'warm',    dark:false},
+  {name:'Naranja',      hex:'#E07A5F', hue:14,  cat:'warm',    dark:false},
+  {name:'Mostaza',      hex:'#C9A227', hue:42,  cat:'warm',    dark:false},
+  {name:'Amarillo',     hex:'#F2CB61', hue:43,  cat:'warm',    dark:false},
+  // Fríos
+  {name:'Lavanda',      hex:'#C4B5D5', hue:270, cat:'cool',    dark:false},
+  {name:'Violeta',      hex:'#9B59B6', hue:288, cat:'accent',  dark:true},
+  {name:'Verde agua',   hex:'#A8D5C2', hue:160, cat:'cool',    dark:false},
+  {name:'Verde claro',  hex:'#8A9E8C', hue:130, cat:'cool',    dark:false},
+  {name:'Verde botella',hex:'#2D5A3D', hue:145, cat:'cool',    dark:true},
+  {name:'Azul petróleo',hex:'#2C6E7A', hue:188, cat:'cool',    dark:true},
+  {name:'Celeste',      hex:'#87CEEB', hue:200, cat:'cool',    dark:false},
+  {name:'Azul',         hex:'#3B6CB7', hue:218, cat:'cool',    dark:false},
+];
+
+// Grupos de colores para monocromático (tonos del mismo color)
+const MONO_GROUPS = [
+  ['Blanco','Crudo','Crema','Beige','Gris perla','Camel'],
+  ['Gris claro','Gris','Gris oscuro','Negro'],
+  ['Rosa palo','Rosa','Bordo','Ciruela'],
+  ['Celeste','Azul','Azul marino','Azul petróleo'],
+  ['Verde agua','Verde claro','Verde oliva','Verde botella'],
+  ['Crudo','Beige','Camel','Marrón'],
+  ['Lavanda','Violeta','Ciruela'],
+  ['Coral','Terracota','Marrón'],
+  ['Mostaza','Naranja','Terracota'],
+];
+
+// Combinaciones clásicas infalibles (pares/tríos de nombres)
+const CLASSIC_COMBOS = [
+  ['Blanco','Negro'],['Negro','Camel'],['Azul marino','Blanco'],
+  ['Azul marino','Beige'],['Gris','Blanco'],['Gris','Negro'],
+  ['Crudo','Marrón'],['Beige','Blanco'],['Bordo','Camel'],
+  ['Verde oliva','Beige'],['Negro','Crudo'],['Azul marino','Mostaza'],
+  ['Gris','Bordo'],['Azul petróleo','Camel'],['Verde botella','Beige'],
+  ['Ciruela','Beige'],['Marrón','Crudo','Verde oliva'],
+  ['Negro','Blanco','Rojo'],['Beige','Crudo','Verde oliva'],
+  ['Celeste','Blanco','Azul marino'],['Gris','Rosa palo','Blanco'],
 ];
 
 const SCHEME_BY_OCC = {
   trabajo:{name:'Neutros + acento',key:'neutro_acento'},
   casual:{name:'Análogo',key:'analogo'},
   salida:{name:'Monocromático',key:'monocromatico'},
-  evento:{name:'Neutros elegantes',key:'neutro_oscuro'},
+  evento:{name:'Clásicos infalibles',key:'clasicos'},
   sport:{name:'Tonal tierra',key:'tonal'},
 };
 
 const SCHEME_TIPS = {
-  neutro_acento:'Un acento de color sobre base neutra: la fórmula más elegante y versátil.',
-  analogo:'Los colores análogos crean armonía natural — distintos pero del mismo universo.',
-  monocromatico:'El total look monocromático alarga la silueta y transmite sofisticación.',
-  neutro_oscuro:'Neutros y oscuros: la paleta del lujo discreto.',
-  tonal:'Los tonos tierra conectan con lo cálido — combinan con todo y nunca fallan.',
-  complementario:'Colores complementarios: contraste máximo con impacto visual.',
+  neutro_acento:'Base neutra + un solo color acento en una prenda o accesorio. La fórmula más segura para la oficina.',
+  analogo:'Colores vecinos en el círculo cromático — coherencia visual sin esfuerzo. Ideal para looks refinados.',
+  monocromatico:'Un solo color en distintas intensidades. Varía texturas para que no quede plano.',
+  neutro_oscuro:'Neutros puros: imagen prolija y sobria. Dejá que el fit y los accesorios sean los protagonistas.',
+  tonal:'Tonos tierra que nunca fallan: camel, crudo, marrón, oliva. Cálidos y atemporales.',
+  complementario:'Colores opuestos en versiones apagadas — uno domina, el otro complementa. Un solo acento basta.',
+  triadico:'Tres colores: 60% principal, 30% secundario, 10% acento. Proporción es la clave.',
+  clasicos:'Combinaciones que nunca fallan. Resolvé rápido y quedá bien siempre.',
 };
 
 const STYLES_BY_CAT = {
@@ -582,7 +626,7 @@ async function analyzeWithAI(){
 {
   "categoria": "top|bottom|dress|outer|shoes|bag|acc",
   "tipo": "tipo específico en español",
-  "color_nombre": "uno de: Blanco|Crema|Beige|Negro|Gris claro|Gris|Rojo|Rosa|Coral|Naranja|Amarillo|Verde claro|Verde|Celeste|Azul|Azul marino|Violeta|Bordo|Camel|Marrón",
+  "color_nombre": "uno de: Blanco|Crudo|Crema|Beige|Gris perla|Gris claro|Gris|Gris oscuro|Negro|Azul marino|Camel|Marrón|Terracota|Coral|Verde oliva|Rojo|Bordo|Ciruela|Rosa palo|Rosa|Naranja|Mostaza|Amarillo|Lavanda|Violeta|Verde agua|Verde claro|Verde botella|Azul petróleo|Celeste|Azul",
   "material": "uno de: Liso / Algodón|Estampado|Denim|Cuero / Eco-cuero|Punto / Tejido|Satinado / Seda|Lino|Lana|Gamuza|Técnico / Deportivo|Encaje|Otro",
   "estilo": "uno de: Recto / Regular|Slim / Entallado|Oversize|Crop|Flare / Acampanado|Skinny|Wide leg / Palazzo|Mom fit|Boyfriend|Bootcut|Baggy|A-line|Wrap|Mini|Midi|Maxi",
   "ocasion": ["Trabajo","Casual","Salida nocturna","Evento formal","Sport"],
@@ -778,45 +822,133 @@ function pickLeast(arr,excl=[]){
   return av.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
-// Determina si una prenda es estampada
+// =============================================
+// REGLAS DE MODA
+// =============================================
 function isPattern(g){
-  return g.material&&g.material.toLowerCase().includes('estampado');
+  return !!(g.material&&g.material.toLowerCase().includes('estampado'));
 }
-
-// Máx 1 estampado por look: dado un array de piezas ya elegidas, ¿hay estampado?
 function hasPattern(pieces){
   return pieces.some(p=>isPattern(p));
 }
+function isNeutral(color){
+  return color.cat==='neutral';
+}
 
-function pickCompatible(arr,baseColor,schemeKey,excl=[],currentPieces=[]){
-  const rule=getCompatibleColors(baseColor,schemeKey);
-  const alreadyHasPattern=hasPattern(currentPieces);
-  const isMonochrome=schemeKey==='monocromatico';
+// Encuentra el grupo monocromático al que pertenece un color
+function getMonoGroup(colorName){
+  return MONO_GROUPS.find(g=>g.includes(colorName))||null;
+}
 
-  let available=arr.filter(g=>!excl.includes(g.id));
-  if(!available.length)return null;
+// Verifica si dos colores son compatibles en monocromático
+function monoCompatible(c1name, c2name){
+  const g1=getMonoGroup(c1name);
+  const g2=getMonoGroup(c2name);
+  if(!g1||!g2) return false;
+  return g1.some(c=>g2.includes(c));
+}
 
-  // Regla estampados: si ya hay un estampado, excluir estampados
+// Verifica compatibilidad clásica
+function classicCompatible(c1name, c2name){
+  return CLASSIC_COMBOS.some(combo=>combo.includes(c1name)&&combo.includes(c2name));
+}
+
+function getCompatibleColors(baseColor, schemeKey){
+  switch(schemeKey){
+
+    case 'monocromatico':
+      // SOLO colores del mismo grupo monocromático, SOLO prendas lisas
+      return c=>{
+        if(isNeutral(baseColor)&&isNeutral(c)) return true;
+        return monoCompatible(baseColor.name, c.name);
+      };
+
+    case 'neutro_acento':
+      // Base neutra + UN acento. Si base es neutra, permite neutros y UN acento
+      if(isNeutral(baseColor)) return c=>isNeutral(c)||c.cat==='accent'||c.cat==='earth';
+      // Si base es acento, el resto debe ser neutro
+      return c=>isNeutral(c);
+
+    case 'analogo':
+      // Colores vecinos (±50°) + neutros siempre
+      return c=>{
+        if(isNeutral(c)) return true;
+        if(isNeutral(baseColor)) return true;
+        const d=Math.abs(c.hue-baseColor.hue);
+        return Math.min(d,360-d)<=55;
+      };
+
+    case 'complementario':
+      // Opuesto apagado (±45° del complementario) + neutros
+      return c=>{
+        if(isNeutral(c)) return true;
+        if(isNeutral(baseColor)) return true;
+        const comp=(baseColor.hue+180)%360;
+        const d=Math.abs(c.hue-comp);
+        return Math.min(d,360-d)<=45;
+      };
+
+    case 'tonal':
+      // Familia tierra: earth + neutral
+      return c=>['neutral','earth'].includes(c.cat);
+
+    case 'neutro_oscuro':
+      return c=>isNeutral(c);
+
+    case 'triadico':
+      // Tres colores a 120° entre sí + neutros
+      return c=>{
+        if(isNeutral(c)) return true;
+        if(isNeutral(baseColor)) return true;
+        const t1=(baseColor.hue+120)%360;
+        const t2=(baseColor.hue+240)%360;
+        const d1=Math.abs(c.hue-t1); const d2=Math.abs(c.hue-t2);
+        return Math.min(d1,360-d1)<=40||Math.min(d2,360-d2)<=40;
+      };
+
+    case 'clasicos':
+      // Combinaciones predefinidas que siempre funcionan
+      return c=>{
+        if(isNeutral(c)) return true;
+        return classicCompatible(baseColor.name, c.name);
+      };
+
+    default: return ()=>true;
+  }
+}
+
+function pickCompatible(arr, baseColor, schemeKey, excl=[], currentPieces=[]){
+  const alreadyHasPattern = hasPattern(currentPieces);
+  const isMono = schemeKey==='monocromatico';
+  const rule = getCompatibleColors(baseColor, schemeKey);
+
+  let available = arr.filter(g=>!excl.includes(g.id));
+  if(!available.length) return null;
+
+  // REGLA 1: monocromático — solo prendas lisas
+  if(isMono){
+    const lisas=available.filter(g=>!isPattern(g));
+    if(lisas.length) available=lisas;
+  }
+
+  // REGLA 2: máximo 1 estampado por look
   if(alreadyHasPattern){
     const noPattern=available.filter(g=>!isPattern(g));
     if(noPattern.length) available=noPattern;
   }
 
-  // Monocromático: preferir prendas lisas
-  if(isMonochrome){
-    const lisas=available.filter(g=>!isPattern(g));
-    if(lisas.length) available=lisas;
-  }
+  // REGLA 3: si hay estampado en la base, priorizar sus colores
+  // (esto se maneja a través del color asignado a la prenda estampada)
 
-  // 1° color compatible con el esquema
+  // 1° prioridad: color compatible con el esquema
   const byScheme=available.filter(g=>rule(g.colorPrimary));
-  if(byScheme.length)return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
+  if(byScheme.length) return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
 
-  // 2° neutros (siempre combinan)
-  const neutrals=available.filter(g=>g.colorPrimary.cat==='neutral');
-  if(neutrals.length)return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
+  // 2° fallback: neutros
+  const neutrals=available.filter(g=>isNeutral(g.colorPrimary));
+  if(neutrals.length) return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
 
-  // 3° fallback: cualquier disponible
+  // 3° último recurso: cualquier disponible
   return available.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
@@ -827,7 +959,7 @@ function generateOutfits(){
   const season=getSeason(temp);
   const cat=tempCat(temp);
   const schemeKey=document.getElementById('outfit-scheme').value;
-  const schemeNames={neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',neutro_oscuro:'Neutros elegantes',tonal:'Tonal tierra',complementario:'Complementario'};
+  const schemeNames={neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',neutro_oscuro:'Neutros elegantes',tonal:'Tonal tierra',complementario:'Complementario',triadico:'Triádico',clasicos:'Clásicos infalibles'};
   const scheme={key:schemeKey,name:schemeNames[schemeKey]||schemeKey};
 
   if(garments.length<2){
@@ -850,12 +982,11 @@ function generateOutfits(){
     let pieces=[];let baseColor=null;
     const excl=outfits.flatMap(o=>o.pieces.map(p=>p.id));
 
-    // Monocromático: preferir base lisa para el top
-    const monoMode=scheme.key==='monocromatico';
+    // Monocromático y clásicos: forzar base lisa
+    const forceSmooth = scheme.key==='monocromatico'||scheme.key==='clasicos';
 
     if(dresses.length&&(i===1||Math.random()>0.55)){
-      // En monocromático preferir vestido liso
-      const dressCandidates=monoMode?dresses.filter(g=>!isPattern(g)):dresses;
+      const dressCandidates=forceSmooth?dresses.filter(g=>!isPattern(g)):dresses;
       const pool=dressCandidates.length?dressCandidates:dresses;
       const d=pickLeast(pool,excl);
       if(d){
@@ -867,8 +998,10 @@ function generateOutfits(){
     }
 
     if(pieces.length<2&&tops.length&&bottoms.length){
-      // En monocromático preferir top liso como base
-      const topCandidates=monoMode?tops.filter(g=>!isPattern(g)&&!excl.includes(g.id)):tops.filter(g=>!excl.includes(g.id));
+      // Para mono y clásicos: base lisa primero
+      const topCandidates=forceSmooth
+        ?tops.filter(g=>!isPattern(g)&&!excl.includes(g.id))
+        :tops.filter(g=>!excl.includes(g.id));
       const topPool=topCandidates.length?topCandidates:tops.filter(g=>!excl.includes(g.id));
       const top=topPool.sort((a,b)=>a.usageCount-b.usageCount)[0];
       if(top){
