@@ -779,7 +779,7 @@ async function analyzeWithAI(){
         model:'claude-opus-4-5',
         max_tokens:600,
         messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:currentPhotoBase64}},
+          {type:'image',source:{type:'base64',media_type:currentPhotoData.startsWith('data:image/png')?'image/png':'image/jpeg',data:currentPhotoBase64}},
           {type:'text',text:prompt}
         ]}]
       })
@@ -793,8 +793,9 @@ async function analyzeWithAI(){
     status.textContent='✓ Completado con IA — revisá y ajustá si hace falta';
 
   }catch(err){
-    console.error(err);
-    status.textContent='⚠️ No se pudo analizar — completá manualmente';
+    console.error('AI Error:', err);
+    const msg = err.message||'Error desconocido';
+    status.textContent=`⚠️ ${msg.length>60?msg.substring(0,60)+'...':msg} — completá manualmente`;
     document.getElementById('ai-analyze-btn').classList.add('visible');
   }
 }
