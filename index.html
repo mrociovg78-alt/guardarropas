@@ -778,14 +778,45 @@ function pickLeast(arr,excl=[]){
   return av.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
-function pickCompatible(arr,baseColor,schemeKey,excl=[]){
+// Determina si una prenda es estampada
+function isPattern(g){
+  return g.material&&g.material.toLowerCase().includes('estampado');
+}
+
+// Máx 1 estampado por look: dado un array de piezas ya elegidas, ¿hay estampado?
+function hasPattern(pieces){
+  return pieces.some(p=>isPattern(p));
+}
+
+function pickCompatible(arr,baseColor,schemeKey,excl=[],currentPieces=[]){
   const rule=getCompatibleColors(baseColor,schemeKey);
-  const available=arr.filter(g=>!excl.includes(g.id));
+  const alreadyHasPattern=hasPattern(currentPieces);
+  const isMonochrome=schemeKey==='monocromatico';
+
+  let available=arr.filter(g=>!excl.includes(g.id));
   if(!available.length)return null;
+
+  // Regla estampados: si ya hay un estampado, excluir estampados
+  if(alreadyHasPattern){
+    const noPattern=available.filter(g=>!isPattern(g));
+    if(noPattern.length) available=noPattern;
+  }
+
+  // Monocromático: preferir prendas lisas
+  if(isMonochrome){
+    const lisas=available.filter(g=>!isPattern(g));
+    if(lisas.length) available=lisas;
+  }
+
+  // 1° color compatible con el esquema
   const byScheme=available.filter(g=>rule(g.colorPrimary));
   if(byScheme.length)return byScheme.sort((a,b)=>a.usageCount-b.usageCount)[0];
+
+  // 2° neutros (siempre combinan)
   const neutrals=available.filter(g=>g.colorPrimary.cat==='neutral');
   if(neutrals.length)return neutrals.sort((a,b)=>a.usageCount-b.usageCount)[0];
+
+  // 3° fallback: cualquier disponible
   return available.sort((a,b)=>a.usageCount-b.usageCount)[0];
 }
 
@@ -819,26 +850,35 @@ function generateOutfits(){
     let pieces=[];let baseColor=null;
     const excl=outfits.flatMap(o=>o.pieces.map(p=>p.id));
 
+    // Monocromático: preferir base lisa para el top
+    const monoMode=scheme.key==='monocromatico';
+
     if(dresses.length&&(i===1||Math.random()>0.55)){
-      const d=pickLeast(dresses,excl);
+      // En monocromático preferir vestido liso
+      const dressCandidates=monoMode?dresses.filter(g=>!isPattern(g)):dresses;
+      const pool=dressCandidates.length?dressCandidates:dresses;
+      const d=pickLeast(pool,excl);
       if(d){
         baseColor=d.colorPrimary;pieces=[d];
-        if(outers.length){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id));if(o)pieces.push(o);}
-        if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id));if(s)pieces.push(s);}
-        if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id));if(b)pieces.push(b);}
+        if(outers.length){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
+        if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
+        if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
       }
     }
 
     if(pieces.length<2&&tops.length&&bottoms.length){
-      const top=pickLeast(tops,excl);
+      // En monocromático preferir top liso como base
+      const topCandidates=monoMode?tops.filter(g=>!isPattern(g)&&!excl.includes(g.id)):tops.filter(g=>!excl.includes(g.id));
+      const topPool=topCandidates.length?topCandidates:tops.filter(g=>!excl.includes(g.id));
+      const top=topPool.sort((a,b)=>a.usageCount-b.usageCount)[0];
       if(top){
         baseColor=top.colorPrimary;
-        const bot=pickCompatible(bottoms,baseColor,scheme.key,[top.id,...excl]);
+        const bot=pickCompatible(bottoms,baseColor,scheme.key,[top.id,...excl],[top]);
         if(bot){
           pieces=[top,bot];
-          if(outers.length&&!pieces.find(p=>p.cat==='outer')){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id));if(o)pieces.push(o);}
-          if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id));if(s)pieces.push(s);}
-          if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id));if(b)pieces.push(b);}
+          if(outers.length&&!pieces.find(p=>p.cat==='outer')){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
+          if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
+          if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
         }
       }
     }
