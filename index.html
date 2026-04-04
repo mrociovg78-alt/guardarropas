@@ -119,14 +119,35 @@
   .avatar-toggle button.active { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
 
   /* COLLAGE BOARD */
+  .collage-card {
+    background: #EEEAE4;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    padding-bottom: 1rem;
+  }
+  .collage-card-header {
+    padding: 1rem 1rem 0.5rem;
+    text-align: center;
+  }
+  .collage-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #3a3530;
+    margin-bottom: 2px;
+  }
+  .collage-card-sub {
+    font-size: 0.65rem;
+    color: #8a7a6a;
+    letter-spacing: 0.06em;
+  }
   .collage-board {
     position: relative;
     width: 100%;
     aspect-ratio: 3/4;
-    background: #EEEAE4;
-    border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 0.5rem;
   }
   .collage-piece {
     position: absolute;
@@ -137,17 +158,35 @@
     height: 100%;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+    filter: drop-shadow(0 3px 10px rgba(0,0,0,0.18));
   }
-  .collage-label {
-    position: absolute;
-    bottom: -16px;
-    left: 50%;
-    transform: translateX(-50%);
+  .collage-palette {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    padding: 0.6rem 1rem 0;
+  }
+  .collage-pdot {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .collage-palette-label {
     font-size: 0.58rem;
-    color: var(--mocha);
-    white-space: nowrap;
-    font-weight: 500;
+    color: #8a7a6a;
+    letter-spacing: 0.05em;
+  }
+  .collage-tip {
+    font-size: 0.68rem;
+    color: #6a5a4a;
+    font-style: italic;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 6px;
+    border-left: 3px solid #C9A84C;
+    margin: 0.5rem 1rem 0;
   }
   .color-harmony-row { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.75rem; }
   .harmony-swatch { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.08); flex-shrink: 0; }
@@ -1477,7 +1516,12 @@ function generateOutfits(){
         </div>
       </div>
       <div id="view-collage-${uid}" style="display:none;">
-        <div class="collage-board" id="collage-board-${uid}"></div>
+        <div class="collage-card">
+          <div class="collage-card-header"></div>
+          <div class="collage-board" id="collage-board-${uid}"></div>
+          <div class="collage-palette"></div>
+          <div class="collage-tip"></div>
+        </div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
       <button class="btn-use" onclick="useOutfit(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
@@ -1539,48 +1583,64 @@ function getCatFromLabel(label){
 }
 
 function renderCollage(board, pieces){
+  // board es .collage-board, su padre es .collage-card
+  // Necesitamos también datos del outfit — los leemos del card padre
+  const card = board.closest('.outfit-card');
+  const occ = card.querySelector('.outfit-number')?.nextElementSibling?.textContent || '';
+  const temp = card.querySelector('.outfit-number')?.textContent?.match(/\d+/)?.[0] || '';
+  const scheme = card.querySelector('.outfit-scheme-label')?.textContent || '';
+  const tip = card.querySelector('.outfit-tip')?.textContent?.replace('💡 ','') || '';
+  const swatches = [...card.querySelectorAll('.harmony-swatch')];
+  const colors = swatches.map(s=>s.style.background);
+
+  // Construir la card completa
+  const cardEl = board.closest('.collage-card');
+  if(!cardEl) return;
+
+  // Header
+  cardEl.querySelector('.collage-card-header').innerHTML = `
+    <div class="collage-card-title">Outfit del día</div>
+    <div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>
+  `;
+
   const W = board.offsetWidth || 260;
   const H = board.offsetHeight || 346;
 
-  // Layouts predefinidos por combinación de categorías
-  // Posiciones relativas (% del ancho/alto del board)
-  const layouts = {
-    // top + bottom + shoes + bag
-    default: [
-      {cat:'outer',  x:0.02, y:0.02, w:0.52, h:0.48, rot:-3},
-      {cat:'top',    x:0.40, y:0.00, w:0.46, h:0.40, rot:3},
-      {cat:'dress',  x:0.12, y:0.02, w:0.55, h:0.62, rot:1},
-      {cat:'bottom', x:0.22, y:0.38, w:0.52, h:0.58, rot:1.5},
-      {cat:'shoes',  x:0.02, y:0.72, w:0.55, h:0.26, rot:-2},
-      {cat:'bag',    x:0.65, y:0.52, w:0.32, h:0.30, rot:4},
-      {cat:'acc',    x:0.62, y:0.03, w:0.34, h:0.22, rot:5},
-    ]
-  };
+  const slots = [
+    {cat:'outer',  x:0.02, y:0.02, w:0.52, h:0.48, rot:-3,  z:3},
+    {cat:'top',    x:0.40, y:0.00, w:0.46, h:0.40, rot:3,   z:2},
+    {cat:'dress',  x:0.10, y:0.02, w:0.58, h:0.64, rot:1,   z:2},
+    {cat:'bottom', x:0.20, y:0.36, w:0.55, h:0.60, rot:1.5, z:1},
+    {cat:'shoes',  x:0.02, y:0.72, w:0.52, h:0.26, rot:-2,  z:4},
+    {cat:'bag',    x:0.63, y:0.50, w:0.35, h:0.32, rot:4,   z:4},
+    {cat:'acc',    x:0.62, y:0.02, w:0.36, h:0.24, rot:5,   z:5},
+  ];
 
-  const template = layouts.default;
-  let html = '';
-
-  // Asignar cada pieza a su slot
+  let boardHtml = '';
   pieces.forEach(p=>{
-    const slot = template.find(s=>s.cat===p.cat);
+    if(!p.photo) return;
+    const slot = slots.find(s=>s.cat===p.cat);
     if(!slot) return;
     const x = Math.round(slot.x * W);
     const y = Math.round(slot.y * H);
     const w = Math.round(slot.w * W);
     const h = Math.round(slot.h * H);
-    const rot = slot.rot || 0;
-    const zMap = {outer:3, top:2, dress:2, bottom:1, shoes:4, bag:4, acc:5};
-    const z = zMap[p.cat]||1;
-
-    if(p.photo){
-      html += `<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg);z-index:${z};">
-        <img src="${p.photo}" alt="${p.label}"/>
-        <span class="collage-label">${p.label}</span>
-      </div>`;
-    }
+    boardHtml += `<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};">
+      <img src="${p.photo}" alt="${p.label}"/>
+    </div>`;
   });
+  board.innerHTML = boardHtml;
 
-  board.innerHTML = html;
+  // Paleta de colores
+  const paletteEl = cardEl.querySelector('.collage-palette');
+  if(paletteEl){
+    paletteEl.innerHTML = colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')
+      + `<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
+  }
+
+  // Tip
+  const tipEl = cardEl.querySelector('.collage-tip');
+  if(tipEl) tipEl.textContent = tip;
 }
 
 function toggleView(view, uid, btn){
