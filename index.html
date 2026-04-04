@@ -914,13 +914,28 @@ function tempCat(v){
 function getSeason(t){if(t<=5)return'Invierno';if(t<=14)return'Otoño';if(t<=22)return'Primavera';return'Verano';}
 const OCC_MAP={trabajo:'Trabajo',casual:'Casual',salida:'Salida nocturna',evento:'Evento formal',sport:'Sport'};
 
+// Compatibilidad de ocasiones: qué ocasiones son compatibles entre sí
+function occasionCompatible(garmentOccasions, requestedOcc){
+  if(garmentOccasions.includes(requestedOcc)) return true;
+  // Reglas de compatibilidad cruzada
+  const compat = {
+    'Trabajo':     ['Trabajo','Evento formal'],
+    'Casual':      ['Casual','Sport'],
+    'Salida nocturna': ['Salida nocturna','Evento formal','Casual'],
+    'Evento formal':   ['Evento formal','Trabajo','Salida nocturna'],
+    'Sport':       ['Sport','Casual'],
+  };
+  const allowed = compat[requestedOcc]||[requestedOcc];
+  return garmentOccasions.some(o=>allowed.includes(o));
+}
+
 function getByRole(role,season,occLabel,strict=true){
   return garments.filter(g=>{
     if(g.cat!==role)return false;
     if(strict){
       const sAll=g.seasons.includes('Todo')||g.seasons.includes('Todo el año');
       if(!sAll&&!g.seasons.includes(season))return false;
-      return g.occasions.includes(occLabel)||g.occasions.includes('Casual');
+      return occasionCompatible(g.occasions||[], occLabel);
     }
     return true;
   });
@@ -971,14 +986,18 @@ function getCompatibleColors(baseColor, schemeKey){
   switch(schemeKey){
 
     case 'monocromatico':
-      // SOLO colores del mismo grupo monocromático
-      // Neutros puros (negro/blanco/gris) pueden acompañar cualquier monocromático
+      // ESTRICTO: solo colores del mismo grupo monocromático
+      // Neutros puros (Negro, Blanco, Gris) como únicos acompañantes permitidos fuera del grupo
+      // Beige, Camel, Crema NO son neutros válidos para monocromático
       return c=>{
-        if(isNeutral(baseColor)&&isNeutral(c)) return true;
-        // Solo neutros oscuros/claros puros como acompañantes (negro, blanco, gris)
-        const pureNeutrals=['Negro','Blanco','Gris claro','Gris','Gris oscuro','Gris perla'];
-        if(pureNeutrals.includes(c.name)) return true;
-        if(pureNeutrals.includes(baseColor.name)) return monoCompatible(baseColor.name,c.name)||isNeutral(c);
+        const strictNeutrals=['Negro','Blanco','Gris claro','Gris','Gris oscuro','Gris perla'];
+        // Si ambos son neutros estrictos: ok
+        if(strictNeutrals.includes(baseColor.name)&&strictNeutrals.includes(c.name)) return true;
+        // Si el acompañante es neutro estricto: siempre ok
+        if(strictNeutrals.includes(c.name)) return true;
+        // Si la base es neutro estricto: acepta del grupo mono o neutros
+        if(strictNeutrals.includes(baseColor.name)) return monoCompatible(baseColor.name,c.name);
+        // Caso general: mismo grupo monocromático obligatorio
         return monoCompatible(baseColor.name, c.name);
       };
 
@@ -1124,16 +1143,37 @@ function generateOutfits(){
         ?tops.filter(g=>!isPattern(g)&&!excl.includes(g.id))
         :tops.filter(g=>!excl.includes(g.id));
       const topPool=topCandidates.length?topCandidates:tops.filter(g=>!excl.includes(g.id));
-      const top=topPool.sort((a,b)=>a.usageCount-b.usageCount)[0];
-      if(top){
-        baseColor=top.colorPrimary;
-        const bot=pickCompatible(bottoms,baseColor,scheme.key,[top.id,...excl],[top]);
-        if(bot){
-          pieces=[top,bot];
-          if(outers.length&&!pieces.find(p=>p.cat==='outer')){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
-          if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
-          if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
+
+      // En monocromático: probar cada top hasta encontrar uno que tenga bottom compatible
+      // Si ningún top tiene bottom compatible, no armar el look (mejor ninguno que uno mal etiquetado)
+      let top=null, bot=null;
+      const isMono=scheme.key==='monocromatico';
+      const sortedTops=topPool.sort((a,b)=>a.usageCount-b.usageCount);
+
+      if(isMono){
+        // En monocromático: ordenar tops por cuántos bottoms compatibles tienen
+        // Prioridad: más pares disponibles primero, luego menor uso
+        const topsWithScore=sortedTops.map(t=>({
+          top:t,
+          score:bottoms.filter(b=>!excl.includes(b.id)&&pickCompatible([b],t.colorPrimary,scheme.key,[],[t])!==null).length
+        }));
+        topsWithScore.sort((a,b)=>b.score-a.score||a.top.usageCount-b.top.usageCount);
+        for(const {top:candidate} of topsWithScore){
+          if(candidate.score===0) break; // ningún bottom compatible, no tiene sentido seguir
+          const testBot=pickCompatible(bottoms,candidate.colorPrimary,scheme.key,[candidate.id,...excl],[candidate]);
+          if(testBot){top=candidate;bot=testBot;break;}
         }
+      } else {
+        top=sortedTops[0];
+        if(top) bot=pickCompatible(bottoms,top.colorPrimary,scheme.key,[top.id,...excl],[top]);
+      }
+
+      if(top&&bot){
+        baseColor=top.colorPrimary;
+        pieces=[top,bot];
+        if(outers.length&&!pieces.find(p=>p.cat==='outer')){const o=pickCompatible(outers,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(o)pieces.push(o);}
+        if(shoes.length){const s=pickCompatible(shoes,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(s)pieces.push(s);}
+        if(bags.length){const b=pickCompatible(bags,baseColor,scheme.key,pieces.map(p=>p.id),pieces);if(b)pieces.push(b);}
       }
     }
 
