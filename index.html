@@ -469,40 +469,41 @@ let selectedColorPrimary=null,selectedColorSecondary=null;
 let currentPhotoData=null,currentPhotoBase64=null,currentPhotoMime=null;
 let editingId=null,editingPhotoUrl=null;
 
-async function gasPost(payload){
-  const r=await fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)});
-  return r.json();
+function gasPost(payload){
+  return fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)}).then(function(r){return r.json();});
 }
 
-async function loadAll(){
-  showToast('⏳ Cargando prendas...');
+function initApp(){
   try{
-    const [rg,rh]=await Promise.all([
-      fetch(GAS_URL+'?action=getAllGarments').then(r=>r.json()),
-      fetch(GAS_URL+'?action=getHistory').then(r=>r.json())
-    ]);
-    garments=rg.garments||[];
-    history=rh.history||[];
-  }catch(e){
-    garments=[];history=[];
-    showToast('⚠️ Error cargando datos');
-  }
-  renderColorPickers();renderGarments();renderStats();renderCalendar();renderHistory();updateSchemePreview();updateDataSummary();
+    var k=localStorage.getItem('mg_apikey')||'';
+    var el=document.getElementById('api-key-input');
+    if(el&&k)el.value=k;
+  }catch(e){}
+  renderColorPickers();
+  renderGarments();
+  renderStats();
+  renderCalendar();
+  renderHistory();
+  updateSchemePreview();
+  updateDataSummary();
+  // Cargar datos de Google en segundo plano
+  fetch(GAS_URL+'?action=getAllGarments')
+    .then(function(r){return r.json();})
+    .then(function(rg){
+      garments=rg.garments||[];
+      return fetch(GAS_URL+'?action=getHistory').then(function(r){return r.json();});
+    })
+    .then(function(rh){
+      history=rh.history||[];
+      renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();
+      showToast('✓ '+garments.length+' prendas cargadas');
+    })
+    .catch(function(){
+      showToast('⚠️ Sin conexión — reintentá');
+    });
 }
 
-// Wrappers sincrónicos para onclick (iOS Safari no tolera async en onclick)
-function saveGarmentBtn(){ saveGarment(); }
-function deleteGarmentBtn(id,e){ deleteGarment(id,e); }
-function useOutfitBtn(ids,occ){ useOutfit(ids,occ); }
-function clearAllDataBtn(){ clearAllData(); }
-function importDataBtn(e){ importData(e); }
-
-window.addEventListener('DOMContentLoaded',()=>{
-  const k=localStorage.getItem('mg_apikey')||'';
-  const el=document.getElementById('api-key-input');
-  if(el&&k)el.value=k;
-  loadAll();
-});
+window.addEventListener('DOMContentLoaded', initApp);
 
 function saveApiKey(){const k=document.getElementById('api-key-input').value.trim();localStorage.setItem('mg_apikey',k);showToast(k?'✓ API key guardada':'API key borrada');}
 function getApiKey(){return localStorage.getItem('mg_apikey')||'';}
@@ -616,30 +617,29 @@ function applyAIResult(r){
   if(r.notas){const n=document.getElementById('f-notes');n.value=r.notas;n.classList.add('ai-filled');}
 }
 
-async function saveGarment(){
-  const cat=document.getElementById('f-category').value;const type=document.getElementById('f-type').value;
+function saveGarmentBtn(){ saveGarment(); }
+function deleteGarmentBtn(id,e){ deleteGarment(id,e); }
+function useOutfitBtn(ids,occ){ useOutfit(ids,occ); }
+function clearAllDataBtn(){ clearAllData(); }
+function importDataBtn(e){ importData(e); }
+
+function saveGarment(){
+  var cat=document.getElementById('f-category').value;
+  var type=document.getElementById('f-type').value;
   if(!cat){showToast('Seleccioná la categoría');return;}
   if(!type){showToast('Seleccioná el tipo de prenda');return;}
   if(!selectedColorPrimary){showToast('Seleccioná el color principal');return;}
-  const seasons=[...document.querySelectorAll('#season-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
-  const occasions=[...document.querySelectorAll('#occasion-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
-  const btn=document.querySelector('.modal-actions .btn-primary');
+  var seasons=[].slice.call(document.querySelectorAll('#season-group .checkbox-pill.selected')).map(function(p){return p.textContent.trim();});
+  var occasions=[].slice.call(document.querySelectorAll('#occasion-group .checkbox-pill.selected')).map(function(p){return p.textContent.trim();});
+  var btn=document.querySelector('.modal-actions .btn-primary');
   btn.textContent='Guardando...';btn.disabled=true;
 
-  try{
-    // Subir foto si hay una nueva
-    let photoUrl = editingPhotoUrl||'';
-    if(currentPhotoBase64){
-      showToast('⏳ Subiendo foto...');
-      const ext=currentPhotoMime==='image/png'?'png':'jpg';
-      const res=await gasPost({action:'uploadPhoto',base64:currentPhotoBase64,mimeType:currentPhotoMime||'image/jpeg',filename:`prenda_${Date.now()}.${ext}`});
-      if(res.url) photoUrl=res.url;
-    }
+  var id=editingId||Date.now();
+  var existing=editingId?garments.find(function(g){return g.id==editingId;}):null;
 
-    const id=editingId||Date.now();
-    const existing=editingId?garments.find(g=>g.id==editingId):null;
-    const garment={
-      id, cat, type,
+  function finish(photoUrl){
+    var garment={
+      id:id, cat:cat, type:type,
       style:document.getElementById('f-style').value,
       material:document.getElementById('f-material').value,
       texture:getTexture(),
@@ -648,30 +648,36 @@ async function saveGarment(){
       seasons:seasons.length?seasons:['Todo'],
       occasions:occasions.length?occasions:['Casual'],
       notes:document.getElementById('f-notes').value,
-      photoUrl,
+      photoUrl:photoUrl||'',
       usageCount:existing?existing.usageCount:0,
       addedAt:existing?existing.addedAt:new Date().toISOString()
     };
-
     showToast('⏳ Guardando prenda...');
-    await gasPost({action:'saveGarment',garment});
+    gasPost({action:'saveGarment',garment:garment})
+      .then(function(){
+        if(editingId){
+          var idx=garments.findIndex(function(g){return g.id==editingId;});
+          if(idx>=0)garments[idx]=garment;
+        }else{
+          garments.push(garment);
+        }
+        editingId=null;editingPhotoUrl=null;
+        renderGarments();closeModal();
+        showToast(existing?'✓ Prenda actualizada':'✓ Prenda guardada');
+        updateDataSummary();
+      })
+      .catch(function(){showToast('⚠️ Error guardando');})
+      .finally(function(){btn.textContent='Guardar prenda';btn.disabled=false;});
+  }
 
-    // Actualizar array local
-    if(editingId){
-      const idx=garments.findIndex(g=>g.id==editingId);
-      if(idx>=0) garments[idx]=garment;
-    } else {
-      garments.push(garment);
-    }
-
-    editingId=null;editingPhotoUrl=null;
-    renderGarments();closeModal();
-    showToast(existing?'✓ Prenda actualizada':'✓ Prenda guardada');
-    updateDataSummary();
-  }catch(err){
-    showToast('⚠️ Error guardando: '+err.message);
-  }finally{
-    btn.textContent='Guardar prenda';btn.disabled=false;
+  if(currentPhotoBase64){
+    showToast('⏳ Subiendo foto...');
+    var ext=currentPhotoMime==='image/png'?'png':'jpg';
+    gasPost({action:'uploadPhoto',base64:currentPhotoBase64,mimeType:currentPhotoMime||'image/jpeg',filename:'prenda_'+Date.now()+'.'+ext})
+      .then(function(res){finish(res.url||editingPhotoUrl||'');})
+      .catch(function(){btn.textContent='Guardar prenda';btn.disabled=false;showToast('⚠️ Error subiendo foto');});
+  }else{
+    finish(editingPhotoUrl||'');
   }
 }
 
@@ -682,14 +688,15 @@ function renderGarments(){
   grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarmentBtn(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
 }
 
-async function deleteGarment(id,e){
+function deleteGarment(id,e){
   e.stopPropagation();
   if(!confirm('¿Eliminar esta prenda?'))return;
-  try{
-    await gasPost({action:'deleteGarment',id:String(id)});
-    garments=garments.filter(g=>g.id!=id);
-    renderGarments();updateDataSummary();showToast('Prenda eliminada');
-  }catch(err){showToast('⚠️ Error eliminando');}
+  gasPost({action:'deleteGarment',id:String(id)})
+    .then(function(){
+      garments=garments.filter(function(g){return g.id!=id;});
+      renderGarments();updateDataSummary();showToast('Prenda eliminada');
+    })
+    .catch(function(){showToast('⚠️ Error eliminando');});
 }
 
 function editGarment(id,e){
@@ -900,12 +907,15 @@ function renderCollage(board,pieces){
   const tipEl=cardEl.querySelector('.collage-tip');if(tipEl)tipEl.textContent=tip;
 }
 
-async function useOutfit(ids,occasion){
-  const dateStr=new Date().toISOString().split('T')[0];
-  ids.forEach(id=>{const g=garments.find(g=>g.id==id);if(g){g.usageCount=(g.usageCount||0)+1;gasPost({action:'saveGarment',garment:g});}});
-  const entry={date:dateStr,garmentIds:ids,occasion,timestamp:Date.now()};
+function useOutfit(ids,occasion){
+  var dateStr=new Date().toISOString().split('T')[0];
+  ids.forEach(function(id){
+    var g=garments.find(function(g){return g.id==id;});
+    if(g){g.usageCount=(g.usageCount||0)+1;gasPost({action:'saveGarment',garment:g});}
+  });
+  var entry={date:dateStr,garmentIds:ids,occasion:occasion,timestamp:Date.now()};
   history.unshift(entry);
-  await gasPost({action:'saveHistory',entry});
+  gasPost({action:'saveHistory',entry:entry});
   renderGarments();showToast('✓ Look registrado');
 }
 
@@ -930,9 +940,39 @@ function renderCalendar(){
   grid.innerHTML=html;
 }
 
-function exportData(){const data={garments,history,exportedAt:new Date().toISOString(),version:6};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`guardarropas_backup_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(url);showToast('✓ Backup exportado');}
-async function importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async ev=>{try{const data=JSON.parse(ev.target.result);if(!data.garments||!Array.isArray(data.garments))throw new Error('inválido');if(!confirm(`Importar ${data.garments.length} prendas? Esto agrega al guardarropas existente.`))return;showToast('⏳ Importando...');for(const g of data.garments){await gasPost({action:'saveGarment',garment:g});}garments=[...garments,...data.garments];renderGarments();updateDataSummary();showToast(`✓ ${data.garments.length} prendas importadas`);}catch(err){showToast('⚠️ Archivo inválido');}};reader.readAsText(file);e.target.value='';}
-async function clearAllData(){if(!confirm('¿Borrar TODOS los datos?'))return;if(!confirm('¿Estás segura? No se puede deshacer.'))return;for(const g of garments){await gasPost({action:'deleteGarment',id:String(g.id)});}garments=[];history=[];renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();showToast('Datos borrados');}
+function exportData(){var data={garments:garments,history:history,exportedAt:new Date().toISOString(),version:6};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='guardarropas_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);showToast('✓ Backup exportado');}
+
+function importData(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var data=JSON.parse(ev.target.result);
+      if(!data.garments||!Array.isArray(data.garments))throw new Error('inválido');
+      if(!confirm('Importar '+data.garments.length+' prendas?'))return;
+      showToast('⏳ Importando...');
+      var i=0;
+      function next(){
+        if(i>=data.garments.length){garments=garments.concat(data.garments);renderGarments();updateDataSummary();showToast('✓ '+data.garments.length+' prendas importadas');return;}
+        gasPost({action:'saveGarment',garment:data.garments[i]}).then(function(){i++;next();}).catch(function(){i++;next();});
+      }
+      next();
+    }catch(err){showToast('⚠️ Archivo inválido');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function clearAllData(){
+  if(!confirm('¿Borrar TODOS los datos?'))return;
+  if(!confirm('¿Estás segura? No se puede deshacer.'))return;
+  var i=0;
+  var all=garments.slice();
+  function next(){
+    if(i>=all.length){garments=[];history=[];renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();showToast('Datos borrados');return;}
+    gasPost({action:'deleteGarment',id:String(all[i].id)}).then(function(){i++;next();}).catch(function(){i++;next();});
+  }
+  next();
+}
 function updateDataSummary(){const el=document.getElementById('data-summary');if(!el)return;el.textContent=`${garments.length} prendas · ${history.length} looks registrados`;}
 
 function openDetail(id){
