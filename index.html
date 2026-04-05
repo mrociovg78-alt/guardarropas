@@ -301,10 +301,10 @@
       <button class="btn-sm" onclick="exportData()">⬇ Exportar backup</button>
       <button class="btn-sm" onclick="document.getElementById('import-input').click()">⬆ Importar backup</button>
     </div>
-    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importDataBtn(event)">
     <div class="divider"></div>
     <p style="font-size:0.75rem;color:var(--mocha);margin-bottom:0.75rem;" id="data-summary"></p>
-    <button class="btn-secondary" onclick="clearAllData()" style="width:100%;color:#C0392B;border-color:#C0392B;">Borrar todos los datos</button>
+    <button class="btn-secondary" onclick="clearAllDataBtn()" style="width:100%;color:#C0392B;border-color:#C0392B;">Borrar todos los datos</button>
   </div>
 </section>
 
@@ -410,7 +410,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-      <button class="btn-primary" onclick="saveGarment()">Guardar prenda</button>
+      <button class="btn-primary" onclick="saveGarmentBtn()">Guardar prenda</button>
     </div>
   </div>
 </div>
@@ -490,12 +490,18 @@ async function loadAll(){
   renderColorPickers();renderGarments();renderStats();renderCalendar();renderHistory();updateSchemePreview();updateDataSummary();
 }
 
-loadAll();
+// Wrappers sincrónicos para onclick (iOS Safari no tolera async en onclick)
+function saveGarmentBtn(){ saveGarment(); }
+function deleteGarmentBtn(id,e){ deleteGarment(id,e); }
+function useOutfitBtn(ids,occ){ useOutfit(ids,occ); }
+function clearAllDataBtn(){ clearAllData(); }
+function importDataBtn(e){ importData(e); }
 
 window.addEventListener('DOMContentLoaded',()=>{
   const k=localStorage.getItem('mg_apikey')||'';
   const el=document.getElementById('api-key-input');
   if(el&&k)el.value=k;
+  loadAll();
 });
 
 function saveApiKey(){const k=document.getElementById('api-key-input').value.trim();localStorage.setItem('mg_apikey',k);showToast(k?'✓ API key guardada':'API key borrada');}
@@ -673,7 +679,7 @@ function renderGarments(){
   const grid=document.getElementById('garments-grid');
   const filtered=currentFilter==='all'?garments:garments.filter(g=>g.cat===currentFilter);
   if(!filtered.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="icon">${garments.length===0?'👗':CAT_EMOJI[currentFilter]||'👗'}</div><p>${garments.length===0?'Tocá "+ Agregar prenda" para empezar':'Sin prendas en esta categoría'}</p></div>`;return;}
-  grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarment(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
+  grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarmentBtn(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
 }
 
 async function deleteGarment(id,e){
@@ -862,7 +868,7 @@ function generateOutfits(){
         <div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-${uid}"></div><div class="collage-palette"></div><div class="collage-tip"></div></div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
-      <button class="btn-use" onclick="useOutfit(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
+      <button class="btn-use" onclick="useOutfitBtn(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
     </div>`;
   }).join('');
 }
