@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Mi Guardarropas</title>
-<link rel="apple-touch-icon" href="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-05%20at%2011.19.58.jpeg">
+<link rel="apple-touch-icon" href="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-05%20at%2012.10.38.jpeg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mi Guardarropas">
@@ -12,25 +12,48 @@
 <style>
   :root {
     --cream: #F5F0E8; --warm-white: #FAFAF7; --charcoal: #1C1C1A;
-    --mocha: #7C6A5A; --sage: #8A9E8C; --dusty-rose: #C4957A;
+    --mocha: #7C6A5A; --sage: #8A9E8C; --dusty-rose: #D48E92;
     --gold: #C9A84C; --light-mocha: #E8DDD4; --border: #D4CCC4;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
 
-  header { background: var(--charcoal); padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--cream); }
-  .logo span { color: var(--gold); font-style: italic; }
-  .logo-img-wrap { display: flex; align-items: center; }
-  .header-logo { height: 36px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
-  nav { display: flex; gap: 0.1rem; }
-  .nav-btn { background: none; border: none; color: #999; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.45rem 0.6rem; cursor: pointer; border-radius: 4px; }
-  .nav-btn.active { color: var(--gold); background: rgba(201,168,76,0.12); }
+  /* HEADER NUEVO */
+  header {
+    background: var(--dusty-rose);
+    padding: 12px 1rem 10px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 108px;
+  }
+  .header-top { display: flex; align-items: center; gap: 14px; }
+  .logo-img-wrap {
+    width: 64px; height: 64px;
+    background: white; border-radius: 12px; overflow: hidden; flex-shrink: 0;
+  }
+  .header-logo { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .header-brand { display: flex; flex-direction: column; }
+  .header-brand-title {
+    font-family: 'DM Sans', sans-serif; font-size: 1.05rem; font-weight: 300;
+    color: white; letter-spacing: 0.18em; text-transform: uppercase; line-height: 1.2;
+  }
+  .header-brand-sub {
+    font-family: 'DM Sans', sans-serif; font-size: 0.58rem; font-weight: 300;
+    color: rgba(255,255,255,0.80); letter-spacing: 0.22em; text-transform: uppercase; margin-top: 3px;
+  }
+  .header-nav { display: flex; justify-content: flex-end; align-items: center; gap: 2px; margin-top: 8px; }
+  .nav-btn {
+    background: none; border: none; color: rgba(255,255,255,0.80);
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.4rem 0.6rem; cursor: pointer; border-radius: 4px;
+  }
+  .nav-btn.active { color: white; background: rgba(255,255,255,0.25); }
 
   .section { display: none; padding: 1.25rem; }
   .section.active { display: block; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 0.2rem; }
-  .section-subtitle { color: var(--mocha); font-size: 0.85rem; font-weight: 300; margin-bottom: 1.5rem; }
+  .section-title { display: none; }
+  .section-subtitle { display: none; }
   .section-h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.85rem; margin-top: 1.25rem; }
 
   .btn-primary { background: var(--charcoal); color: var(--cream); border: none; padding: 0.75rem 1.4rem; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; -webkit-appearance: none; }
@@ -119,81 +142,21 @@
   .piece-label { font-size: 0.66rem; text-align: center; color: var(--mocha); font-weight: 500; }
   .outfit-tip { font-size: 0.8rem; color: var(--mocha); font-style: italic; padding: 0.7rem 0.9rem; background: var(--cream); border-radius: 6px; border-left: 3px solid var(--gold); margin-bottom: 0.75rem; }
 
-  /* AVATAR / COLLAGE */
   .avatar-toggle { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
   .avatar-toggle button { padding: 0.3rem 0.8rem; border-radius: 12px; border: 1px solid var(--border); background: var(--cream); color: var(--mocha); font-size: 0.72rem; cursor: pointer; font-family: 'DM Sans',sans-serif; }
   .avatar-toggle button.active { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
 
-  /* COLLAGE BOARD */
-  .collage-card {
-    background: #EEEAE4;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-    padding-bottom: 1rem;
-  }
-  .collage-card-header {
-    padding: 1rem 1rem 0.5rem;
-    text-align: center;
-  }
-  .collage-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #3a3530;
-    margin-bottom: 2px;
-  }
-  .collage-card-sub {
-    font-size: 0.65rem;
-    color: #8a7a6a;
-    letter-spacing: 0.06em;
-  }
-  .collage-board {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 3/4;
-    overflow: hidden;
-  }
-  .collage-piece {
-    position: absolute;
-    overflow: visible;
-  }
-  .collage-piece img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    filter: drop-shadow(0 3px 10px rgba(0,0,0,0.18));
-  }
-  .collage-palette {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-    padding: 0.6rem 1rem 0;
-  }
-  .collage-pdot {
-    width: 13px; height: 13px;
-    border-radius: 50%;
-    border: 1.5px solid rgba(0,0,0,0.1);
-    flex-shrink: 0;
-  }
-  .collage-palette-label {
-    font-size: 0.58rem;
-    color: #8a7a6a;
-    letter-spacing: 0.05em;
-  }
-  .collage-tip {
-    font-size: 0.68rem;
-    color: #6a5a4a;
-    font-style: italic;
-    padding: 6px 12px;
-    background: rgba(255,255,255,0.5);
-    border-radius: 6px;
-    border-left: 3px solid #C9A84C;
-    margin: 0.5rem 1rem 0;
-  }
+  .collage-card { background: #EEEAE4; border-radius: 12px; overflow: hidden; margin-bottom: 0.5rem; padding-bottom: 1rem; }
+  .collage-card-header { padding: 1rem 1rem 0.5rem; text-align: center; }
+  .collage-card-title { font-family: 'Playfair Display', serif; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: #3a3530; margin-bottom: 2px; }
+  .collage-card-sub { font-size: 0.65rem; color: #8a7a6a; letter-spacing: 0.06em; }
+  .collage-board { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; }
+  .collage-piece { position: absolute; overflow: visible; }
+  .collage-piece img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.18)); }
+  .collage-palette { display: flex; gap: 5px; justify-content: center; align-items: center; padding: 0.6rem 1rem 0; }
+  .collage-pdot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+  .collage-palette-label { font-size: 0.58rem; color: #8a7a6a; letter-spacing: 0.05em; }
+  .collage-tip { font-size: 0.68rem; color: #6a5a4a; font-style: italic; padding: 6px 12px; background: rgba(255,255,255,0.5); border-radius: 6px; border-left: 3px solid #C9A84C; margin: 0.5rem 1rem 0; }
   .color-harmony-row { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.75rem; }
   .harmony-swatch { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.08); flex-shrink: 0; }
   .harmony-label { font-size: 0.7rem; color: var(--mocha); }
@@ -228,7 +191,6 @@
   .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--charcoal); color: var(--cream); padding: 0.7rem 1.4rem; border-radius: 8px; font-size: 0.85rem; z-index: 300; transition: transform 0.3s ease; white-space: nowrap; max-width: 90vw; text-align: center; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* DETALLE PRENDA */
   .detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 250; align-items: flex-end; justify-content: center; }
   .detail-overlay.open { display: flex; }
   .detail-modal { background: var(--warm-white); border-radius: 16px 16px 0 0; width: 100%; max-height: 88vh; overflow-y: auto; padding: 1.5rem 1.25rem 2rem; animation: slideUp 0.25s ease; }
@@ -242,21 +204,25 @@
 <body>
 
 <header>
-  <div class="logo-img-wrap">
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAADICAIAAADdvUsCAABEHklEQVR42u29eZAcV50n/r4vX2YdfV9qqW/dt2xLPuXb2NgYGxh7ZoeYjV0MO3hjZpdlYjeGYwb/AiLAQAwwxHCYmP39NmKBHRjYWVhYj5mVD4xP2ZZsZFuW1FK3pL4v9VlHHu99f39kHZlVWVVZVVlXd2UEWN1dlfnyve/nex8QiURI/ar4hYRAWR8IGVZR5D3Ri2UUv5IauoAQWqf/ajmKsqM+5cfqoXvcSCePdRBucOnrLdFjfU/rkrB+1cV/TXG/2A7Q+laue0KHrKZXXXyVG4FpO069Ouna3xwkiOsPgVV7RhvRJYNIkBAAj0EI6waHEN+mshtE4NXu1RT9YppAzi2Wa5pRmit3OmlW1w9sKIRiaArTmVxRugPmw97MM7YwWnB6KFYrDt1uW+0yeyfawBKBMMNJOwtib+iv/I4CT/kxeqvl20OOuJ6M9nXqfmDe7kl+u5Qg5XRw5rvdiOXjlO4RiBllYwIb6NVKMjyo7jarMGcvNQi9USQAPN1mqOARQ54IwPKS34ZHYJWikJUGcO5OHbzeDoASnl/i5ol/2EUi5Kl+o32jIF/AuBCD9ct+PFW6SywPQoTcjBZLav0n746pxF9aKsRCzhyKoJb8HgnZf1UXg1V+UddUiC5ps4RHDo5PQMcAqMe2vSPI80G+YxwCMwTTc2jVKZ76wj26dXjmv2Ml2DTmloTAPLOK+ogxlXAgRf1L/MLbRQJkNCfc4RDyEXSYk5cBxINO2ZwxGVWSKraOql6nLcmOsYqvoGCdEJIUmaYIZ7bHMK8HJg21QqKIOb3HhSuNsbd2ZW1mtiTrqKoECYPXjpkyKTSmrx8IQYR0owus3N+LZ6XQKWK+DAjcnUJRuwcFnkuMt7h5ozwzEMpECZ6IBA/96Fl2yVF3xVR1skYyZtI9k+UEf/44TMgiR7xhRXcS8iL3del39TiShUU+vhIgTDKzWlCJsEDzCSuOt7pVlol1QomXhCSLPQ5pMKxsPWFVIzBLEHBdllzUvHRD9MxvXBrZaOHLWFFJiOXYIQcPJNofD24zqMGlor/BZU5VscykAKzUK0CqlWiRjekGOSv7TmGFuBS6te8TRmDB2k71EOUG8X9WG1tMt7NMVGYgfVrWwB9k1+g80/EccgvyRQuAowRNvVX2BWPRzKLAl8d8cxhqHoEA5rmgk75X8gXkR7epH2bl9h0kAs2p8KtS/SoejbRrpsm3yOmYhkIOtSgBi6kbu74zS+1vFw+QQqUWkONjaLEK499jVcErMbchVhmdIguQTByC16oRerAJKSsAtGSJg116rDdAWl+yaleYmvhRhE1YMMO2CUMzFa5yu5aFHJPVEq5ZYPHEDVni/MXvUlww5gx+1ipKa5Kt0BKQS17fhXV3sqV7I/Rm7a4c1FAvjyrb5UISpiszlbPQSmWjesX4S/hSYHNcZXkQAORQiTE3DjcgACthBpkWbL3RUw3RXcLp4C6TDiAD8LyLX6yPQEjSWVI+cxIsPnyWB3WuV+5YQ3qXy4ppcKrfsLhkoHiSBVg/KIR4lUyZge/KJqwXnVm3oioiwlBsLrv16zk9T9mExvrKiwUP2796aBPa+liWW1hXB/AsRcw1kWte+Gu6O1yHhKc6h/bgotkOJpsIJcmU2XVsJdYGjWGxCHT7SY9q+eqXW0mYosOgUyOUxPGsg1NJb3sGtcMsCnjPlLQeqJ5j2HAIp9m4I1hNiKzW/3oQiYl8y/K+CGZI2XO5jLx3Hoj72Q8px52h12MRQhiLYyjrWx2NYQxyH0z9Ko4QHfKsE06gsrEDsEMay3XiG20kbx7qqMuNRruorPXdKX/jDIcf0wohs0fnPbcI3NykmAelshVYz5ADt+/KiiBcXC/+0uoJxeA6eEJ2BK5Pmw+LsmwLzR01ZWBtbWelrNbiDGa0WVBp7RvyKiFP630C637za4GHbqSZ9Vma0pVUFwVwTmFJO0DMfqpZijmgQErBsiMQ1q02Gu8gY5VP1hyPzLyYebnLtRjRrrRNC+7/am4vuJMzzu+FKXYnFLsD7vQuSCndqJz+XyptGJ3P0x0iWOnesD6TJE8wphykC/e9mQhKKZEkM78HYqeOQggiRBaAeTO3J6Hf5qA2sKXauGlnXqrghRetBrLxkKwoz/BcVn4Sq18p9hlYTT9CIPnrzMPPzG9TCgBc0/RwWI+EDU0jiFSWlWCDr6lJkhXBjYxEgF7kLIOljx+4+CgUOpPcK/FVvOKTPsnDpbmb+dFegBCdG6jV07+znyJmYPqYkCtor12yfwokqocjq7Mz0ZVlNAzzY4JzQ41y3ZD9/tb+gZaeXhILRpaIKF1z13xNFaji8/PahIFIJOIdCNdpy/SkhuiunA+zD6PAnPp5zFRLKntpI4ABVmZmVibGCSENHZ2B1lY54CeUEgSuqeGlxcWxy5HFxY7Boe59+wmWspFWztPfIIloRaDAC0m4brGHziaKU8MsV1w8pQMsSRmulD75lDgPY0OcH7mwOjPb2NnR2jegBIMECAph/l1SZH9zc8uWnun3Ts+dH2ayvGnvPkPTSnVMOW+7QXShIraXVZhzVC+ArTksNqUrIVWgwPkU9mMDO7W6UOJnz51dnpzs3LatfXCIEIgZfonVCDQMTiW6Zf8BbW11dni4aUuPr7lZGEY9zbA6FKrUixZFpYk8wwJKPKEGWgklO+iZq7Xk00IeQM7fA5EhpRskae78+fnRi239A+1DW1EI5Dx9J4GC4Byo1LVjl6EbV8bHKKU1T8C1jkF0Pm0AYMWSqJXU1lfVr3MMDfIp+7GWrmfPs02HKxJbVBCRMrY8Mz07fLa1p7dzxw7BOUlUXKeNAgZKBTcCbW2+5ua1+Xle22LQuwTJShmoWTefFkWkrlNUaxOD4CUZFfktSg1Nmznzni8Y3Lx3X0ww5pLDlDHWENTCYa7rUKMgRO9mzFXntDpEb7UUTFVWq+043a/KWwy6BQCYDfcxZQYGIqXS0uXLkSuLXTt2KoEgcmEBFWY1Q0Bwo1ZTNwtLscvYFgKr8P2waJswBXiQmmRchWdfhQLBVkWdFm217GHH0FBLT68wDKB2JoHOBodAoYXDTJYpY9WOQlcdVYpFYXVerGgkp1A2OFfKVSp5ugbYPDoKRLTZLyC40bFtGxBAFOioV1njVIimF0cLhaOLiy1beiQmG4ZdI62GXIoEAWBOlp2XTZj6mmhJmq1Co4kVtX2OssWqJmFWvGWDn9cWNBbfDckL30A8xI/u+38mhrQhIiKBHIF3RAQCSJBKbGlsXAuFmjZ1O2e9VYwk0dbn065P2ZaVnBWZJz2gDXhQ3W6LksYJgUCc7PLGAJRqSZX4anZZCGmcArOtIUemGBBARCoxdW1t6sx7wba21t5ebujg0tAqNZm6cLRAsawYSUrOeHUrW0U7ZsBdH5pkLMuLrrGu/Ct2N0ws0FfoOxbZ0yFt3AWkOiuB5NydTI4le+NaJEiAIJDxt96Khlb7rrpaCfhRCCdfNtgdBJWaK4rWxWQwiaGAIwMCNVF6Tiuw4cUfswMq0nuiVtzYcyVcwVEnS6c7i5DMiMK48kaZNH7q1Mz5s1v27G0fGMwVn3DXTha9bzNrqTHErIVQeQIJamxwAyscBmUzyQpTFpNVNvb8s0pdOXtGZlTJ0FGLzCA4CPMpU2fOjL/1ZsfgYP/V14h4gUXeXCmTKlhkUylI7+IdV5FSDdeN4rcrfe4oYlHoLYbkIT+55JljCNLA5o4HZQn8oYsFIiKT5bmRkctvnGjdsmXbDTeBRJGL1CRVt9tSouySTHWSUCyjr4Owou6WfJ7plrQ8nfaeXouU3nEJ81BpHVLqECVZXpyYGH3llUBry45bbpX9Ac6NjIooJNufpW6StclvkfNnPFSm1u9Fy4qGath2cE8ipVmuGcQDoJRC0gWfRwOkdAQiImUssrg0+uqrSjC469bblGBQZEEgyeGBrSTTrIOwBEQPRXkmqx+u+QEQKWPM5+Pc0EIhrmlUkqjM0JQ5lkINyGdlAMAN4/IbrxFu7Lj5tkBzizByJovGLC7zSjKdMmAQYP3DG/PwQDIvHlY5gBXjJEDrCxCb96JkryP7fGvzczNnz2mqKskyJQhM7hwaau7u5rqeNN4wuxh0MAUn3nlnZWZ6641Hm7q79GgUKEXnF4bc2wI1yeCqjIPn8YbFgRDLeW4l8xUlyBNLeigAlI699dbK9FRb/0BPXx/z+VDw8NLy1Jn39KjaMTho6JpVfDk6UJAQsLMeKknR1dW5s2dbens7tm4zNA2S1YOYecpUGtYhESipa6FlVbZYjWAmg7B1w29yZaGkSgEobqmOSwIghAy/8DsqsV233yEHAlzXUQhgcmtPjxIMjB4/3tTVyfx+5CJN2GF2/Vai0tLEhK5Fh3btoRI1dA7gFH0EFy0x6+grWBoVsXXUAyCbTfqwdAgkhd8dc48A83JSMmTAiSSNvvqq7PPvvO02YEyPRjHeFFSPRIKt7b7GpuWpKYkxTLbxTLqzsmDF7DG6MjejNDY2dHRyzourG4Q6EGvRMeM0pbCw0LznORlxF3w+d0SPUYiC+Xzjb78tBN96002GqhIhgFKL658SQnyNjWoolLNttqOMFZxr4Ygv2MAUOS0qW4iJUr8KMspKBEL39Ask2Yil+CPHtL5jBbBnzMLbweKKLFqKZ+YdiEiZsjw1tTQ+NnTd9ULXM+mraBiQVoDj9thjvmfI0I0D1hUCc05QdE8eHupuUNSXaLErhdJ0R06ZFgzFMqjkm2S5m1t6RctNMYu/BwBQiKl33+nZt18JBIWZvBIPDSSeKVBEV1b8TU3o3EbZKUHN0jmYSkwOBCOhVUNTN4DE8yj90Eu6LVaCehEnxJLtdTFPdRQ4WR5kc2ZkfW7SzMymOqOZwjJ+mclyx9CQoalA4019EbmuxzEEejisRyINnZ1oGBmlIdg0jQRfQURKacum7ujy8sr0NGUs0YC04kdYKgzWEKPJZV5hbhC612TQoxXnhUHMA8mxKgNnfc3+e1eDSjCHqRZ3mSyMjnZs246W4mYqyxMnTy5PTkqMoRASk1emJgItzYHmZmH2L0x9yXijYVMPo9TKxc0wfVt/n7+xafLdt/VIhMoyemVXI7HpfvVxIgUod7kQhN5lzGAlXs8l1/QuZQfRrfqBSGV5dW4WEVu2bOGGTgAQUVKUufPn1XCorb+f6zpQipwvjk90bN2GKBydKmiW4aMAKjFZRs7tdjgRgisNjX1XXx1dXr746qtcVZkse+DiSil2R6xwgVhFCLAs70s9Wql3A9NNwHjoI/W2aRqAc9Qgnb1J0tL4hNnfxRRNlLHw0uLs8HD/kWupJKFApvgWx8YoZY2bNqVW/QEhhAhEQpAyRhlT11an3n3n7L/8y8yZM1ZxRwG4rndu2zZw+NqlyYnh3/52bW5eUhQqMVdQTDi00z2r6WUdULUYRKyqrmL5rIUVdHe7i89DHb0UOfulqsjJxikoBT0aDV+50rVtO+cGxGl97ORbXdu2B1padFWllOqqOn3mTN811wDY03UwNm2QyTLX9ZWZ6cXLY0sT41zTAq0t/uZmFALs7yc0o3v3XjkQGHvz5Nnnnunatq1z+45AWxshRJj2J0DmfDhbl+Hk/ifbRGCVQxBKlDsJBSMQCbp1JtVCxkxxCmSMaZAyGvSIwOTw/CwB8Dc3C84Rkfn902fOUIl27dhhqFFCgPmUi6+/EWhra+7ebKgxtw0iAiGUMaBUi4QXLo7Oj46uzS8whbX09HYMDTV2dlKJYXpHbSDc0NuHhhra2yfffWf2/PDc6Ehb30DX9u1NXV2m6YiOAZL07ltY5eYfxlgDksIHHpZdLFqGWUPRIHQzaA7Ri1Bh0bwNS6SV2umVoKMuGl68EmhpoTLjEZ1KTF1dXbp0cfD6G1BwRCIpbHlqOrQwv/uOO4WugQk/AEmWCcHoyuqVi5cWLo1GlpeVxsYt+/Z2DA4FWloBCDcMkZYWkxj1ZGia0tCw9YYbO7fvmDt/bvHSxYXR0bb+ga4dO5q6u5gkc8MQphR11fDCPj8YKkTBmO5lI9XdvimPVMmSSUJPZI5X9bT53i0vDmId5WkXwJHlpWB7O4lZg9L06XfbBof8LS2GqgKlQjcm33m79+BBqsiGqkpMkpgsOF+dnV0YHVmamOSa3tDZsXnvvtaeHiUYFEJwQyfx2qPE4M8UOAGAOaOiqbOrqasrtHvvwujowqWLVybGmru6Ordube3pY8GAMJHs6qQq2q8FseRmRUm9h0mpXX4QVgmMSZ5zGwts7EXsE68JEIKca9Foa7BBcCEpytLEOFe1zu3bDVU1PTSXjr/W3LWppaeHG1z2+/RwZPHy2MLliyszsyBJHX19ndu3N27qZpQKQrhhAIDEWBx7QCmYpRIohODcJtwACCHc0JGQQFvbQEdH9+7dC5cuzl24cO7FF4MtrV3btnVu3epvakIhhGEgsZfS2zBXOcJ3aCpXaQiiO6UAHRQwqEkQlu5EwU0IErLdJ0vDiPgjBOeEcyUQIASFwefOnuvet9+UYCwQmDj1e0NTt958VGhqZGl5cWxs8fIlNbQWaG/vv/rq1p4e5vMbUXVpbExdW+Oayg0uOBecE0CgEiABSpnPJ/v9geaWQGsz8/lNRFk9W0AIGoZBiBIM9h44uGn7jvnLl2eHz46dPDH93unOrdu6duwItrYRIKa56JClg1D1x1oupRStZXtZp0SlJ34lvVzOEtGLcdmpGnxp9iX3DOo0xSmvWe2pe5T+FmgbswvpSmzytyjEyIsv9B0+0tjZOf3e6bX5ha1Hj+qRiOz3X7l06crF0YHrrludnZsfHVmZmeGa2tje2TY4EGxp1aOR6OoKVzWCRPIpst/PfD7m9zNZAUkCSk2FUxiGoWl6OKyG1rjBZb+/taenadMmwXmiPiOFFIBSicmGpq1MTU4Pn1uZnpYYa+np7dq2rbm7m8pyrLqKEJIoR8T8tYlSSUJw2PBSKVAZ4Wc3cArLZ3bg456CEDEVMtkX6klPuyynhc6jqElKqRDBjF90bMLn4shRiJGXXuw/fEQJBs8992z/4SOB1laJySszUxffeL2hozO0sBBeWgIqNXV0KMGAFgkTQaJrIS0aburqbOrsamhrC7S2yYGA7PdTxsyFcoGCGwTjvW0pECGiofDa3NzazDTz+Tfv3SMpvkxDeRERgEoyE5yHFubnLly4cvmyoWnNXV2d27a39vYqwQbBrZ4bi5+9MJqD8kC0ZCDMEHyEgj1D6CEIHfHjyDNKzUHRqZO7rUg8V1/d9CPEzOzfHQMGQs49/9uh629YnplZmZ7afceduqquTE2OvPKKGg4jkIa2Vj0aZUxp6uzsGByQA8GJt98eOHLE0HQjGjFUVQ2FjKjKDQOIoEyRg0E5EPA3NfkamyRFNocTIgAhRKIUGEPOFy5dWpme6j14ldIQRG5k6qcbc8NKjACJLC/PjV5YuHgxurQUbGndtHtP+8Cgr6kxYS6Ce5d4ZS1Gb0EYf3PELB72ioMwTQGzcs3USqSS4tBZ1bZrjGnJ1tlAmMHx6EokxrNPKGPnXnh+8669sxfOd27dSimdPP3u/KWLVGItmzf3HjxIuLFw8RJQ2tjeEV5aIgCUMdmn9F19DTcT0wAICq4Zhqbq0Yi6uqaureqRiKGqwfaO7t27rV5c06KTA4G5kZHFscvbb7wJSa4EEkQkhEpMkqgaDl8Zuzx/4fzalUXmD3QODW3ati3Y1kYI4bqOSMwYZnlhZvlPlpFeJRKDCfbjqGd5nblQEnW07CBM/Q84mRAZU6+SfQftYtyNCwfTQYgoiBwIXDz5ur4WDi8vgSStzc6xgK9jaKhjYLCxo1P2++dHR5bGJ3oPHRp95eVdt985e354/tJFrkY7h7b1HDrEDQOFIEABCFBKKQVJAoKCCz0a5bquBALpZIeIsk8Zfe215k3dHYODhqbFIpm5XHlAKWUy17WVmemZ4XNLE5NAoL2vr2vHjqbuTRJjggshBJRTHuYHwlK7ZzxtQlta72hKb+XynJbdjwckY5cXyKS4FvNsSHXWmeM4Qwvz+lpoaWIcCfE1Ng4cOdIxOGhGBbiuG6qqBIJaNBxoaW7p6xs5/sreO+4MtrZefPPEzPlzSEjPgQOEMa7pBMAMQqBhEIKAhMkyUxTHeiUgBLlo3rw5fOVKx+CgK4ssPqfN0FQK0NbX39bTuzY/PzcysjR+eWVqoql7c8fWbS2bt8gBv+Ccu40uenis6MxHrGmDUPrVlPIRzOu1IkFrB8FypT95PYEO8h+2QRkjQNbm5uYvjCxPTiBia29ve/9Q85bNzKcIgxuaRpAAABEi0NxMJTm0sNC7b/+Z5347ee7c5l27mN8/9tbJtbmZi8fDm/ftDba1G5pqmnAQ79WJGNM0Y/moaakzTFGEmaGWaT+cshHM9+WaBgCNXV1Nm7rV0IGlSxfnL14aPf6qv7Gpc9u29sFBpaEhFgsh5Z1oUG2Xpxqp5yGKGrlSdE+7RpofeSECpUBpeGFhdvjslbExSqXW/oGOrVsbOzsppaZuGRcgZkMNlBVl7NQpyuT+gwdW5xcuvPLKzltu9jc3h68sjP3+9y2bt6xMTTV1b+rasZP5fFzXY0NFs6wTERHlYHDq7d8TxC37D+maCpmb1mSjoHiWjyQxLRJZnBhfGLmwNjfLfIGOoaH2wcFAWztQEAY3GcTGIBXinONeB6GXJnhB7A0RJca0cHj6vXcXL19GJG19/Zt27gy0txNCUDdEesDbNK0oVUNrl0++ue2GG32NwYm331FXVgevv5ZK0uzw+bWF+f6rr5l85x01tNa6pbe1t1cOBggSITgKYeItaXADECCUShJjy9NTU+++O3jddbI/iILHwgxp3YLdtYpMmItM6Pra7MzshQuL42MA0Nrb17VjZ9OmTZQxYSajApT2aCoMwlhRi9W/4KGFvOFBWJwjijIWXlq6/Prx8Mpy59D2rh07gi2tSJAbhoPgspthzOebfu+0EYn2Hz7MDX38xMmOoaFgRwdQeu53z3dt2945NLQyN7swetGIRgMtLYHWVn9Li+z3S4xBvEUVISi4ELoeXV1dnZmOrq5u2rUr2NYudCOtjQrkB8KEnYkIQCljBHF1fnbuwvkrly4bmt66ZUvX9u0tvT1M8SXbh9c6CNMr9ZKos4PQO3Nx44EwET8stkQDQZLUtbWRl1/S1ejA4Wvb+geISHNdZPWkU4mOvvJqy5YtXTt3qqGQGfVjsjI7PBxeWhq69lrOucSYFg6tzS+EFuaNaBQolRiTZBkkiRBELriqcUOnTA52dLT19lLGODcAaKojsVCQgMW7LMkyISS8tDg/Orpw6aK6utrQ3tZ78Kr2/kHBDawhGoASYLWUIFxffdEzpA4V5r0ZefnltfnZrTfe1NrTZ6hqrBsTpqbOY4ZcJ6BUaNrF115rGxzo2rbN0HTBuaTIK9PT8yOj248e1TUNCKESNcvkua5r4YgWCRvRqBCCAkiyzPx+paFB9vuBUq4byfhtzPwkOQxdzNT+yjnnhiBKjIEk6eHwlfHxmTOn1bXV3v0Htxw4JASvDc+JJ24V9AyEzDUrrFY3VIrK7rw1TnzEYlZloEvInMiNTFEWx8YWJyd69x9o7ekz1GhsAkSsihgdphul9aFHziWfr/+6ay+/8YYWCm/asUOSZYnJK9PTzO8zXwkAUKDBNbOKydfc5G9pBqBJCYUEBRecY1IIO/WDcUc0lrEcGZyoAMIw0OCSrGzetbu9r+/i669Nnn6XBYKbdu40dL0KXDWYdLwBOJNTrIFVMYVadceMTV13kd2Sbp5lYfa5cgzMQUiXXn994dLFvffc629qEtxISbjJeFBpEXaJSYLz6bPDkZWlYGODHlHVaHjgyHWyz5csbrDqt4iY4hYAcBD1mQV4JknovPLMHggUQpJlrqrnfve8YRh77riL+XyIompAmCHtG6ylZ2mu5rJrfqyyAPI6ezsrzSF6xckAQAihhkL+xkY5EBBoa1UI+d7K4IRC74H96loourJMCGno6KQSFZk6iAIFyCLjc41WclcBhNZ+bxnsH6CU6zoLBDqGhsbfPhVeXmzZ0iN0XmlhCK7M/oxjw8uNwlquJ0TMb7ccfZUZlQx3mhulQFMkCFg6hbpeGBKuaXLArzQEwczYjPcgTY3LQxoPSssxxqx6fbwiLi9lC7IuHuVgAwUQVaGLkvwM/pxNd0p/0drYqUxCJDlSqYBy+MyrytWkFBGpJPkbG6Mrq1ooTCXJnkeWvS1ifM5UyhALAORc6DrXtJTNQYsimkvbRJLYDkvnWUx9dr7bY1ltChdDJGaqDaWSoqQWB1fbVZWTOSip6asADFpHQxfxTILY0tsruDFz9iyYvnuMXenEirbO3QmvSaLqRNi+Ai40xSwNRd1tSLHhBEQUAoUASeKGsTo9qfgD/qZmTG0iXnvqVfmfWeM2YcX4KQhdb9myZfOePXPDwyDRzbv3KMFgbEh1rM8iJmaz2RqNWEWcVW6kFXNAmpUT+3fCSLNVvpNEDZwtBwgA7eZPlr5DkBGqyRIeM9+HQCyjlRvG7Lmzobm5zp275GBQ6HrcS+ytB9FDjGXtklgJgnTyjqLbTu+VWnQ1CODEu8+cOTM3OkIlqaG9PdjSojQ0mrXwZjA9HjQHkkhsR7v1aC2+gjRfgUMNjdk9JnFDK0nFB86k2bfZmo6kOlrTXhTiifkmaxGIgnPDMKJqZGVlZWYqvLjY2tPTe+AqQiHJWEsBwmISLTL5Qj1cGxTo0bGDMHfda/4gXKcj0JMNlZgUXli4MnYptLDANVUIBADKpFiQT6KxAgiMZ3zGJBUFCjSR15KoG4z3d4mHsjCOOABAAGq2mUmI2xiCYm0QCRASk8aJIGPiNxgbCBUTv8mDA0SEVKGHcewBAFAgwvwmF9zQDU3jusZ1QwihBIPt/YNtA/1AAFM6FHoPwkIhlB6F8RaExTXjSQFhnp1e3eiTNatzukMixoqYCOGarkcjejRidkxCIdAssAC7XhmXLjbZZIFFzHsZp+k45Cx/phCTSBjvtRhvRkoSyQsJ5BOkYIJQkHjKCyGWKYmIIuHvSQwnTzS5jqGRIInf35wNJTOJMeYP+JtbmE+JFTeRrH1E0MG1i3lVjRWsfOVsG1WQUWzPTyyc4xQHQrdier2rp6aQo9SUbgQoJI0PC5eEVJrMSmokrWyfVEd7esuIxASvcexcClkpIZtY85poygBCzxwzpSjD3QAIjMkURBQGcoLE2iEfrO07MSsFQK1xnlgpVbI+Iyt6IAOYEbNrkF4okCneKA/aVaS6d7BwdZQ5vGoxbKgWlc8i2a6tz4LFVQK2+Dqm+Tq8sEPcjDRFz0ZMO0iThPqaBBMSdzOSnDspZX65anMEeucNYV4z5BoUfBnyItPyYNz3HbXQZ9zPATkloXtekDqhAXK4CmIZPLmmEefLjCzSJTUBB/LnF7nPpFDOlaV1aHVwd5Z53Xm+s8n3y4ZBLG9naExv0J3L3nCazQ3Zm4jnbF5uXwbkOOs0HSz5T3DW+gpS0hza2KX2K0Dnm1snH2cf/eLlKZeASh0zKF2vmeW30NSKBMiuVJRWGSjtQzPGtKEw5SS30lgYRycZplhDjpO1PzQpq/KUh5hxSZDd/ZTlEMFLwGB5RGAxThpWnFKZYN6VGBYH4Kltl6eOVNhQYSTZZiqAK1oCd5C1he3d0yl4tY2YzyFiyYybEjTrTb9fcYK6oLQ1m/fFXhxZMecKekpARRvl2ckRUyUgOGxsNlEJhaMeU9LaPHZTFehCghJGX6reU8jyfp+kz89VZVANa6dZ7pmXEzhF6XOqc0IrDt2/TsrMFidDJW8hBS5tb3TkLZD9lqmjE5K3wkyKRhVeXi+NOh8R5sFXMCaCqgCHlRTInu5A5nlSSToAKIYiwPVf0GGWB2bfBUw/GlvKQU6DtmqussgYFsvNLRjopaviLGUavq2Xbk5NxvEk0OWmOfkz88Q0OqRVQ27wA4DTUiGbayFPmYkO5emYW+XE9OF07mqo481/yuQST+yek8vDK/pENAffAWb2cpVbuqQQracLMBtGSJIkSRIhhHPOOaep6Z1Z9VLHXjWY6AFBUrIoMNUaAzNd2uK0t0MqvbO94wgNgiRrnDKW6pmpBbc1K9VGS5buUWZCany9GRaDKS9ifYQQgkqUUsncebM9XNrH4ik39i11TIUrt8iEMs0qhmg0GtfJszg8Sj/bzCFD0j5mEDxAYCAQAABNU0OhMKXQ2NgkSZKu67quU0pTpIjZSMZButgpUZZZvEcuEUJIlAKlJg0Zus7jd6BmkQQApRBnfIQQout64ikAIEkSFwIt35JlOX4UQnAhSVJiK3SzPb4DSEGSJMaYpmmxaUpog4csy1SSdF23NQRIOCoBFFkhhGhmjb/l3WVZTjANRAGQbJRhfREUQlEUJsuIGIlEACAQCJg35IaRqBShlJr7n4pqIEyWUWBsShzmGrlVEiefx6MOcztmoJKpwWhba4owyavZuDVmmsaYg8Hg2bNnf/WrX71x4o2VpRUkoru7+8477/zQhz7c1tYWiURovERIVpRvfuubIxcuPP6Vrza3NBuGAQBIiMLY1772tZnZ2S996UsNDQ2EkLW1tc9+9rNrayFJopLEmpqaNE2NRlWJ0iuLVx752Mf+4KGHVlZWGhsbf/3rXz/55JOUUhMYhBBKpWg08slHH73j9ttDoVAwGHzvvff+9lvf+shDD93/gQ+EQ6GGxsbXX3/9O9/5jk/xabqmKEowGIxEIoahEwKI4vOf+/yuXbsikQhQW6tfWZafeOL7V64sfuYzn6GUCs4TQk8IEQwGz5w984Mf/ODRP/3k3n371GjUmv4JBITAx77w2ODgwCcffTQajZrCUJblubm5xx9/XFVVQoBKtCEYNAwdBVKJRiPRP/3kJw8fPhyNRhGxoaFhZmbml7/8xVtv/T4cDgshmhobr73uuocffqipqVlVo4jE7/e//NLLx479389+7nOSJImYvAUCRJKkr3/t64cPX3PffR+IRCLU0ksSXFN2cQKwEt7RLIZFObiOp/vqFIpDn8/305/+9Hvf+57P57v55lv6+nrD4fBbb735rW9+66l/fuqxxx7bf+BAJBw2zxsALgyff/vtU4ah25QigPMXLkyMj5sCBBEppUNDg6FQWPEpV+YXXnzppT279+zdu0cz9La2tta2NpOXU0pnZqZfevnl9999d29PT1SNAlAAiEajwUAgjkm6urp6/Pjxo0ePmstARL/f193drSiKxKSJ8YkXXnzh+uuuHxocUjXNBIZwGsyEiOfOnjt27Fh/f98nPvHvQqGQBGD+XpKkSCT8zW984/XXX//oH3+UUmrNYxGCB4MNzz777NNPH9vUvene++7t7e3TNI1SaqL3wx/6kMG5JEmRSOTv/u7vHn744YMHD6qqKjjv6dliGAYK0dDY+NvfPveVL395+46dH/zgB/v6+hBxdHTkN0/95sn/8+RXHv/yzp07TWhNTU8df+01jE9WTayDUnryxInu7k0m/stuJnlK8+AGhFi0NzZjdAtdzawv2O+bojZkmLBrUs8/P/nk1776tZuO3vhXn/+r/oGBxJ+OHfu/X/nyVx577LHvP/H9zs4uTdNMhVNRfIFAEFNsEkS/z+fz+wkhFEDnPBAI/PVff8H863unTz//u9+9/957Hnnk4yaVCM6jqmoiyufz+32+T3ziEwcPHbK+BDcMTVVNISxJUmNjo+LzmXJSVbV9+/Z94xvfMD/5zDPPvPHGG4987GM3HT0aU0c1TUsbvZT48YMPPPDkk0/u33/ghhtuCIXWKJUQhd8f/Ju/+ZtIJLJ71+70zQegQvAf//jHn3z00dnZ2Z/85Kef+9znTKVUCOH3++++5x7zk2o0+qMf/vDoTTdddfXV5m8Mw1BVNRAMnjx58vOf/6t//+ijj3z844kHHD58+KGHHn7yySdlWUmINJmxhoYGR7s1GAwqii/lrMFmhHtrKJXe+ZH5CdQDJ7EHGwE2dzgWxmecYhSIEpVWV1d++N//+5Ytmx977P/pHxhYi1+RSOTee+/71Kc//d577/30p/8oyzIm8SaEOc8sDfOm1yLuOcNQKLS6usoNIxQOUUp1Xeecr66shtbW1Di6Yr4OxKXlZcMwVlZW1lZX11ZXQ2trWqIpi4lJwVEkql2JrunhUGhlZYVzvrq6IoRYC61xztfW1sKhkCG4I9OmANGoessttzzysUe++vjjy8vLMpMNw2hoaHzm6aefefqZv/7rL1BKjUQlblwM+v3+48dfm5yc+KM/+lcf/vCHX3rppfHxcUVR4i0BMBwOh0IhVVWXV1Z0Q19ZWRFCrK2thcNhXdcliQohvvvd791///2PfPzj4VAoFAqFw2HzW9Fo5IEHHhgaGtLjnRE551xwITjnXFgvzg3OYwZhGYIQWBACvFNZKVZJpkLSIMQ8Mp5SeiHFuhUmnZkCUfEpoyOjI6Ojd911V09Pz+rqqhS/gBBN0+66887+gYGXX34lHA6bXlO0sFqbVyA5rzN5SabLRZIolSDueqWSJMU6XNj8hT6fjzHWEAw2NDY2NDb6/X6wZj5Y81kAY4+L3V6KOXYAYv+WpMxObWCMLS0tPfihDw0NDX37299WfD7G2OTk5Lf+9tv/5b/85507d66urqaJUEoQ/+F//I977723paV5z+7dg4ODP/vZzxhjwu5eokAlSsHszxG/TJ3//PnzU1OTf/zHfyyEIImlUipJEgANh8MxXSOhiVGpsbEpGAw2NDQE45esKDKTsxGVfdM8jUi4tJ6IhxHOKmn+i2m1Y8WVLVtoGgBm5+YMbvQN9Fsd30AIUEkI0dzc1LNly9j4eCgUamlp0XUd4o0hUiNGGbJQEqsUKCxfAmLJ6EOBPp/viSee+OEPfyiEYEwKhyPve9/7PvrRj6a0+YFEoySHSRC5C1UAEYCY8EDEz33+8//+0Ud//etfP/jgg3/5mc/ccMP197z//fPzc1SSqF1pDwQCr7322rlzZ//yM38ZjkQUWX744Ye/+tXH/+RP/qSjo8P0Tln5HaWQ5lKmly5ebGxo2LRpk+3zCZZv/7zPpywuLn7zG9802ydSSaJATZ1hanrK5/M5mClJBx54JirQXcgvzXb1yjjMH4RZFpHvwKNkWy50iAR4s8NACJFlGYCuLK9YEZhYsWHwSCQiyzJjDG3FNWj2C7TCQZIoUJqFmYiM7UCBEKooSlNjk0Buygef4jP5QmIABqTlhdtrpiDnKSMQAoQCMEkCgM2bN3/qP336Bz94YmRkdGZ6+itf/rKuaZIkKYqMaXv185///IEHHhwYGDR/c+edd/785z/7nz//+X/81Kc0TTPVBJskEKkvq/h8ADQWvcgZNCKEyXJnZ4f5WSpJZrcooOBTlJi2XAZHZV7kWowXw0tJaOs65DTpIS9ukRqTAE+3F4QQ/f39zc3NJ0+e1HVdkiQzQE8IMbjR3NR86tSp8xcu3HrLLS0tzdGoan5LURRN00zdKTGJVggRCoV9ipKEa6pXDdKOLbZFlFJVjT76yUePXHsksT+CC/MRmHAzZHn9WAMbyEEIQK21/CsrK3ff/b433zz5ve999yc/+Ulzc3M0GqVUkiSWVNqF8Pv9b7/99ssvv9Tb0/MPP/kHTdUIoqzIiiz/+te/+pN//a+bmpqSwi0+ecqWrgjAOd++fXskGr548dI111yjqipjSQJDIcy+cIlVa6rW2tLysUceSX+Jp489kxKlLJ8HpezuHFo45zD1tYLt2rIwOQBQVXVocOjWW289ceLEP/3TPwUCgYaGBkVRfD5fc1PzwsLCD37wA4LiD//wD83cDhMwO3bsWF5ePvH6G4wxRVEURWloaHj33XfPnj3b19vb1NTE48G3REsLh87XmExMNj0Omq4JIdZCIdNpoapqqtxOpKcgprutUjNOEgtItNGI30FgLOJvRsP/7b/5N9/+9revufrqcDhMJYkgCs6BglVR/NGPfjQ4OAiUXrp4eXJycnxi4vz5C1u3bmtubv4/v/6VLMvW1IVYzzUqWSlJVdWBgf5DBw898f0nTA9n0uPCueLzBfwB61dQCE3XTedNKL4noVBI0zTDMCTzk9WbyO0Z+bICEZj+I0LeOZLl2l+B4s/+7M8uXbr0jW9849zZcx/+8IfaOzvVaPSdd9796U9/Mjx87j/8h/948y23mMErROSc3/eBD/yvX/ziO9/9LgFy5NprkeB7p9/7r//1/0UiPvIHH4klc9lVR6AgKwpN0dmSVCvM3K64b8PBtUApMCZlaQlDJYnSDEqR/VYyY0w2cxKJYRht7e33339/OBwGANOdE18BEUI0NDQMD587ceKN73znu/v27Ut56I6dO//bf/v/PvIHDwUCgYRDlQKw+NRu61J03fj0X/zFf/rUp/7i05/+zGc/29PTk/jr6OjoE9///gMPPnjrrbeura2ZyJcZkyQJAGKh14TODxh7U7TzfW8lWDH5n1BZdTSpfdlPAKG06HIuhMktDDVN6+7u/vrXv/73f//3Tx879sv//YuGhkZd16PR6NatW7/4xS998IMfVNVYwA0ANFXdvn37F7/4xW9962+/+KUvBYNBSZJCodDg4MBjX3js1ltujUaiNh8DEgLADWN5eUlVo44GfTgcWZifT0YFnI7QMPiVK1eiasSR5aqqOj8/b+iGm7deWVmJqXNAzGb1IV03WQwBgiiWlpZ03Uho7N///veuvfbaffv2ra2uWo1eALjrzjt//OMf/fjHP/7zP/9zXdcT9vLq6qphyzgjAFTX9I6Ojr/7zne++vjjn/zTP92zZ/fmLVsQcWpy8vLY+JEjR3bt3JVwkGq6vrq2aoVFYlOWluI7WYJWFGlyrMLStoghoeVWzjG1D2dewtDMZmRsZGTknXfeWVhY8Pt9/f0DBw4caG1tNfMbU9yzgUBgYWHhzTffHJ+YoAC9vb2HDh3q6uqKhMNgN95QCImxhYWFl19+ec+e3Tt37ubcsLhMUWbs3PDw6dPvHj16c9JziNaeEihJ0sLCwosvvLD/wIGdO3cahgEWlyxj7PLlsbfePHnDjTdu3rw5NhA3gx8VAJ5//vne3p5dO3clDDlL930wDP3ZZ549fPhw9+bNnHNd159++tjVV1/T29ubVLMt+3b69Om5ublbb71VcG7KfE3Tf/e731111VXd3d3x14m9DedcURRZln//1luvvf7a7OysIit9fX3XXXf9jp07DMMwk0XNsxgeHr777rvtUg6oRJ999pn+/v5du3bbvKzFB+jdtuoiHjzC9c1ralJvcf0UzXC53++3CjHT/KBODk8hhMyYrCiJ3zimepveXYFoWo+Cc1VVgVJrgDHxXF3XU9wbxI40RVE455qmpdTrIqJPUSTGDF2PB7vtDX7sTCEQDHLOE9kC6Y5Qv99v6LoeX4zf79d13bBnDiQebcYzo5FoMqEewO/365pmcA5p2ZamizgYCKSkLpmZqIk2/oosS4xFrRQY/7zf7xdCJNSTkoAwf63KtamI6xeE3gAZBecYN2wgax0TCsEt3giJZohPmMEMs3gHwDKWCK23EohUkhwRmFybEAmLMcXCTvw1NYyRPggBkQsBkJzom96cnnNuXQznHMznOu1GIrvVGicVuarAhNmcm4BppqR/GM36JkmCNANHCG6m19pFfdFNe6tyitGGA2HctedkEKSfjcMnIY+RVdmteSQZ+iXmqAO2KpbpaE+tYQeSUqrm3EXCccG5VuvKoko0I8+UYJxdOXQjWFxqgNU6R4xtQAQ6YA8dyTxD/n5qV/uCDhWdBVTsfy7dgDH9HJ2VdqfWhvlp+O6Wgc77admcbCMRwdYmPM9H52fgVWvfmpKBMK0Os3oQiOkHkzqoBDI1IiOxan/iPA43LWfNJVmn10C66NqZ+Yb2blHoUkPL+ll0ceAOum/C+QRZm9ogZOUXueinxsd+lUsSVkmeQ7KXRPYIEVozP7M1TbHrrfaib3DZ1ddJy41PUEOSPmC3uHaLWdeBRd3BHn1zd/wpjdvd67vetVxYvyCEAgimrHDMZV1Y3sH9YC1w5PEuUJwpLRFSf8igAuYxOA1TnwsFYDglaxEzrys/DuGm12PKmA2sS8J1dgE45Emnxqlyo8/aNgZcq5YF8BBb4k4hFp0l9QezgS0fThYHZ24jLfM9AFyiMM4lixaJOV1EpQMhkKru+1hVYjKrYWP7UzAYNP9hGIauxQPrlqHVScBDrBwhtUoJEeO1P/HyYgc6Y4zFi1/RqlWmgDPxY7wqPfajGTbgnCem8KYnLaQUUKITb4LsGq3XLhYshcFTOXFKq4LoY1ngWC39vIu7JEk6fvz4b5566rfPPTc9PU2ZhAQJIpMZUCqEkBiTzDqM2Fx5qigyAEER2wQUaOaYhiNhsxbB6kw17U8zdfOlF1/UNI0CCIx9xYSN2aMtEWFRFMXMOkVESoji8xEAWZYnJiZOnjghy7KZuqkoCqWxkg6BaFaTEOcmww4jp8psfKyb8bO0SrrYV5Gbq/A1oBDC5/O98sorV65cuf6GG1rbWhevXDFDzpIkzc3NaZoWDAaXlpaWFhd9imLWzkfV6Nj4uKZpTGZmP1BZlldXV2RZPnni5FtvvWkYhjWgL8syQZybnaUAk5OThmGYvzTLEWRZ5oLPzMwAgMSYmaEyMT6xtrYGAEyWuRCTk5O6rnHB29ratm7dyg2DShIAnZqaiqqa2c9CURRN16emplCgJElWYzlVebWG+BPNDYouyM5OLhAriwKofUiyqsFg7W6irZASANbW1oCQxsbGq6++xsyVO3nixOnTp7s3b56Znt60aRMSXFpcGhoauuno0aWlpZMnT0iSdPzVV2+6+WhvT+8zTz89NTU1MDBw4003nTt71uBGU2PT3v37TDkpy/Ls7OyxY8fa29tlWV5aXgoGg3Nzc88++2xDQ/DGm47qhvHcc882NTVFo9Hbb7+jsbHxySf/OeD3I4obb7oJEZ9//vlgMIhC3H3PPbOzMxPjk3fcecfTx45NTU11d3fPzs4evfnmgYGB0YujL/7uhYGBASH4zMzMww//oY3gPW61lFf9jSWqVDzlYFlcrFn3ipL6VawinexPRSmNRqO33XZbQ2PDU0899bN//Mfz589TSmdmZ1vb2u+///5DVx06d274gQcefOihh4fPnzcbauzbt//AgYOKz/fWm29JkjR68eKWnp4777orEAjs2r37+uuuv+bwYW5ws+pckqRnn332yJEjDz744IEDB8KhEGMsGo3Oz89/+CN/0Nvb+/SxY93d3bfdeltDMPjcs88KIS5dGt2zd89d73tfW1vb5OTk1NTUDTfccPsddzDGQqHQ/PwcAExOTQ4MDNx7331Hrr32+PFXZVl+8YUX77zrrvfdffeBg4eWlpbivR2wNPQKznHXLJ/1EBuWgcMVcZDUvaMeycC4KoUogoHAbbfdTghOTEz85qnfDA0NNTU1NTU1CSFaW9v27t2LiEBpc3OzLMtnz549Nzw8NDgoBFcUhRDS0dGxf/9+XddkWeGcS4yZXlYChALVdV2NRoeGhjjnfX19ff0DhmFwIfbt388Y03V9ano6EAy+9vprVJL6B/olSfqjP/pXJ0+efOWVV2677bYDBw7IjD37zDMSk+677z5ZVswOjm1t7X39/UKIxsYGSWJCCCDQ3tZOCGlra+vo7OKC+3wBAqCpqjfNRyqeRIap7qUSqrVZX7MuCT3AoN1gU06cPPnySy9NT8+EQmGQKABEIpFwOGy2315ZNVvdYFRVZcbGxsaam5v37NljtrohhEQiEbPLtel9mZ6eXl5eNu8vhJBleUtPz9NPP720tPTSSy++/fYpRVFUTQ2FQqZP6MCB/Yjk2muv6+7u7tnSG41Gr1y5cs8991BKR0YuLC0uciHef++909PT8/MLZpt6Qoiqqpqqmn0Qo9EopfTgwQO//OUvXnjxxd/85l/mZmcDgcDk5OTIyIi1MaSFdrOLmkxKYEVtELCXniRSCcsuDKUvfOELdTS5U1qysTRr0rSiKJcuXx4eHp6amrr99tubmpp0XW9rb29pbuFC+AP+zs5OzjmTpNbW1r6+vuHh4QsXLnR2du7YsaOlpYUQ3NTV5fP5DMPo7OwYHh4Oh8MDA/1mCQXnfPv2bfPzC2fOnGlsbDxw4EBnZxdB0tDQ0N7ermnatm3b5ufnTv3+VDgaHRjoDwYCIyMjb5482dbaeuNNN2madurUqdOnT+/evWfXrl2apjU2NnZ1doIkdXZ2+v1+RBIMBjs6Oto7O7u6unw+X0dH+/Ly8lWHDs3Mzkai0e5NmwzOs7biSouM2qVNSSYrZckRz+eIwXMHoTV/MxPx5FFFUa1J6KUXdxlAmJaZaf5NYkyWZc65JEmGrmu6bkoPw+CSRJnENF0zowi6rlOgik8xAWbohq7riiIb3GwBjECpz+cz626tz/UHAiiEOXlGVVVKqUQl87aEEL/fbwYqNE3jnAcCAbO3laapAFRRFLN1VTQaNbuk6rpuLtj8mBmcHB4ePnXq1JYtW8bGxq86dHDvvn1CCEmSNFVN7wTnUJWSnsZNylJTWzyfLdHaMgcy8wThRkNginICzpn+qTUYiLGoN6JZFJdoMBMviI1VtZoF6QJFomkNEEj0C8T4rajZZ83yUBG/f0ykmMlb8c+YjXdJPPJuQg4RJUqJ2TyOEIGYCCrGnx57XfOXlNLl5eXFxcXOzs621tZovCcVOLV7y6PgKz29rqqIKv+6eA/04o1YT1gwCDMw9WxZx5nqbnPRgc1nn15dnspesxC9LQc8fc1g0x5tjzbnq3HDMAwjux6eX9Wl+1zcvL0spQNhCUsQqgaE1SxmHQ84DQzOBAqFDLrBLNScQQfOME3WuT44Z5MjC4NBE6V5eSvA/n85+FqpRWIy43ej1RMWsE1YrbsEWSim4J6r7gSjqz8mVmKtCcpI6S5WbClzdmxRk5nvpALZwTdTIfWySM/NOgdhbeeL2gZOZBeMKbIOcvroMkPQwYmHqb44zCSWbW6mTG2UspcUxXRYzH52js1C0+NyJcVFLXgxWPXQcRWLwqJlZ1rHVCcUubOUHEvg0ek/6TYN5jOMMvOkkHQmYfdegSsYlA4etVbvy6qDYGsZe9mA5NqwR8xDEU1yLcyreghz6yOQ8VmO64rLOvDOM+KdEV8zPL2etlb8eUNmXSuBk6zNHRxLzAtbgKteHGnftg4tR0i/H2QXX4mmIVViWdRaIK2etlYKpw2xl/OgzUthGfQb/2OGZk1ZaBrsWqsd5pBjihfYhhojZpWXVgnnpp0Z1GkiTyWkLgnLdwqpTQ5T2iLl2QMDnL3/VicMWgVcWrzE3vLKFsZIqqY2JTVNSubBlDb22ZtbnHHzaH3TKqgaJaqgoHgaxmxPhKz3Rkccg0XPrFNJKaUhy58H168CVFaHpmuOHo5UV4hL54Jj1BEAUkcvuFOvwa7sxsdT15HogUh02kVmaU6INQnFKkkrzxILhkxO/jT9JJEOmqLGxnNO85a67rYFsmi5deR5TieQyTFTozoHohvDt8Kmtz0ED3nNtLDeGzFzCNDFGIZ0Nw9avSlQ/k5NFSWcSnUVQ0dJmMwBJkhqqQNi/rpWpWw/q6TLlacGuWezuBG1br4OVbN7lbAQymyPZDkIVjWSpCC6r/4SR0zR9MD9F/J4tbq9VhKm6SHisz2OIbGlyNcUGKsSgRmHolXG6K9fxZr0pb8oSRskUHl6LdoKq5T158WawNNWYnWfdw1cNEE7tXdcUIlOQSbLdJccVuiu5v9eDk6XeAy+DkWXGuMGbYPv5rWrqj2+VW13UZkKjuUULlGRB4vBHJjEYpSOOoDdkGjtgjA/vbR6qAFyELetFbxTdrWXEdlStuhDrGOwDBYEqyTkwMUICkiZhFdRf0ayfi6RBwY5lpYYf13qDkKQtZij4GOqO3vcU0XNgLBAsigZKRRGZKldJKBy1WtAiosgerYzWPKzysbHaxa/WG4QInpBHeuUH3o/pBJTx8eXqpOSTcMGLH5ep+PPTnX85emRUWInQ3lBaCMCWC/YwzxePKNeioUrydmFZHKEC5SRtAp6FmLWagJcr6k9rIqYAlYPP3OtWhWVc5tSw4QleZFyZAWntA8oGIEkew9XGzfBauqnUdxVPZX1VYNA67SzcurMUAztZmcl6B3WXCwdCuEVOThderQH4hnnxY+qt/UiWU+SsHb5lLVRX+k0INdFT3ljI6XRIJSeTYDVXVwCJT+ncg4evVQF09ZKIUzMEHsN9xSFguVPriPP1ogFPACGQ24DlGO7oAj2AVbhlpLpvv5jJKWRhOugChtLoDom74zZOkR5zLmqdrhA1noRWx0z1DIV5fax1Rs9FQBBL26eRcXykINVM/UW0CigJvWp3G+x3lsexvXidUS8zrCup5dtGHW0hlKZrD0lClhvGd4xkzD0ZJM9iUzUaxSrEYTVPL0sPaGiSmc8QXxie0m1zuIRaI6v2JC9nhLcxz6lrjpAWEFoufwoopeEmDfZuoNWzjYzhXNGdNWXLaeyk3JDsoF6QFnaapWJlKrbJoSSfLSEyy1mFd6UTXpQ6IwO71M3OTcsCIvCINTeO1SFtg+QWMzGbL4NidcHB85UpJaLmEMdXRelDTWrOEE1kWCmHzcQDkuj5TrdmjrqIfXtq1/1K05PQNKG+XjA3dahOlq/vOLWZeDEWFv5jFjqralnzHhBUmS9tIGA8u7bBglCIrHFOtJc6KxOlB68bP3KD+pQHafmwn2QKBAhnoytq0vCuiVavyyYAJdhaPCWRByQXwIQbsREJ7RMONrIannVu6YrMv6vXkVRv8pkyFX1WB5rU7xEl4xqWXAdhC7MvNxtUTeUHlf7tkOVHRqrGWCUidyxqs29gvfBk0adNYdBtNTsV99xJhrL1eOE5TLMK2tvb0xj1cOXLqUbvEZAWD4agtjjSpK4hBXeQ1syZJ4R8w0bjClZagHWbcJcgC8BDl1OoSqP3VIgX6sHY7zHIYX1uq9YX30JQLsBMWh2xyulLkarzfPg2TguqE08FHDYWC4NasNGQUv83qzKJtBVk/s4ln9X9QYwlIRwoF7JW65rY9mEeReK12g1XaEiK2UWZB2HdRBWAxqhDE+vNlqv+14qA0LIRz7k9eFMp4vVRHBYehMIsv4SyrIn2VkP1L5SCmUkLfDOc8DWJefLRTpxy7NcsS9IB3YRj4Y0qsNCuUBh0q8wWgcX4MeaQrtX1/8PhszK6vLYmbYAAAAASUVORK5CYII=" alt="Outfit Match" class="header-logo"/>
+  <div class="header-top">
+    <div class="logo-img-wrap">
+      <img src="https://mrociovg78-alt.github.io/guardarropas/WhatsApp%20Image%202026-04-05%20at%2012.10.30.jpeg" alt="Outfit Match" class="header-logo"/>
+    </div>
+    <div class="header-brand">
+      <span class="header-brand-title">Outfit Match</span>
+      <span class="header-brand-sub">Smart Dressing</span>
+    </div>
   </div>
-  <nav>
+  <div class="header-nav">
     <button class="nav-btn active" onclick="showSection('wardrobe',this)">Prendas</button>
     <button class="nav-btn" onclick="showSection('outfit',this)">Outfit</button>
     <button class="nav-btn" onclick="showSection('history',this)">Historial</button>
     <button class="nav-btn" onclick="showSection('config',this)">⚙</button>
-  </nav>
+  </div>
 </header>
 
 <!-- PRENDAS -->
 <section id="wardrobe" class="section active">
-  <h1 class="section-title">Mi guardarropas</h1>
-  <p class="section-subtitle" id="wardrobe-count">0 prendas registradas</p>
   <button class="btn-primary" onclick="openAddModal()" style="margin-bottom:1rem;">+ Agregar prenda</button>
   <div class="filter-chips">
     <span class="chip active" onclick="setFilter('all',this)">Todas</span>
@@ -273,8 +239,6 @@
 
 <!-- OUTFIT -->
 <section id="outfit" class="section">
-  <h1 class="section-title">Outfit del día</h1>
-  <p class="section-subtitle">Combinaciones por armonía de color, clima y ocasión</p>
   <div class="outfit-setup">
     <div class="form-group">
       <label>Temperatura aproximada</label>
@@ -313,8 +277,6 @@
 
 <!-- HISTORIAL -->
 <section id="history" class="section">
-  <h1 class="section-title">Historial</h1>
-  <p class="section-subtitle">Looks registrados y estadísticas</p>
   <div class="stats-grid" id="stats-grid"></div>
   <h2 class="section-h2">Este mes</h2>
   <div class="calendar-grid" id="calendar-grid"></div>
@@ -324,8 +286,6 @@
 
 <!-- CONFIG -->
 <section id="config" class="section">
-  <h1 class="section-title">Configuración</h1>
-  <p class="section-subtitle">API key y gestión de datos</p>
   <div class="config-card">
     <h3>🤖 IA para análisis de fotos</h3>
     <div class="form-group">
@@ -356,7 +316,6 @@
       <span>Nueva prenda</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-
     <div class="photo-upload-area">
       <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoUpload(event)">
       <div id="upload-placeholder">
@@ -366,10 +325,8 @@
       </div>
       <img id="upload-preview" class="upload-preview" style="display:none;" alt="preview">
     </div>
-
     <button class="ai-analyze-btn" id="ai-analyze-btn" onclick="analyzeWithAI()">✦ Analizar con IA — autocompletar características</button>
     <div class="ai-status" id="ai-status"></div>
-
     <div class="form-row">
       <div class="form-group">
         <label>Categoría *</label>
@@ -389,7 +346,6 @@
         <select id="f-type"><option value="">Primero categoría</option></select>
       </div>
     </div>
-
     <div class="form-row">
       <div class="form-group">
         <label>Estilo / Corte</label>
@@ -413,7 +369,6 @@
         </select>
       </div>
     </div>
-
     <div class="form-group">
       <label>Color principal *</label>
       <div class="color-picker-group" id="color-primary-picker"></div>
@@ -422,7 +377,6 @@
       <label>Color secundario <span style="font-weight:300;opacity:0.6;">(opcional)</span></label>
       <div class="color-picker-group" id="color-secondary-picker"></div>
     </div>
-
     <div class="form-group">
       <label>Temporada</label>
       <div class="checkbox-group" id="season-group">
@@ -433,7 +387,6 @@
         <span class="checkbox-pill selected" onclick="togglePill(this)">Todo</span>
       </div>
     </div>
-
     <div class="form-group">
       <label>Ocasión</label>
       <div class="checkbox-group" id="occasion-group">
@@ -444,7 +397,6 @@
         <span class="checkbox-pill" onclick="togglePill(this)">Sport</span>
       </div>
     </div>
-
     <div class="form-group">
       <label>Textura *</label>
       <div class="checkbox-group" id="texture-group">
@@ -452,12 +404,10 @@
         <span class="checkbox-pill" onclick="selectTexture(this,'estampado')">Estampado</span>
       </div>
     </div>
-
     <div class="form-group">
       <label>Notas <span style="font-weight:300;opacity:0.6;">(opcional)</span></label>
       <textarea id="f-notes" placeholder="Ej: talle M, combina con el pantalón beige, solo para verano..."></textarea>
     </div>
-
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="saveGarment()">Guardar prenda</button>
@@ -487,163 +437,63 @@ const TYPES_BY_CAT = {
 };
 
 const COLORS = [
-  // Neutros claros
-  {name:'Blanco',       hex:'#FFFFFF', hue:0,   cat:'neutral', dark:false},
-  {name:'Crudo',        hex:'#F0EAD6', hue:42,  cat:'neutral', dark:false},
-  {name:'Crema',        hex:'#F5F0E8', hue:40,  cat:'neutral', dark:false},
-  {name:'Beige',        hex:'#D4C5AA', hue:38,  cat:'neutral', dark:false},
-  {name:'Gris perla',   hex:'#D8D8D8', hue:0,   cat:'neutral', dark:false},
-  {name:'Gris claro',   hex:'#C0C0C0', hue:0,   cat:'neutral', dark:false},
-  // Neutros oscuros
-  {name:'Gris',         hex:'#7A7A7A', hue:0,   cat:'neutral', dark:true},
-  {name:'Gris oscuro',  hex:'#444444', hue:0,   cat:'neutral', dark:true},
-  {name:'Negro',        hex:'#1C1C1A', hue:0,   cat:'neutral', dark:true},
-  {name:'Azul marino',  hex:'#1A2E5A', hue:222, cat:'neutral', dark:true},
-  // Tierras / cálidos neutros
-  {name:'Camel',        hex:'#C19A6B', hue:33,  cat:'earth',   dark:false},
-  {name:'Marrón',       hex:'#7A5230', hue:27,  cat:'earth',   dark:true},
-  {name:'Terracota',    hex:'#C0674A', hue:15,  cat:'earth',   dark:false},
-  {name:'Coral',        hex:'#C4957A', hue:20,  cat:'earth',   dark:false},
-  {name:'Verde oliva',  hex:'#6B7A3A', hue:72,  cat:'earth',   dark:true},
-  // Cálidos
-  {name:'Rojo',         hex:'#C0392B', hue:4,   cat:'accent',  dark:true},
-  {name:'Bordo',        hex:'#7B2D3E', hue:348, cat:'accent',  dark:true},
-  {name:'Ciruela',      hex:'#6D2B4A', hue:330, cat:'accent',  dark:true},
-  {name:'Rosa palo',    hex:'#E8C4C4', hue:0,   cat:'warm',    dark:false},
-  {name:'Rosa',         hex:'#E8A0A0', hue:0,   cat:'warm',    dark:false},
-  {name:'Naranja',      hex:'#E07A5F', hue:14,  cat:'warm',    dark:false},
-  {name:'Mostaza',      hex:'#C9A227', hue:42,  cat:'warm',    dark:false},
-  {name:'Amarillo',     hex:'#F2CB61', hue:43,  cat:'warm',    dark:false},
-  // Fríos
-  {name:'Lavanda',      hex:'#C4B5D5', hue:270, cat:'cool',    dark:false},
-  {name:'Violeta',      hex:'#9B59B6', hue:288, cat:'accent',  dark:true},
-  {name:'Verde agua',   hex:'#A8D5C2', hue:160, cat:'cool',    dark:false},
-  {name:'Verde claro',  hex:'#8A9E8C', hue:130, cat:'cool',    dark:false},
-  {name:'Verde botella',hex:'#2D5A3D', hue:145, cat:'cool',    dark:true},
-  {name:'Azul petróleo',hex:'#2C6E7A', hue:188, cat:'cool',    dark:true},
-  {name:'Celeste',      hex:'#87CEEB', hue:200, cat:'cool',    dark:false},
-  {name:'Azul',         hex:'#3B6CB7', hue:218, cat:'cool',    dark:false},
+  {name:'Blanco',hex:'#FFFFFF',hue:0,cat:'neutral',dark:false},{name:'Crudo',hex:'#F0EAD6',hue:42,cat:'neutral',dark:false},
+  {name:'Crema',hex:'#F5F0E8',hue:40,cat:'neutral',dark:false},{name:'Beige',hex:'#D4C5AA',hue:38,cat:'neutral',dark:false},
+  {name:'Gris perla',hex:'#D8D8D8',hue:0,cat:'neutral',dark:false},{name:'Gris claro',hex:'#C0C0C0',hue:0,cat:'neutral',dark:false},
+  {name:'Gris',hex:'#7A7A7A',hue:0,cat:'neutral',dark:true},{name:'Gris oscuro',hex:'#444444',hue:0,cat:'neutral',dark:true},
+  {name:'Negro',hex:'#1C1C1A',hue:0,cat:'neutral',dark:true},{name:'Azul marino',hex:'#1A2E5A',hue:222,cat:'neutral',dark:true},
+  {name:'Camel',hex:'#C19A6B',hue:33,cat:'earth',dark:false},{name:'Marrón',hex:'#7A5230',hue:27,cat:'earth',dark:true},
+  {name:'Terracota',hex:'#C0674A',hue:15,cat:'earth',dark:false},{name:'Coral',hex:'#C4957A',hue:20,cat:'earth',dark:false},
+  {name:'Verde oliva',hex:'#6B7A3A',hue:72,cat:'earth',dark:true},{name:'Rojo',hex:'#C0392B',hue:4,cat:'accent',dark:true},
+  {name:'Bordo',hex:'#7B2D3E',hue:348,cat:'accent',dark:true},{name:'Ciruela',hex:'#6D2B4A',hue:330,cat:'accent',dark:true},
+  {name:'Rosa palo',hex:'#E8C4C4',hue:0,cat:'warm',dark:false},{name:'Rosa',hex:'#E8A0A0',hue:0,cat:'warm',dark:false},
+  {name:'Naranja',hex:'#E07A5F',hue:14,cat:'warm',dark:false},{name:'Mostaza',hex:'#C9A227',hue:42,cat:'warm',dark:false},
+  {name:'Amarillo',hex:'#F2CB61',hue:43,cat:'warm',dark:false},{name:'Lavanda',hex:'#C4B5D5',hue:270,cat:'cool',dark:false},
+  {name:'Violeta',hex:'#9B59B6',hue:288,cat:'accent',dark:true},{name:'Verde agua',hex:'#A8D5C2',hue:160,cat:'cool',dark:false},
+  {name:'Verde claro',hex:'#8A9E8C',hue:130,cat:'cool',dark:false},{name:'Verde botella',hex:'#2D5A3D',hue:145,cat:'cool',dark:true},
+  {name:'Azul petróleo',hex:'#2C6E7A',hue:188,cat:'cool',dark:true},{name:'Celeste',hex:'#87CEEB',hue:200,cat:'cool',dark:false},
+  {name:'Azul',hex:'#3B6CB7',hue:218,cat:'cool',dark:false},
 ];
 
-// Grupos de colores para monocromático (tonos del mismo color)
-const MONO_GROUPS = [
-  ['Blanco','Crudo','Crema','Beige','Gris perla','Camel'],
-  ['Gris claro','Gris','Gris oscuro','Negro'],
-  ['Rosa palo','Rosa','Bordo','Ciruela'],
-  ['Celeste','Azul','Azul marino','Azul petróleo'],
-  ['Verde agua','Verde claro','Verde oliva','Verde botella'],
-  ['Crudo','Beige','Camel','Marrón'],
-  ['Lavanda','Violeta','Ciruela'],
-  ['Coral','Terracota','Marrón'],
-  ['Mostaza','Naranja','Terracota'],
-];
+const MONO_GROUPS=[['Blanco','Crudo','Crema','Beige','Gris perla','Camel'],['Gris claro','Gris','Gris oscuro','Negro'],['Rosa palo','Rosa','Bordo','Ciruela'],['Celeste','Azul','Azul marino','Azul petróleo'],['Verde agua','Verde claro','Verde oliva','Verde botella'],['Crudo','Beige','Camel','Marrón'],['Lavanda','Violeta','Ciruela'],['Coral','Terracota','Marrón'],['Mostaza','Naranja','Terracota']];
+const CLASSIC_COMBOS=[['Blanco','Negro'],['Negro','Camel'],['Azul marino','Blanco'],['Azul marino','Beige'],['Gris','Blanco'],['Gris','Negro'],['Crudo','Marrón'],['Beige','Blanco'],['Bordo','Camel'],['Verde oliva','Beige'],['Negro','Crudo'],['Azul marino','Mostaza'],['Gris','Bordo'],['Azul petróleo','Camel'],['Verde botella','Beige'],['Ciruela','Beige'],['Marrón','Crudo','Verde oliva'],['Negro','Blanco','Rojo'],['Beige','Crudo','Verde oliva'],['Celeste','Blanco','Azul marino'],['Gris','Rosa palo','Blanco']];
+const SCHEME_BY_OCC={trabajo:{name:'Neutros + acento',key:'neutro_acento'},casual:{name:'Análogo',key:'analogo'},salida:{name:'Monocromático',key:'monocromatico'},evento:{name:'Clásicos infalibles',key:'clasicos'},sport:{name:'Tonal tierra',key:'tonal'}};
+const SCHEME_TIPS={neutro_acento:'Base neutra + un solo color acento en una prenda o accesorio. La fórmula más segura para la oficina.',analogo:'Colores vecinos en el círculo cromático — coherencia visual sin esfuerzo. Ideal para looks refinados.',monocromatico:'Un solo color en distintas intensidades. Varía texturas para que no quede plano.',neutro_oscuro:'Neutros puros: imagen prolija y sobria. Dejá que el fit y los accesorios sean los protagonistas.',tonal:'Tonos tierra que nunca fallan: camel, crudo, marrón, oliva. Cálidos y atemporales.',complementario:'Colores opuestos en versiones apagadas — uno domina, el otro complementa. Un solo acento basta.',triadico:'Tres colores: 60% principal, 30% secundario, 10% acento. Proporción es la clave.',clasicos:'Combinaciones que nunca fallan. Resolvé rápido y quedá bien siempre.'};
+const STYLES_BY_CAT={top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico','Sin mangas / Chaleco','Largo / Maxi'],bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],acc:[]};
+const CAT_EMOJI={top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
 
-// Combinaciones clásicas infalibles (pares/tríos de nombres)
-const CLASSIC_COMBOS = [
-  ['Blanco','Negro'],['Negro','Camel'],['Azul marino','Blanco'],
-  ['Azul marino','Beige'],['Gris','Blanco'],['Gris','Negro'],
-  ['Crudo','Marrón'],['Beige','Blanco'],['Bordo','Camel'],
-  ['Verde oliva','Beige'],['Negro','Crudo'],['Azul marino','Mostaza'],
-  ['Gris','Bordo'],['Azul petróleo','Camel'],['Verde botella','Beige'],
-  ['Ciruela','Beige'],['Marrón','Crudo','Verde oliva'],
-  ['Negro','Blanco','Rojo'],['Beige','Crudo','Verde oliva'],
-  ['Celeste','Blanco','Azul marino'],['Gris','Rosa palo','Blanco'],
-];
-
-const SCHEME_BY_OCC = {
-  trabajo:{name:'Neutros + acento',key:'neutro_acento'},
-  casual:{name:'Análogo',key:'analogo'},
-  salida:{name:'Monocromático',key:'monocromatico'},
-  evento:{name:'Clásicos infalibles',key:'clasicos'},
-  sport:{name:'Tonal tierra',key:'tonal'},
-};
-
-const SCHEME_TIPS = {
-  neutro_acento:'Base neutra + un solo color acento en una prenda o accesorio. La fórmula más segura para la oficina.',
-  analogo:'Colores vecinos en el círculo cromático — coherencia visual sin esfuerzo. Ideal para looks refinados.',
-  monocromatico:'Un solo color en distintas intensidades. Varía texturas para que no quede plano.',
-  neutro_oscuro:'Neutros puros: imagen prolija y sobria. Dejá que el fit y los accesorios sean los protagonistas.',
-  tonal:'Tonos tierra que nunca fallan: camel, crudo, marrón, oliva. Cálidos y atemporales.',
-  complementario:'Colores opuestos en versiones apagadas — uno domina, el otro complementa. Un solo acento basta.',
-  triadico:'Tres colores: 60% principal, 30% secundario, 10% acento. Proporción es la clave.',
-  clasicos:'Combinaciones que nunca fallan. Resolvé rápido y quedá bien siempre.',
-};
-
-const STYLES_BY_CAT = {
-  top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico','Sin mangas / Chaleco','Largo / Maxi'],
-  bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],
-  dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],
-  outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],
-  shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],
-  bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],
-  acc:[]
-};
-
-const CAT_EMOJI = {top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
-
-let garments=[], history=[], currentFilter='all';
-let selectedColorPrimary=null, selectedColorSecondary=null;
-let currentPhotoData=null, currentPhotoBase64=null;
+let garments=[],history=[],currentFilter='all';
+let selectedColorPrimary=null,selectedColorSecondary=null;
+let currentPhotoData=null,currentPhotoBase64=null;
 let editingId=null;
 
 try{garments=JSON.parse(localStorage.getItem('mg_garments')||'[]');}catch(e){}
 try{history=JSON.parse(localStorage.getItem('mg_history')||'[]');}catch(e){}
 
-renderColorPickers(); renderGarments(); renderStats(); renderCalendar(); renderHistory();
-updateSchemePreview(); updateDataSummary();
+renderColorPickers();renderGarments();renderStats();renderCalendar();renderHistory();updateSchemePreview();updateDataSummary();
 
-// Cargar api key
 window.addEventListener('DOMContentLoaded',()=>{
   const k=localStorage.getItem('mg_apikey')||'';
   const el=document.getElementById('api-key-input');
-  if(el&&k) el.value=k;
+  if(el&&k)el.value=k;
 });
 
-function save(){
-  try{
-    localStorage.setItem('mg_garments',JSON.stringify(garments));
-    localStorage.setItem('mg_history',JSON.stringify(history));
-  }catch(e){showToast('⚠️ Espacio lleno — exportá backup y borrá fotos');}
-}
-function saveApiKey(){
-  const k=document.getElementById('api-key-input').value.trim();
-  localStorage.setItem('mg_apikey',k);
-  showToast(k?'✓ API key guardada':'API key borrada');
-}
+function save(){try{localStorage.setItem('mg_garments',JSON.stringify(garments));localStorage.setItem('mg_history',JSON.stringify(history));}catch(e){showToast('⚠️ Espacio lleno — exportá backup y borrá fotos');}}
+function saveApiKey(){const k=document.getElementById('api-key-input').value.trim();localStorage.setItem('mg_apikey',k);showToast(k?'✓ API key guardada':'API key borrada');}
 function getApiKey(){return localStorage.getItem('mg_apikey')||'';}
 
 function showSection(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(btn)btn.classList.add('active');
   if(id==='history'){renderStats();renderCalendar();renderHistory();}
   if(id==='config'){updateDataSummary();}
 }
 
-function updateTypeOptions(selectedType=''){
-  const cat=document.getElementById('f-category').value;
-  const sel=document.getElementById('f-type');
-  if(!cat){sel.innerHTML='<option value="">Primero categoría</option>';return;}
-  const types=TYPES_BY_CAT[cat]||[];
-  sel.innerHTML='<option value="">Seleccioná tipo</option>'+types.map(t=>`<option${t===selectedType?' selected':''}>${t}</option>`).join('');
-  updateStyleOptions();
-}
-
-function updateStyleOptions(selectedStyle=''){
-  const cat=document.getElementById('f-category').value;
-  const sel=document.getElementById('f-style');
-  const styles=STYLES_BY_CAT[cat]||[];
-  if(!styles.length){sel.innerHTML='<option value="">No aplica</option>';return;}
-  sel.innerHTML='<option value="">Seleccioná</option>'+styles.map(s=>`<option${s===selectedStyle?' selected':''}>${s}</option>`).join('');
-}
-
-function setFilter(f,el){
-  currentFilter=f;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderGarments();
-}
+function updateTypeOptions(selectedType=''){const cat=document.getElementById('f-category').value;const sel=document.getElementById('f-type');if(!cat){sel.innerHTML='<option value="">Primero categoría</option>';return;}const types=TYPES_BY_CAT[cat]||[];sel.innerHTML='<option value="">Seleccioná tipo</option>'+types.map(t=>`<option${t===selectedType?' selected':''}>${t}</option>`).join('');updateStyleOptions();}
+function updateStyleOptions(selectedStyle=''){const cat=document.getElementById('f-category').value;const sel=document.getElementById('f-style');const styles=STYLES_BY_CAT[cat]||[];if(!styles.length){sel.innerHTML='<option value="">No aplica</option>';return;}sel.innerHTML='<option value="">Seleccioná</option>'+styles.map(s=>`<option${s===selectedStyle?' selected':''}>${s}</option>`).join('');}
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderGarments();}
 
 function renderColorPickers(){
   ['color-primary-picker','color-secondary-picker'].forEach(id=>{
@@ -653,64 +503,30 @@ function renderColorPickers(){
       const s=document.createElement('div');
       s.className='color-swatch';s.style.background=col.hex;s.title=col.name;
       if(col.hex==='#FFFFFF'||col.hex==='#F5F0E8')s.style.border='2px solid #ccc';
-      s.onclick=()=>{
-        c.querySelectorAll('.color-swatch').forEach(x=>x.classList.remove('selected'));
-        s.classList.add('selected');
-        if(id==='color-primary-picker')selectedColorPrimary=col;
-        else selectedColorSecondary=col;
-      };
+      s.onclick=()=>{c.querySelectorAll('.color-swatch').forEach(x=>x.classList.remove('selected'));s.classList.add('selected');if(id==='color-primary-picker')selectedColorPrimary=col;else selectedColorSecondary=col;};
       c.appendChild(s);
     });
   });
 }
 
-function selectColorByName(pickerId, name){
-  const c=document.getElementById(pickerId);if(!c)return;
-  const col=COLORS.find(x=>x.name===name);if(!col)return;
-  c.querySelectorAll('.color-swatch').forEach(s=>{
-    if(s.title===col.name){
-      s.classList.add('selected');
-      if(pickerId==='color-primary-picker')selectedColorPrimary=col;
-      else selectedColorSecondary=col;
-    }
-  });
-}
-
+function selectColorByName(pickerId,name){const c=document.getElementById(pickerId);if(!c)return;const col=COLORS.find(x=>x.name===name);if(!col)return;c.querySelectorAll('.color-swatch').forEach(s=>{if(s.title===col.name){s.classList.add('selected');if(pickerId==='color-primary-picker')selectedColorPrimary=col;else selectedColorSecondary=col;}});}
 function togglePill(el){el.classList.toggle('selected');}
-
-function selectTexture(el, val){
-  document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>p.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-function getTexture(){
-  const sel = document.querySelector('#texture-group .checkbox-pill.selected');
-  return sel ? sel.textContent.trim().toLowerCase() : 'liso';
-}
-
+function selectTexture(el,val){document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>p.classList.remove('selected'));el.classList.add('selected');}
+function getTexture(){const sel=document.querySelector('#texture-group .checkbox-pill.selected');return sel?sel.textContent.trim().toLowerCase():'liso';}
 function openAddModal(){resetForm();document.getElementById('modal-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(){
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.body.style.overflow='';
-  editingId=null;
-  document.querySelector('.modal-title span').textContent='Nueva prenda';
-}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';editingId=null;document.querySelector('.modal-title span').textContent='Nueva prenda';}
 function handleOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
 function resetForm(){
-  currentPhotoData=null;currentPhotoBase64=null;
-  selectedColorPrimary=null;selectedColorSecondary=null;
+  currentPhotoData=null;currentPhotoBase64=null;selectedColorPrimary=null;selectedColorSecondary=null;
   document.getElementById('upload-placeholder').style.display='flex';
   document.getElementById('upload-preview').style.display='none';
   document.getElementById('photo-input').value='';
   document.getElementById('f-category').value='';
   document.getElementById('f-type').innerHTML='<option value="">Primero categoría</option>';
-  document.getElementById('f-style').value='';
-  document.getElementById('f-material').value='';
-  document.getElementById('f-notes').value='';
+  document.getElementById('f-style').value='';document.getElementById('f-material').value='';document.getElementById('f-notes').value='';
   document.getElementById('ai-analyze-btn').classList.remove('visible');
-  const status=document.getElementById('ai-status');
-  status.classList.remove('visible');status.textContent='';
+  const status=document.getElementById('ai-status');status.classList.remove('visible');status.textContent='';
   renderColorPickers();
   document.querySelectorAll('#season-group .checkbox-pill').forEach((p,i)=>p.classList.toggle('selected',i===4));
   document.querySelectorAll('#occasion-group .checkbox-pill').forEach((p,i)=>p.classList.toggle('selected',i===1));
@@ -720,33 +536,21 @@ function resetForm(){
 
 function handlePhotoUpload(e){
   const file=e.target.files[0];if(!file)return;
-  const isPNG = file.type==='image/png';
+  const isPNG=file.type==='image/png';
   const reader=new FileReader();
   reader.onload=ev=>{
     const img=new Image();
     img.onload=()=>{
       const canvas=document.createElement('canvas');
       const MAX=800;let w=img.width,h=img.height;
-      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}
-      else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
       canvas.width=w;canvas.height=h;
       const ctx=canvas.getContext('2d');
-      // Si es PNG con posible transparencia, NO rellenar con blanco
-      if(isPNG){
-        ctx.clearRect(0,0,w,h);
-        ctx.drawImage(img,0,0,w,h);
-        currentPhotoData=canvas.toDataURL('image/png');
-      } else {
-        // Para JPEG, rellenar fondo blanco (evita negro en transparencias accidentales)
-        ctx.fillStyle='#ffffff';
-        ctx.fillRect(0,0,w,h);
-        ctx.drawImage(img,0,0,w,h);
-        currentPhotoData=canvas.toDataURL('image/jpeg',0.82);
-      }
+      if(isPNG){ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);currentPhotoData=canvas.toDataURL('image/png');}
+      else{ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);currentPhotoData=canvas.toDataURL('image/jpeg',0.82);}
       currentPhotoBase64=currentPhotoData.split(',')[1];
       document.getElementById('upload-placeholder').style.display='none';
-      const preview=document.getElementById('upload-preview');
-      preview.src=currentPhotoData;preview.style.display='block';
+      const preview=document.getElementById('upload-preview');preview.src=currentPhotoData;preview.style.display='block';
       if(getApiKey())document.getElementById('ai-analyze-btn').classList.add('visible');
     };
     img.src=ev.target.result;
@@ -755,155 +559,49 @@ function handlePhotoUpload(e){
 }
 
 async function analyzeWithAI(){
-  const apiKey=getApiKey();
-  if(!apiKey){showToast('Configurá tu API key en ⚙');return;}
+  const apiKey=getApiKey();if(!apiKey){showToast('Configurá tu API key en ⚙');return;}
   if(!currentPhotoBase64){showToast('Subí una foto primero');return;}
   document.getElementById('ai-analyze-btn').classList.remove('visible');
-  const status=document.getElementById('ai-status');
-  status.classList.add('visible');status.textContent='🔍 Analizando la prenda...';
-
+  const status=document.getElementById('ai-status');status.classList.add('visible');status.textContent='🔍 Analizando la prenda...';
   try{
-    const prompt=`Analizá esta imagen de una prenda de ropa. Respondé SOLO con JSON válido, sin markdown ni texto extra:
-{
-  "categoria": "top|bottom|dress|outer|shoes|bag|acc",
-  "tipo": "tipo específico en español",
-  "color_nombre": "uno de: Blanco|Crudo|Crema|Beige|Gris perla|Gris claro|Gris|Gris oscuro|Negro|Azul marino|Camel|Marrón|Terracota|Coral|Verde oliva|Rojo|Bordo|Ciruela|Rosa palo|Rosa|Naranja|Mostaza|Amarillo|Lavanda|Violeta|Verde agua|Verde claro|Verde botella|Azul petróleo|Celeste|Azul",
-  "material": "uno de: Liso / Algodón|Estampado|Denim|Cuero / Eco-cuero|Punto / Tejido|Satinado / Seda|Lino|Lana|Gamuza|Técnico / Deportivo|Encaje|Otro",
-  "estilo": "uno de: Recto / Regular|Slim / Entallado|Oversize|Crop|Flare / Acampanado|Skinny|Wide leg / Palazzo|Mom fit|Boyfriend|Bootcut|Baggy|A-line|Wrap|Mini|Midi|Maxi",
-  "ocasion": ["Trabajo","Casual","Salida nocturna","Evento formal","Sport"],
-  "temporada": ["Verano","Primavera","Otoño","Invierno","Todo"],
-  "notas": "observación breve si corresponde, sino cadena vacía"
-}`;
-
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':apiKey,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-opus-4-5',
-        max_tokens:600,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:currentPhotoData.startsWith('data:image/png')?'image/png':'image/jpeg',data:currentPhotoBase64}},
-          {type:'text',text:prompt}
-        ]}]
-      })
-    });
-
+    const prompt=`Analizá esta imagen de una prenda de ropa. Respondé SOLO con JSON válido, sin markdown ni texto extra:\n{"categoria":"top|bottom|dress|outer|shoes|bag|acc","tipo":"tipo específico en español","color_nombre":"uno de: Blanco|Crudo|Crema|Beige|Gris perla|Gris claro|Gris|Gris oscuro|Negro|Azul marino|Camel|Marrón|Terracota|Coral|Verde oliva|Rojo|Bordo|Ciruela|Rosa palo|Rosa|Naranja|Mostaza|Amarillo|Lavanda|Violeta|Verde agua|Verde claro|Verde botella|Azul petróleo|Celeste|Azul","material":"uno de: Liso / Algodón|Estampado|Denim|Cuero / Eco-cuero|Punto / Tejido|Satinado / Seda|Lino|Lana|Gamuza|Técnico / Deportivo|Encaje|Otro","estilo":"uno de: Recto / Regular|Slim / Entallado|Oversize|Crop|Flare / Acampanado|Skinny|Wide leg / Palazzo|Mom fit|Boyfriend|Bootcut|Baggy|A-line|Wrap|Mini|Midi|Maxi","ocasion":["Trabajo","Casual","Salida nocturna","Evento formal","Sport"],"temporada":["Verano","Primavera","Otoño","Invierno","Todo"],"notas":"observación breve si corresponde, sino cadena vacía"}`;
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:600,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:currentPhotoData.startsWith('data:image/png')?'image/png':'image/jpeg',data:currentPhotoBase64}},{type:'text',text:prompt}]}]})});
     if(!response.ok){const err=await response.json();throw new Error(err.error?.message||'Error API');}
     const data=await response.json();
     const text=data.content[0].text.trim().replace(/```json|```/g,'').trim();
     const result=JSON.parse(text);
     applyAIResult(result);
     status.textContent='✓ Completado con IA — revisá y ajustá si hace falta';
-
   }catch(err){
-    console.error('AI Error:', err);
-    const msg = err.message||'Error desconocido';
+    const msg=err.message||'Error desconocido';
     status.textContent=`⚠️ ${msg.length>60?msg.substring(0,60)+'...':msg} — completá manualmente`;
     document.getElementById('ai-analyze-btn').classList.add('visible');
   }
 }
 
 function applyAIResult(r){
-  if(r.categoria){
-    const cat=document.getElementById('f-category');
-    cat.value=r.categoria;cat.classList.add('ai-filled');
-    updateTypeOptions(r.tipo||'');
-    document.getElementById('f-type').classList.add('ai-filled');
-  }
-  if(r.material){
-    const mat=document.getElementById('f-material');
-    [...mat.options].forEach(o=>{if(o.text===r.material)mat.value=o.text;});
-    mat.classList.add('ai-filled');
-  }
-  if(r.estilo){
-    updateStyleOptions(r.estilo);
-    const sty=document.getElementById('f-style');
-    sty.classList.add('ai-filled');
-  }
-  if(r.color_nombre){
-    renderColorPickers();
-    setTimeout(()=>selectColorByName('color-primary-picker',r.color_nombre),60);
-  }
-  if(r.ocasion&&Array.isArray(r.ocasion)){
-    document.querySelectorAll('#occasion-group .checkbox-pill').forEach(p=>{
-      p.classList.toggle('selected',r.ocasion.includes(p.textContent.trim()));
-    });
-  }
-  if(r.temporada&&Array.isArray(r.temporada)){
-    document.querySelectorAll('#season-group .checkbox-pill').forEach(p=>{
-      const t=p.textContent.trim();
-      p.classList.toggle('selected',r.temporada.includes(t)||r.temporada.includes('Todo'));
-    });
-  }
-  // Textura desde IA — detectar si el material sugiere estampado
-  if(r.material){
-    const matLower = (r.material||'').toLowerCase();
-    const patternMats = ['estampado','flores','floral','rayas','lunares','cuadros','animal'];
-    const isPatternMat = patternMats.some(w=>matLower.includes(w));
-    document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{
-      const val = p.textContent.trim().toLowerCase();
-      p.classList.toggle('selected', isPatternMat ? val==='estampado' : val==='liso');
-    });
-  }
-  if(r.notas){
-    const n=document.getElementById('f-notes');
-    n.value=r.notas;n.classList.add('ai-filled');
-  }
+  if(r.categoria){const cat=document.getElementById('f-category');cat.value=r.categoria;cat.classList.add('ai-filled');updateTypeOptions(r.tipo||'');document.getElementById('f-type').classList.add('ai-filled');}
+  if(r.material){const mat=document.getElementById('f-material');[...mat.options].forEach(o=>{if(o.text===r.material)mat.value=o.text;});mat.classList.add('ai-filled');}
+  if(r.estilo){updateStyleOptions(r.estilo);document.getElementById('f-style').classList.add('ai-filled');}
+  if(r.color_nombre){renderColorPickers();setTimeout(()=>selectColorByName('color-primary-picker',r.color_nombre),60);}
+  if(r.ocasion&&Array.isArray(r.ocasion)){document.querySelectorAll('#occasion-group .checkbox-pill').forEach(p=>{p.classList.toggle('selected',r.ocasion.includes(p.textContent.trim()));});}
+  if(r.temporada&&Array.isArray(r.temporada)){document.querySelectorAll('#season-group .checkbox-pill').forEach(p=>{const t=p.textContent.trim();p.classList.toggle('selected',r.temporada.includes(t)||r.temporada.includes('Todo'));});}
+  if(r.material){const matLower=(r.material||'').toLowerCase();const patternMats=['estampado','flores','floral','rayas','lunares','cuadros','animal'];const isPatternMat=patternMats.some(w=>matLower.includes(w));document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{const val=p.textContent.trim().toLowerCase();p.classList.toggle('selected',isPatternMat?val==='estampado':val==='liso');});}
+  if(r.notas){const n=document.getElementById('f-notes');n.value=r.notas;n.classList.add('ai-filled');}
 }
 
 function saveGarment(){
-  const cat=document.getElementById('f-category').value;
-  const type=document.getElementById('f-type').value;
-  if(!cat){showToast('Seleccioná la categoría');return;}
-  if(!type){showToast('Seleccioná el tipo de prenda');return;}
-  if(!selectedColorPrimary){showToast('Seleccioná el color principal');return;}
+  const cat=document.getElementById('f-category').value;const type=document.getElementById('f-type').value;
+  if(!cat){showToast('Seleccioná la categoría');return;}if(!type){showToast('Seleccioná el tipo de prenda');return;}if(!selectedColorPrimary){showToast('Seleccioná el color principal');return;}
   const seasons=[...document.querySelectorAll('#season-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
   const occasions=[...document.querySelectorAll('#occasion-group .checkbox-pill.selected')].map(p=>p.textContent.trim());
-
   if(editingId){
-    // Modo edición: actualizar prenda existente
     const idx=garments.findIndex(g=>g.id===editingId);
-    if(idx>=0){
-      const existing=garments[idx];
-      garments[idx]={
-        ...existing, cat, type,
-        style:document.getElementById('f-style').value,
-        material:document.getElementById('f-material').value,
-        texture:getTexture(),
-        colorPrimary:selectedColorPrimary,
-        colorSecondary:selectedColorSecondary||null,
-        seasons:seasons.length?seasons:['Todo'],
-        occasions:occasions.length?occasions:['Casual'],
-        notes:document.getElementById('f-notes').value,
-        photo:currentPhotoData||existing.photo,
-      };
-    }
-    editingId=null;
-    save();renderGarments();closeModal();
-    showToast('✓ Prenda actualizada');
-  } else {
-    // Modo nuevo
-    garments.push({
-      id:Date.now(),cat,type,
-      style:document.getElementById('f-style').value,
-      material:document.getElementById('f-material').value,
-      texture:getTexture(),
-      colorPrimary:selectedColorPrimary,
-      colorSecondary:selectedColorSecondary||null,
-      seasons:seasons.length?seasons:['Todo'],
-      occasions:occasions.length?occasions:['Casual'],
-      notes:document.getElementById('f-notes').value,
-      photo:currentPhotoData,
-      usageCount:0,
-      addedAt:new Date().toISOString()
-    });
-    save();renderGarments();closeModal();
-    showToast('✓ Prenda guardada');
+    if(idx>=0){garments[idx]={...garments[idx],cat,type,style:document.getElementById('f-style').value,material:document.getElementById('f-material').value,texture:getTexture(),colorPrimary:selectedColorPrimary,colorSecondary:selectedColorSecondary||null,seasons:seasons.length?seasons:['Todo'],occasions:occasions.length?occasions:['Casual'],notes:document.getElementById('f-notes').value,photo:currentPhotoData||garments[idx].photo};}
+    editingId=null;save();renderGarments();closeModal();showToast('✓ Prenda actualizada');
+  }else{
+    garments.push({id:Date.now(),cat,type,style:document.getElementById('f-style').value,material:document.getElementById('f-material').value,texture:getTexture(),colorPrimary:selectedColorPrimary,colorSecondary:selectedColorSecondary||null,seasons:seasons.length?seasons:['Todo'],occasions:occasions.length?occasions:['Casual'],notes:document.getElementById('f-notes').value,photo:currentPhotoData,usageCount:0,addedAt:new Date().toISOString()});
+    save();renderGarments();closeModal();showToast('✓ Prenda guardada');
   }
   updateDataSummary();
 }
@@ -911,596 +609,162 @@ function saveGarment(){
 function renderGarments(){
   const grid=document.getElementById('garments-grid');
   const filtered=currentFilter==='all'?garments:garments.filter(g=>g.cat===currentFilter);
-  document.getElementById('wardrobe-count').textContent=`${garments.length} prenda${garments.length!==1?'s':''} registrada${garments.length!==1?'s':''}`;
-  if(!filtered.length){
-    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="icon">${garments.length===0?'👗':CAT_EMOJI[currentFilter]||'👗'}</div><p>${garments.length===0?'Tocá "+ Agregar prenda" para empezar':'Sin prendas en esta categoría'}</p></div>`;
-    return;
-  }
-  grid.innerHTML=filtered.map(g=>`
-    <div class="garment-card" onclick="openDetail(${g.id})">
-      <div class="img-wrap">
-        ${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}
-        ${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}
-      </div>
-      <div class="card-info">
-        <div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>
-        ${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}
-      </div>
-      <div class="card-actions">
-        <button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button>
-        <button class="delete-btn" onclick="deleteGarment(${g.id},event)" title="Eliminar">✕</button>
-      </div>
-    </div>`).join('');
+  if(!filtered.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="icon">${garments.length===0?'👗':CAT_EMOJI[currentFilter]||'👗'}</div><p>${garments.length===0?'Tocá "+ Agregar prenda" para empezar':'Sin prendas en esta categoría'}</p></div>`;return;}
+  grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarment(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
 }
 
-function deleteGarment(id,e){
-  e.stopPropagation();
-  if(!confirm('¿Eliminar esta prenda?'))return;
-  garments=garments.filter(g=>g.id!==id);
-  save();renderGarments();updateDataSummary();showToast('Prenda eliminada');
-}
+function deleteGarment(id,e){e.stopPropagation();if(!confirm('¿Eliminar esta prenda?'))return;garments=garments.filter(g=>g.id!==id);save();renderGarments();updateDataSummary();showToast('Prenda eliminada');}
 
 function editGarment(id,e){
-  e.stopPropagation();
-  const g=garments.find(x=>x.id===id);
-  if(!g)return;
-  editingId=id;
-
-  // Reset y pre-completar formulario
-  resetForm();
-
-  // Título del modal
+  e.stopPropagation();const g=garments.find(x=>x.id===id);if(!g)return;editingId=id;resetForm();
   document.querySelector('.modal-title span').textContent='Editar prenda';
-
-  // Foto
-  if(g.photo){
-    currentPhotoData=g.photo;
-    currentPhotoBase64=g.photo.split(',')[1]||null;
-    document.getElementById('upload-placeholder').style.display='none';
-    const prev=document.getElementById('upload-preview');
-    prev.src=g.photo; prev.style.display='block';
-    if(getApiKey()) document.getElementById('ai-analyze-btn').classList.add('visible');
-  } else {
-    document.getElementById('upload-placeholder').style.display='flex';
-    document.getElementById('upload-preview').style.display='none';
-  }
-
-  // Categoría y tipo
-  document.getElementById('f-category').value=g.cat||'';
-  updateTypeOptions(g.type||'');
-  updateStyleOptions(g.style||'');
-
-  // Material
-  const mat=document.getElementById('f-material');
-  [...mat.options].forEach(o=>{if(o.text===g.material)mat.value=o.text;});
-
-  // Colores
+  if(g.photo){currentPhotoData=g.photo;currentPhotoBase64=g.photo.split(',')[1]||null;document.getElementById('upload-placeholder').style.display='none';const prev=document.getElementById('upload-preview');prev.src=g.photo;prev.style.display='block';if(getApiKey())document.getElementById('ai-analyze-btn').classList.add('visible');}
+  document.getElementById('f-category').value=g.cat||'';updateTypeOptions(g.type||'');updateStyleOptions(g.style||'');
+  const mat=document.getElementById('f-material');[...mat.options].forEach(o=>{if(o.text===g.material)mat.value=o.text;});
   renderColorPickers();
-  setTimeout(()=>{
-    if(g.colorPrimary) selectColorByName('color-primary-picker',g.colorPrimary.name);
-    if(g.colorSecondary) selectColorByName('color-secondary-picker',g.colorSecondary.name);
-  },60);
-
-  // Temporada
-  document.querySelectorAll('#season-group .checkbox-pill').forEach(p=>{
-    p.classList.toggle('selected', (g.seasons||[]).includes(p.textContent.trim()));
-  });
-
-  // Ocasión
-  document.querySelectorAll('#occasion-group .checkbox-pill').forEach(p=>{
-    p.classList.toggle('selected', (g.occasions||[]).includes(p.textContent.trim()));
-  });
-
-  // Textura
-  document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{
-    const val = p.textContent.trim().toLowerCase();
-    p.classList.toggle('selected', (g.texture||'liso')===val);
-  });
-  // Notas
+  setTimeout(()=>{if(g.colorPrimary)selectColorByName('color-primary-picker',g.colorPrimary.name);if(g.colorSecondary)selectColorByName('color-secondary-picker',g.colorSecondary.name);},60);
+  document.querySelectorAll('#season-group .checkbox-pill').forEach(p=>{p.classList.toggle('selected',(g.seasons||[]).includes(p.textContent.trim()));});
+  document.querySelectorAll('#occasion-group .checkbox-pill').forEach(p=>{p.classList.toggle('selected',(g.occasions||[]).includes(p.textContent.trim()));});
+  document.querySelectorAll('#texture-group .checkbox-pill').forEach(p=>{const val=p.textContent.trim().toLowerCase();p.classList.toggle('selected',(g.texture||'liso')===val);});
   document.getElementById('f-notes').value=g.notes||'';
-
-  // Abrir modal
-  document.getElementById('modal-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.getElementById('modal-overlay').classList.add('open');document.body.style.overflow='hidden';
 }
 
-function updateTemp(){
-  const v=parseInt(document.getElementById('temp-slider').value);
-  document.getElementById('temp-display').textContent=`${v}°C`;
-  const labels=[[-5,5,'🥶 Muy frío'],[6,12,'🧥 Frío'],[13,18,'🍂 Fresco'],[19,26,'🌤 Templado'],[27,32,'☀️ Cálido'],[33,45,'🔥 Muy caluroso']];
-  const found=labels.find(([a,b])=>v>=a&&v<=b);
-  document.getElementById('temp-label').textContent=found?found[2]:'';
-}
+function updateTemp(){const v=parseInt(document.getElementById('temp-slider').value);document.getElementById('temp-display').textContent=`${v}°C`;const labels=[[-5,5,'🥶 Muy frío'],[6,12,'🧥 Frío'],[13,18,'🍂 Fresco'],[19,26,'🌤 Templado'],[27,32,'☀️ Cálido'],[33,45,'🔥 Muy caluroso']];const found=labels.find(([a,b])=>v>=a&&v<=b);document.getElementById('temp-label').textContent=found?found[2]:'';}
+function updateSchemePreview(){const occ=document.getElementById('outfit-occasion')?document.getElementById('outfit-occasion').value:'casual';const scheme=SCHEME_BY_OCC[occ]||SCHEME_BY_OCC.casual;const sel=document.getElementById('outfit-scheme');if(sel)sel.value=scheme.key;const lbl=document.getElementById('scheme-suggested-label');if(lbl)lbl.textContent='· sugerido';}
+function onSchemeChange(){const lbl=document.getElementById('scheme-suggested-label');if(lbl)lbl.textContent='· modificado';}
 
-function updateSchemePreview(){
-  const occ=document.getElementById('outfit-occasion')?document.getElementById('outfit-occasion').value:'casual';
-  const scheme=SCHEME_BY_OCC[occ]||SCHEME_BY_OCC.casual;
-  const sel=document.getElementById('outfit-scheme');if(sel)sel.value=scheme.key;
-  const lbl=document.getElementById('scheme-suggested-label');if(lbl)lbl.textContent='· sugerido';
-}
+function getColorFamily(colorName){const families={azul:['Celeste','Azul','Azul marino','Azul petróleo'],gris:['Gris perla','Gris claro','Gris','Gris oscuro','Negro'],blanco:['Blanco','Crudo','Crema'],tierra:['Beige','Camel','Marrón','Terracota','Coral','Verde oliva'],rosa:['Rosa palo','Rosa','Bordo','Ciruela'],verde:['Verde agua','Verde claro','Verde oliva','Verde botella'],calido:['Naranja','Mostaza','Amarillo','Terracota','Coral'],violeta:['Lavanda','Violeta','Ciruela']};for(const[fam,members]of Object.entries(families)){if(members.includes(colorName))return fam;}return null;}
+const ANALOG_NEIGHBORS={azul:['azul','violeta','verde'],gris:['gris','blanco','azul'],blanco:['blanco','gris','tierra'],tierra:['tierra','calido','verde'],rosa:['rosa','violeta','calido'],verde:['verde','azul','tierra'],calido:['calido','tierra','rosa'],violeta:['violeta','rosa','azul']};
+const TONAL_TIERRA=new Set(['Beige','Camel','Marrón','Terracota','Coral','Verde oliva','Crudo','Crema','Blanco','Gris perla','Gris claro']);
+const PURE_NEUTRALS=new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro']);
+const EXTENDED_NEUTRALS=new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro','Beige','Camel','Azul marino']);
 
-function onSchemeChange(){
-  const lbl=document.getElementById('scheme-suggested-label');if(lbl)lbl.textContent='· modificado';
-}
-
-function getCompatibleColors(baseColor,schemeKey){
+function scoreColorPair(c1,c2,schemeKey){
+  const f1=getColorFamily(c1.name),f2=getColorFamily(c2.name);
+  const c1N=PURE_NEUTRALS.has(c1.name),c2N=PURE_NEUTRALS.has(c2.name);
+  const c1E=EXTENDED_NEUTRALS.has(c1.name),c2E=EXTENDED_NEUTRALS.has(c2.name);
   switch(schemeKey){
-    case 'neutro_acento':
-      if(['neutral','dark'].includes(baseColor.cat))return c=>['neutral','dark','accent'].includes(c.cat);
-      if(baseColor.cat==='accent')return c=>['neutral','dark'].includes(c.cat);
-      return c=>['neutral'].includes(c.cat);
-    case 'analogo':
-      return c=>{if(c.cat==='neutral')return true;const d=Math.abs(c.hue-baseColor.hue);return Math.min(d,360-d)<=50;};
-    case 'monocromatico':
-      return c=>{if(c.cat==='neutral')return true;const d=Math.abs(c.hue-baseColor.hue);return Math.min(d,360-d)<=35;};
-    case 'neutro_oscuro':
-      return c=>['neutral','dark'].includes(c.cat);
-    case 'tonal':
-      return c=>['neutral','earth','warm'].includes(c.cat);
-    case 'complementario':
-      return c=>{if(c.cat==='neutral')return true;const comp=(baseColor.hue+180)%360;const d=Math.abs(c.hue-comp);return Math.min(d,360-d)<=40;};
-    default:return()=>true;
+    case 'monocromatico':{if(c1N&&c2N)return 85;if(c2N)return 80;if(!f1||!f2)return 0;if(f1===f2)return 100;const mg1=MONO_GROUPS.find(g=>g.includes(c1.name));const mg2=MONO_GROUPS.find(g=>g.includes(c2.name));if(mg1&&mg2&&mg1.some(c=>mg2.includes(c)))return 95;return 0;}
+    case 'neutro_acento':{if(c1E&&c2E)return 90;if(c1E&&!c2E)return 85;if(!c1E&&c2E)return 85;if(!c1E&&!c2E)return 10;return 60;}
+    case 'analogo':{if(c2N)return 75;if(c1N)return 75;if(!f1||!f2)return 40;if(f1===f2)return 100;const neighbors=ANALOG_NEIGHBORS[f1]||[];if(neighbors.includes(f2))return 88;const hueDiff=Math.abs(c1.hue-c2.hue);const minDiff=Math.min(hueDiff,360-hueDiff);if(minDiff<=55)return 80;if(minDiff<=80)return 50;return 15;}
+    case 'complementario':{if(c2N)return 80;if(c1N)return 80;const hueDiff=Math.abs(c1.hue-c2.hue);const minDiff=Math.min(hueDiff,360-hueDiff);if(minDiff>=150&&minDiff<=210)return 95;if(minDiff>=120&&minDiff<=240)return 70;if(f1===f2)return 20;return 30;}
+    case 'triadico':{if(c2N)return 75;if(c1N)return 75;const hueDiff=Math.abs(c1.hue-c2.hue);const minDiff=Math.min(hueDiff,360-hueDiff);if(minDiff>=100&&minDiff<=140)return 90;if(minDiff>=80&&minDiff<=160)return 70;if(f1===f2)return 30;return 40;}
+    case 'tonal':{const c1T=TONAL_TIERRA.has(c1.name),c2T=TONAL_TIERRA.has(c2.name);if(c1T&&c2T)return 100;if(c2T)return 85;if(c2N)return 70;return 5;}
+    case 'clasicos':{if(CLASSIC_COMBOS.some(combo=>combo.includes(c1.name)&&combo.includes(c2.name)))return 100;if(c2N&&c1E)return 85;if(c2N)return 75;return 20;}
+    default:return 60;
   }
 }
 
-function tempCat(v){
-  if(v<=5)return'muyfrio';if(v<=12)return'frio';if(v<=18)return'fresco';
-  if(v<=26)return'templado';if(v<=32)return'calido';return'muycalido';
+function isPattern(g){if(g.texture==='estampado')return true;if(g.texture==='liso')return false;const patternWords=['estampado','estampada','lunares','cuadrillé','cuadros','vichy','rayas','flores','floral','animal print','leopardo','cebra','pata de gallo','tweed','principe de gales','tie dye','geométrico','tropical','jacquard','encaje','brocado','paisley'];const mat=(g.material||'').toLowerCase();const notes=(g.notes||'').toLowerCase();return patternWords.some(w=>mat.includes(w)||notes.includes(w));}
+function hasPattern(pieces){return pieces.some(p=>isPattern(p));}
+
+function scoreOutfit(pieces,schemeKey,occLabel,tempCatVal){
+  if(pieces.length<2)return 0;
+  let schemeScore=0,pairs=0;
+  for(let i=0;i<pieces.length;i++)for(let j=i+1;j<pieces.length;j++){schemeScore+=scoreColorPair(pieces[i].colorPrimary,pieces[j].colorPrimary,schemeKey);pairs++;}
+  schemeScore=pairs>0?schemeScore/pairs:0;
+  const patternCount=pieces.filter(p=>isPattern(p)).length;
+  const patternPenalty=patternCount>1?-40*(patternCount-1):0;
+  const occScore=pieces.every(p=>{const occ=p.occasions||[];return occ.includes(occLabel)||(occLabel==='Trabajo'&&occ.includes('Evento formal'))||(occLabel==='Evento formal'&&occ.includes('Trabajo'));})?100:60;
+  let climaScore=100;const hasOuter=pieces.some(p=>p.cat==='outer');
+  if((tempCatVal==='muyfrio'||tempCatVal==='frio')&&!hasOuter)climaScore=60;
+  if((tempCatVal==='calido'||tempCatVal==='muycalido')&&hasOuter)climaScore=50;
+  const darkCount=pieces.filter(p=>p.colorPrimary.dark).length;const lightCount=pieces.length-darkCount;
+  const balanceScore=(darkCount>0&&lightCount>0)?100:60;
+  const textureScore=patternCount===1?95:patternCount===0?80:40;
+  const total=(schemeScore*0.40)+(occScore*0.25)+(climaScore*0.15)+(balanceScore*0.10)+(textureScore*0.10)+patternPenalty;
+  return Math.max(0,Math.min(100,total));
 }
+
+function pickBestCompatible(arr,baseColor,schemeKey,excl=[],currentPieces=[],strict=true){
+  const alreadyHasPattern=hasPattern(currentPieces);const isMono=schemeKey==='monocromatico';
+  let available=arr.filter(g=>!excl.includes(g.id));if(!available.length)return null;
+  if(isMono){const lisas=available.filter(g=>!isPattern(g));if(lisas.length)available=lisas;else if(strict)return null;}
+  else if(alreadyHasPattern){const noPattern=available.filter(g=>!isPattern(g));if(noPattern.length)available=noPattern;}
+  const scored=available.map(g=>({g,score:scoreColorPair(baseColor,g.colorPrimary,schemeKey)}));
+  scored.sort((a,b)=>b.score-a.score||a.g.usageCount-b.g.usageCount);
+  if(strict){const best=scored.find(x=>x.score>0);return best?best.g:null;}
+  return scored[0]?.g||null;
+}
+
+function tempCat(v){if(v<=5)return'muyfrio';if(v<=12)return'frio';if(v<=18)return'fresco';if(v<=26)return'templado';if(v<=32)return'calido';return'muycalido';}
 function getSeason(t){if(t<=5)return'Invierno';if(t<=14)return'Otoño';if(t<=22)return'Primavera';return'Verano';}
 const OCC_MAP={trabajo:'Trabajo',casual:'Casual',salida:'Salida nocturna',evento:'Evento formal',sport:'Sport'};
 
-// Compatibilidad de ocasiones: qué ocasiones son compatibles entre sí
-function occasionCompatible(garmentOccasions, requestedOcc){
-  if(garmentOccasions.includes(requestedOcc)) return true;
-  // Reglas de compatibilidad cruzada
-  const compat = {
-    'Trabajo':     ['Trabajo','Evento formal'],
-    'Casual':      ['Casual','Sport'],
-    'Salida nocturna': ['Salida nocturna','Evento formal','Casual'],
-    'Evento formal':   ['Evento formal','Trabajo','Salida nocturna'],
-    'Sport':       ['Sport','Casual'],
-  };
-  const allowed = compat[requestedOcc]||[requestedOcc];
-  return garmentOccasions.some(o=>allowed.includes(o));
-}
-
-function getByRole(role,season,occLabel,strict=true){
-  return garments.filter(g=>{
-    if(g.cat!==role)return false;
-    if(strict){
-      const sAll=g.seasons.includes('Todo')||g.seasons.includes('Todo el año');
-      if(!sAll&&!g.seasons.includes(season))return false;
-      return occasionCompatible(g.occasions||[], occLabel);
-    }
-    return true;
-  });
-}
-
-function pickLeast(arr,excl=[]){
-  const av=arr.filter(g=>!excl.includes(g.id));
-  if(!av.length)return null;
-  return av.sort((a,b)=>a.usageCount-b.usageCount)[0];
-}
-
-// =============================================
-// REGLAS DE MODA
-// =============================================
-function isPattern(g){
-  // Campo explícito tiene prioridad absoluta
-  if(g.texture === 'estampado') return true;
-  if(g.texture === 'liso') return false;
-  // Fallback: buscar en notas/material para prendas cargadas antes del campo
-  const patternWords = [
-    'estampado','estampada','estampados',
-    'lunares','puntos',
-    'cuadrillé','cuadrille','cuadros','cuadrado','vichy','escocés','escoces',
-    'rayas','rayado','rayada','stripes',
-    'flores','floral','florido','florales',
-    'animal print','animalprint','leopardo','cebra','serpiente','snake','jaguar','tigre',
-    'tartán','tartan','escoces',
-    'pata de gallo','pata de gallina','houndstooth',
-    'tweed','principe de gales','príncipe de gales','glen plaid',
-    'tie dye','tiedye','batik',
-    'geométrico','geometrico','geométrica','geometrica',
-    'abstracto','abstracta',
-    'tropical','palmeras','camuflaje','camo',
-    'jacquard','broderie','encaje','brocado',
-    'paisley','damasco','argyle',
-    'a cuadros','de cuadros','de rayas','de lunares','de flores'
-  ];
-  const mat = (g.material||'').toLowerCase();
-  const notes = (g.notes||'').toLowerCase();
-  const type = (g.type||'').toLowerCase();
-  return patternWords.some(w => mat.includes(w) || notes.includes(w) || type.includes(w));
-}
-function hasPattern(pieces){
-  return pieces.some(p=>isPattern(p));
-}
-function isNeutral(color){
-  return color.cat==='neutral';
-}
-
-// Encuentra el grupo monocromático al que pertenece un color
-function getMonoGroup(colorName){
-  return MONO_GROUPS.find(g=>g.includes(colorName))||null;
-}
-
-// Verifica si dos colores son compatibles en monocromático
-function monoCompatible(c1name, c2name){
-  const g1=getMonoGroup(c1name);
-  const g2=getMonoGroup(c2name);
-  if(!g1||!g2) return false;
-  return g1.some(c=>g2.includes(c));
-}
-
-// Verifica compatibilidad clásica
-function classicCompatible(c1name, c2name){
-  return CLASSIC_COMBOS.some(combo=>combo.includes(c1name)&&combo.includes(c2name));
-}
-
-// =============================================
-// MOTOR DE COLOR v2 — Sistema de scoring
-// Basado en: teoría cromática + paletas curadas + proporción
-// =============================================
-
-// Familias cromáticas de cada color (para reglas monocromático/análogo)
-function getColorFamily(colorName){
-  const families = {
-    azul:    ['Celeste','Azul','Azul marino','Azul petróleo'],
-    gris:    ['Gris perla','Gris claro','Gris','Gris oscuro','Negro'],
-    blanco:  ['Blanco','Crudo','Crema'],
-    tierra:  ['Beige','Camel','Marrón','Terracota','Coral','Verde oliva'],
-    rosa:    ['Rosa palo','Rosa','Bordo','Ciruela'],
-    verde:   ['Verde agua','Verde claro','Verde oliva','Verde botella'],
-    calido:  ['Naranja','Mostaza','Amarillo','Terracota','Coral'],
-    violeta: ['Lavanda','Violeta','Ciruela'],
-  };
-  for(const [fam, members] of Object.entries(families)){
-    if(members.includes(colorName)) return fam;
-  }
-  return null;
-}
-
-// Familias vecinas para análogo
-const ANALOG_NEIGHBORS = {
-  azul:    ['azul','violeta','verde'],
-  gris:    ['gris','blanco','azul'],
-  blanco:  ['blanco','gris','tierra'],
-  tierra:  ['tierra','calido','verde'],
-  rosa:    ['rosa','violeta','calido'],
-  verde:   ['verde','azul','tierra'],
-  calido:  ['calido','tierra','rosa'],
-  violeta: ['violeta','rosa','azul'],
-};
-
-// Paleta tonal tierra cerrada
-const TONAL_TIERRA = new Set(['Beige','Camel','Marrón','Terracota','Coral','Verde oliva','Crudo','Crema','Blanco','Gris perla','Gris claro']);
-
-// Neutros puros (siempre pueden acompañar en cualquier esquema)
-const PURE_NEUTRALS = new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro']);
-
-// Neutros extendidos (neutros + tierras, para neutros+acento)
-const EXTENDED_NEUTRALS = new Set(['Negro','Blanco','Crudo','Crema','Gris perla','Gris claro','Gris','Gris oscuro','Beige','Camel','Azul marino']);
-
-// =============================================
-// SCORING POR ESQUEMA
-// Devuelve score 0-100 para un par de colores
-// =============================================
-function scoreColorPair(c1, c2, schemeKey){
-  const f1 = getColorFamily(c1.name);
-  const f2 = getColorFamily(c2.name);
-  const c1Neutral = PURE_NEUTRALS.has(c1.name);
-  const c2Neutral = PURE_NEUTRALS.has(c2.name);
-  const c1ExtNeutral = EXTENDED_NEUTRALS.has(c1.name);
-  const c2ExtNeutral = EXTENDED_NEUTRALS.has(c2.name);
-
-  switch(schemeKey){
-
-    case 'monocromatico': {
-      // max_familias_color = 1, neutros puros permitidos, estampados prohibidos
-      if(c1Neutral && c2Neutral) return 85; // neutros entre sí: muy bien
-      if(c2Neutral) return 80;              // neutro puro acompaña siempre
-      if(!f1 || !f2) return 0;
-      if(f1 === f2) return 100;             // misma familia: perfecto
-      // Mismo grupo monocromático (MONO_GROUPS)
-      const mg1 = getMonoGroup(c1.name);
-      const mg2 = getMonoGroup(c2.name);
-      if(mg1 && mg2 && mg1.some(c=>mg2.includes(c))) return 95;
-      return 0; // diferente familia: no permitido
-    }
-
-    case 'neutro_acento': {
-      // min_neutros=2, max_acentos=1
-      if(c1ExtNeutral && c2ExtNeutral) return 90; // dos neutros: excelente base
-      if(c1ExtNeutral && !c2ExtNeutral) return 85; // neutro + acento: correcto
-      if(!c1ExtNeutral && c2ExtNeutral) return 85;
-      if(!c1ExtNeutral && !c2ExtNeutral) return 10; // dos acentos: mal
-      return 60;
-    }
-
-    case 'analogo': {
-      // colores vecinos en rueda ±1 familia
-      if(c2Neutral) return 75;
-      if(c1Neutral) return 75;
-      if(!f1 || !f2) return 40;
-      if(f1 === f2) return 100;
-      const neighbors = ANALOG_NEIGHBORS[f1] || [];
-      if(neighbors.includes(f2)) return 88;
-      // Verificar por hue también
-      const hueDiff = Math.abs(c1.hue - c2.hue);
-      const minDiff = Math.min(hueDiff, 360-hueDiff);
-      if(minDiff <= 55) return 80;
-      if(minDiff <= 80) return 50;
-      return 15;
-    }
-
-    case 'complementario': {
-      // 1 dominante + opuesto suavizado, resto neutros
-      if(c2Neutral) return 80;
-      if(c1Neutral) return 80;
-      const hueDiff = Math.abs(c1.hue - c2.hue);
-      const minDiff = Math.min(hueDiff, 360-hueDiff);
-      if(minDiff >= 150 && minDiff <= 210) return 95; // complementario real
-      if(minDiff >= 120 && minDiff <= 240) return 70; // near-complementario
-      if(f1 === f2) return 20; // misma familia en complementario: no
-      return 30;
-    }
-
-    case 'triadico': {
-      // 3 familias a ~120° de distancia
-      if(c2Neutral) return 75;
-      if(c1Neutral) return 75;
-      const hueDiff = Math.abs(c1.hue - c2.hue);
-      const minDiff = Math.min(hueDiff, 360-hueDiff);
-      if(minDiff >= 100 && minDiff <= 140) return 90; // triádico real
-      if(minDiff >= 80 && minDiff <= 160) return 70;
-      if(f1 === f2) return 30;
-      return 40;
-    }
-
-    case 'tonal': {
-      // Solo paleta tierra curada
-      const c1Tonal = TONAL_TIERRA.has(c1.name);
-      const c2Tonal = TONAL_TIERRA.has(c2.name);
-      if(c1Tonal && c2Tonal) return 100;
-      if(c2Tonal) return 85;
-      if(c2Neutral) return 70;
-      return 5;
-    }
-
-    case 'clasicos': {
-      // Catálogo de combinaciones aprobadas
-      if(classicCompatible(c1.name, c2.name)) return 100;
-      if(c2Neutral && c1ExtNeutral) return 85;
-      if(c2Neutral) return 75;
-      return 20;
-    }
-
-    default: return 60;
-  }
-}
-
-// =============================================
-// SCORE TOTAL DE UN OUTFIT
-// Pesos: esquema 40% + ocasión 25% + clima 15% + equilibrio 10% + textura 10%
-// =============================================
-function scoreOutfit(pieces, schemeKey, occLabel, tempCatVal){
-  if(pieces.length < 2) return 0;
-
-  // 1. Score de esquema (40%) — promedio de pares de colores
-  let schemeScore = 0;
-  let pairs = 0;
-  for(let i=0; i<pieces.length; i++){
-    for(let j=i+1; j<pieces.length; j++){
-      schemeScore += scoreColorPair(pieces[i].colorPrimary, pieces[j].colorPrimary, schemeKey);
-      pairs++;
-    }
-  }
-  schemeScore = pairs > 0 ? schemeScore/pairs : 0;
-
-  // 2. Score de estampados — penalizar si hay más de 1
-  const patternCount = pieces.filter(p=>isPattern(p)).length;
-  const patternPenalty = patternCount > 1 ? -40 * (patternCount-1) : 0;
-
-  // 3. Score de ocasión (25%) — ya filtrado antes, pero penalizar si hay mezcla rara
-  const occScore = pieces.every(p=>{
-    const occ = p.occasions||[];
-    return occ.includes(occLabel) || (occLabel==='Trabajo'&&occ.includes('Evento formal')) || (occLabel==='Evento formal'&&occ.includes('Trabajo'));
-  }) ? 100 : 60;
-
-  // 4. Score de clima (15%) — prendas de abrigo en clima frío, sin en calor
-  let climaScore = 100;
-  const hasOuter = pieces.some(p=>p.cat==='outer');
-  if((tempCatVal==='muyfrio'||tempCatVal==='frio') && !hasOuter) climaScore = 60;
-  if((tempCatVal==='calido'||tempCatVal==='muycalido') && hasOuter) climaScore = 50;
-
-  // 5. Score de equilibrio visual (10%) — premiar variedad de luminosidad
-  const darkCount = pieces.filter(p=>p.colorPrimary.dark).length;
-  const lightCount = pieces.length - darkCount;
-  const balanceScore = (darkCount>0 && lightCount>0) ? 100 : 60;
-
-  // 6. Score de textura (10%) — premiar variedad (liso+estampado está ok si es 1)
-  const textureScore = patternCount === 1 ? 95 : patternCount === 0 ? 80 : 40;
-
-  const total = (schemeScore*0.40) + (occScore*0.25) + (climaScore*0.15) + (balanceScore*0.10) + (textureScore*0.10) + patternPenalty;
-  return Math.max(0, Math.min(100, total));
-}
-
-// =============================================
-// PICK CON SCORING
-// =============================================
-function pickBestCompatible(arr, baseColor, schemeKey, excl=[], currentPieces=[], strict=true){
-  const alreadyHasPattern = hasPattern(currentPieces);
-  const isMono = schemeKey==='monocromatico';
-
-  let available = arr.filter(g=>!excl.includes(g.id));
-  if(!available.length) return null;
-
-  // REGLA ESTAMPADOS: mono=0 estampados, resto max 1
-  if(isMono){
-    const lisas = available.filter(g=>!isPattern(g));
-    if(lisas.length) available = lisas;
-    else if(strict) return null;
-  } else if(alreadyHasPattern){
-    const noPattern = available.filter(g=>!isPattern(g));
-    if(noPattern.length) available = noPattern;
-  }
-
-  // Calcular score para cada candidato
-  const scored = available.map(g=>{
-    const s = scoreColorPair(baseColor, g.colorPrimary, schemeKey);
-    return { g, score: s };
-  });
-
-  // Ordenar por score desc, luego por menor uso
-  scored.sort((a,b)=> b.score-a.score || a.g.usageCount-b.g.usageCount);
-
-  // En modo estricto, no aceptar score 0
-  if(strict){
-    const best = scored.find(x=>x.score>0);
-    return best ? best.g : null;
-  }
-
-  return scored[0]?.g || null;
+function occasionCompatible(garmentOccasions,requestedOcc){
+  if(garmentOccasions.includes(requestedOcc))return true;
+  const compat={'Trabajo':['Trabajo','Evento formal'],'Casual':['Casual','Sport'],'Salida nocturna':['Salida nocturna','Evento formal','Casual'],'Evento formal':['Evento formal','Trabajo','Salida nocturna'],'Sport':['Sport','Casual']};
+  const allowed=compat[requestedOcc]||[requestedOcc];return garmentOccasions.some(o=>allowed.includes(o));
 }
 
 function generateOutfits(){
-  const temp = parseInt(document.getElementById('temp-slider').value);
-  const occ = document.getElementById('outfit-occasion').value;
-  const occLabel = OCC_MAP[occ];
-  const season = getSeason(temp);
-  const cat = tempCat(temp);
-  const schemeKey = document.getElementById('outfit-scheme').value;
-  const schemeNames = {
-    neutro_acento:'Neutros + acento', analogo:'Análogo', monocromatico:'Monocromático',
-    neutro_oscuro:'Neutros elegantes', tonal:'Tonal tierra', complementario:'Complementario',
-    triadico:'Triádico', clasicos:'Clásicos infalibles'
-  };
-  const scheme = {key:schemeKey, name:schemeNames[schemeKey]||schemeKey};
+  const temp=parseInt(document.getElementById('temp-slider').value);
+  const occ=document.getElementById('outfit-occasion').value;
+  const occLabel=OCC_MAP[occ];const season=getSeason(temp);const cat=tempCat(temp);
+  const schemeKey=document.getElementById('outfit-scheme').value;
+  const schemeNames={neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',neutro_oscuro:'Neutros elegantes',tonal:'Tonal tierra',complementario:'Complementario',triadico:'Triádico',clasicos:'Clásicos infalibles'};
+  const scheme={key:schemeKey,name:schemeNames[schemeKey]||schemeKey};
+  if(garments.length<2){document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">👗</div><p>Necesitás al menos 2 prendas registradas.</p></div>';return;}
 
-  if(garments.length<2){
-    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">👗</div><p>Necesitás al menos 2 prendas registradas.</p></div>';
-    return;
-  }
-
-  // Filtrar por ocasión ESTRICTO — no usar fallback para ocasión
   function getStrict(role){
-    // Primero: temporada + ocasión estrictos
-    let r = garments.filter(g=>{
-      if(g.cat!==role) return false;
-      const sAll = g.seasons.includes('Todo')||g.seasons.includes('Todo el año');
-      if(!sAll&&!g.seasons.includes(season)) return false;
-      return occasionCompatible(g.occasions||[], occLabel);
-    });
-    // Fallback solo de temporada (no de ocasión)
-    if(!r.length){
-      r = garments.filter(g=>{
-        if(g.cat!==role) return false;
-        return occasionCompatible(g.occasions||[], occLabel);
-      });
-    }
+    let r=garments.filter(g=>{if(g.cat!==role)return false;const sAll=g.seasons.includes('Todo')||g.seasons.includes('Todo el año');if(!sAll&&!g.seasons.includes(season))return false;return occasionCompatible(g.occasions||[],occLabel);});
+    if(!r.length)r=garments.filter(g=>{if(g.cat!==role)return false;return occasionCompatible(g.occasions||[],occLabel);});
     return r;
   }
 
-  const tops    = getStrict('top');
-  const bottoms = getStrict('bottom');
-  const dresses = getStrict('dress');
-  const outers  = (cat!=='calido'&&cat!=='muycalido') ? getStrict('outer') : [];
-  const shoes   = getStrict('shoes');
-  const bags    = getStrict('bag');
+  const tops=getStrict('top'),bottoms=getStrict('bottom'),dresses=getStrict('dress');
+  const outers=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
+  const shoes=getStrict('shoes'),bags=getStrict('bag');
+  const forceSmooth=schemeKey==='monocromatico'||schemeKey==='clasicos';
+  const combos=[];
 
-  // Generar candidatos: top+bottom o dress
-  // Para monocromático y clásicos: solo prendas lisas como base
-  const forceSmooth = schemeKey==='monocromatico'||schemeKey==='clasicos';
-
-  // Armar pool de combos posibles con score
-  const combos = [];
-
-  // Combos dress-based
-  const dressPool = forceSmooth ? dresses.filter(g=>!isPattern(g)) : dresses;
+  const dressPool=forceSmooth?dresses.filter(g=>!isPattern(g)):dresses;
   for(const d of dressPool){
-    const pieces = [d];
-    if(outers.length){ const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true); if(o) pieces.push(o); }
-    if(shoes.length){  const s=pickBestCompatible(shoes, d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(s) pieces.push(s); }
-    if(bags.length){   const b=pickBestCompatible(bags,  d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(b) pieces.push(b); }
-    if(pieces.length>=1){
-      const sc = scoreOutfit(pieces,schemeKey,occLabel,cat);
-      combos.push({pieces:[...pieces],score:sc,scheme});
-    }
+    const pieces=[d];
+    if(outers.length){const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true);if(o)pieces.push(o);}
+    if(shoes.length){const s=pickBestCompatible(shoes,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
+    if(bags.length){const b=pickBestCompatible(bags,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
+    if(pieces.length>=1){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
   }
 
-  // Combos top+bottom
-  const topPool = forceSmooth ? tops.filter(g=>!isPattern(g)) : tops;
+  const topPool=forceSmooth?tops.filter(g=>!isPattern(g)):tops;
   for(const top of topPool){
-    // Si el top es estampado, forzar bottom liso — regla dura
-    const bottomPool = isPattern(top)
-      ? bottoms.filter(g=>!isPattern(g))
-      : bottoms;
-    if(!bottomPool.length && isPattern(top)) continue;
-    const bot = pickBestCompatible(bottomPool, top.colorPrimary, schemeKey, [top.id], [top], true);
-    if(!bot) continue;
-    const pieces = [top, bot];
-    if(outers.length){ const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true); if(o&&o.cat==='outer') pieces.push(o); }
-    if(shoes.length){  const s=pickBestCompatible(shoes, top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(s) pieces.push(s); }
-    if(bags.length){   const b=pickBestCompatible(bags,  top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false); if(b) pieces.push(b); }
-    // Rechazar combo si tiene 2+ estampados — regla dura final
-    const patternPieces = pieces.filter(p=>isPattern(p));
-    if(patternPieces.length > 1) continue;
-    const sc = scoreOutfit(pieces,schemeKey,occLabel,cat);
-    combos.push({pieces:[...pieces],score:sc,scheme});
+    const bottomPool=isPattern(top)?bottoms.filter(g=>!isPattern(g)):bottoms;
+    if(!bottomPool.length&&isPattern(top))continue;
+    const bot=pickBestCompatible(bottomPool,top.colorPrimary,schemeKey,[top.id],[top],true);if(!bot)continue;
+    const pieces=[top,bot];
+    if(outers.length){const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true);if(o&&o.cat==='outer')pieces.push(o);}
+    if(shoes.length){const s=pickBestCompatible(shoes,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
+    if(bags.length){const b=pickBestCompatible(bags,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
+    const patternPieces=pieces.filter(p=>isPattern(p));if(patternPieces.length>1)continue;
+    const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});
   }
 
-  if(!combos.length){
-    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles para esta ocasión y esquema. Intentá cambiar el esquema o agregá más prendas.</p></div>';
-    return;
-  }
+  if(!combos.length){document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles para esta ocasión y esquema. Intentá cambiar el esquema o agregá más prendas.</p></div>';return;}
 
-  // Ordenar por score y tomar top 3 sin repetir piezas principales
   combos.sort((a,b)=>b.score-a.score);
-  const chosen = [];
-  const usedMains = new Set();
-  const usedIds = new Set(); // ids de cualquier prenda ya usada en looks elegidos
-
+  const chosen=[];const usedMains=new Set();const usedIds=new Set();
   for(const combo of combos){
-    if(chosen.length>=3) break;
-    const mainPieces = combo.pieces.filter(p=>['top','bottom','dress'].includes(p.cat));
-    const mainKey = mainPieces.map(p=>p.id).sort().join('-');
-    if(usedMains.has(mainKey)) continue;
-    // Para el 2° y 3° look, al menos el top debe ser diferente
-    if(chosen.length > 0){
-      const topId = mainPieces.find(p=>p.cat==='top'||p.cat==='dress')?.id;
-      if(topId && usedIds.has(topId)) continue;
-    }
-    usedMains.add(mainKey);
-    combo.pieces.forEach(p=>usedIds.add(p.id));
-    chosen.push(combo);
+    if(chosen.length>=3)break;
+    const mainPieces=combo.pieces.filter(p=>['top','bottom','dress'].includes(p.cat));
+    const mainKey=mainPieces.map(p=>p.id).sort().join('-');if(usedMains.has(mainKey))continue;
+    if(chosen.length>0){const topId=mainPieces.find(p=>p.cat==='top'||p.cat==='dress')?.id;if(topId&&usedIds.has(topId))continue;}
+    usedMains.add(mainKey);combo.pieces.forEach(p=>usedIds.add(p.id));chosen.push(combo);
   }
 
-  if(!chosen.length){
-    document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles. Intentá con otro esquema u ocasión.</p></div>';
-    return;
-  }
+  if(!chosen.length){document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles. Intentá con otro esquema u ocasión.</p></div>';return;}
 
   document.getElementById('outfit-result').innerHTML=chosen.map((o,i)=>{
     const colors=o.pieces.map(p=>p.colorPrimary).filter((c,idx,arr)=>arr.findIndex(x=>x.hex===c.hex)===idx);
-    const scoreBar = Math.round(o.score);
-    const uid = `outfit-${i}-${Date.now()}`;
+    const scoreBar=Math.round(o.score);
+    const uid=`outfit-${i}-${Date.now()}`;
     return`<div class="outfit-card">
       <div class="outfit-header">
-        <div>
-          <div class="outfit-number">Look ${i+1} · ${temp}°C</div>
-          <div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">${occLabel}</div>
-        </div>
-        <div style="text-align:right;">
-          <span class="outfit-scheme-label">${o.scheme.name}</span>
-          <div style="font-size:0.65rem;color:var(--mocha);margin-top:3px;">score ${scoreBar}/100</div>
-        </div>
+        <div><div class="outfit-number">Look ${i+1} · ${temp}°C</div><div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">${occLabel}</div></div>
+        <div style="text-align:right;"><span class="outfit-scheme-label">${o.scheme.name}</span><div style="font-size:0.65rem;color:var(--mocha);margin-top:3px;">score ${scoreBar}/100</div></div>
       </div>
-      <div class="color-harmony-row">
-        ${colors.map(c=>`<div class="harmony-swatch" style="background:${c.hex}" title="${c.name}"></div>`).join('')}
-        <span class="harmony-label">${o.scheme.name.toLowerCase()}</span>
-      </div>
+      <div class="color-harmony-row">${colors.map(c=>`<div class="harmony-swatch" style="background:${c.hex}" title="${c.name}"></div>`).join('')}<span class="harmony-label">${o.scheme.name.toLowerCase()}</span></div>
       <div class="avatar-toggle">
         <button class="active" onclick="toggleSketch('foto','${uid}',this)">Prendas</button>
         <button onclick="showCollage('${uid}',this)">Collage</button>
@@ -1511,685 +775,90 @@ function generateOutfits(){
           <button onclick="toggleSketch('sketch','${uid}',this)">Sketches</button>
         </div>
         <div id="sketch-fotos-${uid}">
-          <div class="outfit-pieces">
-            ${o.pieces.map(g=>`<div class="outfit-piece">
-              <div class="piece-img">${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div>
-              <div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div>
-              <div class="piece-label">${g.type}</div>
-            </div>`).join('')}
-          </div>
+          <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photo?`<img src="${g.photo}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
         </div>
         <div id="sketch-view-${uid}" style="display:none;">
-          <div class="outfit-pieces">
-            ${o.pieces.map(g=>{
-              const sketchSVG = getSketchSVG(g.type, g.colorPrimary.hex);
-              return `<div class="outfit-piece">
-                <div class="piece-img" style="background:white;">
-                  ${sketchSVG
-                    ? `<svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">${sketchSVG}</svg>`
-                    : `<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}
-                </div>
-                <div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div>
-                <div class="piece-label">${g.type}</div>
-              </div>`;
-            }).join('')}
-          </div>
+          <div class="outfit-pieces">${o.pieces.map(g=>{const sketchSVG=getSketchSVG(g.type,g.colorPrimary.hex);return`<div class="outfit-piece"><div class="piece-img" style="background:white;">${sketchSVG?`<svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">${sketchSVG}</svg>`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`;}).join('')}</div>
         </div>
       </div>
       <div id="view-collage-${uid}" style="display:none;">
-        <div class="collage-card">
-          <div class="collage-card-header"></div>
-          <div class="collage-board" id="collage-board-${uid}"></div>
-          <div class="collage-palette"></div>
-          <div class="collage-tip"></div>
-        </div>
+        <div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-${uid}"></div><div class="collage-palette"></div><div class="collage-tip"></div></div>
       </div>
       <div class="outfit-tip">💡 ${SCHEME_TIPS[o.scheme.key]}</div>
       <button class="btn-use" onclick="useOutfit(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
     </div>`;
   }).join('');
-
-  // Dibujar avatares
-  chosen.forEach((o,i)=>{
-    const uid = `outfit-${i}-${document.querySelector(`[id^="svg-outfit-${i}-"]`)?.id.split('-').slice(2).join('-') || ''}`;
-    const svgId = document.getElementById(`view-avatar-outfit-${i}`);
-  });
 }
 
-function toggleSketch(view, uid, btn){
-  const fotos = document.getElementById(`sketch-fotos-${uid}`);
-  const collage = document.getElementById(`view-collage-${uid}`);
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  fotos.style.display = 'block';
-  if(collage) collage.style.display = 'none';
+function toggleSketch(view,uid,btn){
+  const fotos=document.getElementById(`sketch-fotos-${uid}`);const collage=document.getElementById(`view-collage-${uid}`);
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  fotos.style.display='block';if(collage)collage.style.display='none';
 }
 
-function showCollage(uid, btn){
-  const fotos = document.getElementById(`sketch-fotos-${uid}`);
-  const collage = document.getElementById(`view-collage-${uid}`);
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(fotos) fotos.style.display = 'none';
-  if(collage){
-    collage.style.display = 'block';
-    const board = document.getElementById(`collage-board-${uid}`);
-    if(board && !board.innerHTML.trim()){
-      // Buscar piezas del outfit en el DOM
-      const card = btn.closest('.outfit-card');
-      const pieces = [];
-      card.querySelectorAll('.outfit-piece').forEach(p=>{
-        const img = p.querySelector('img');
-        const label = p.querySelector('.piece-label')?.textContent||'';
-        const strip = p.querySelector('.piece-color-strip');
-        const color = strip ? strip.style.background : '#aaa';
-        const photo = img ? img.src : null;
-        const cat = getCatFromLabel(label);
-        pieces.push({photo, label, color, cat});
-      });
-      renderCollage(board, pieces);
-    }
-  }
+function showCollage(uid,btn){
+  const fotos=document.getElementById(`sketch-fotos-${uid}`);const collage=document.getElementById(`view-collage-${uid}`);
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  if(fotos)fotos.style.display='none';
+  if(collage){collage.style.display='block';const board=document.getElementById(`collage-board-${uid}`);if(board&&!board.innerHTML.trim()){const card=btn.closest('.outfit-card');const pieces=[];card.querySelectorAll('.outfit-piece').forEach(p=>{const img=p.querySelector('img');const label=p.querySelector('.piece-label')?.textContent||'';const strip=p.querySelector('.piece-color-strip');const color=strip?strip.style.background:'#aaa';const photo=img?img.src:null;const cat=getCatFromLabel(label);pieces.push({photo,label,color,cat});});renderCollage(board,pieces);}}
 }
 
-function getCatFromLabel(label){
-  const l = label.toLowerCase();
-  if(['blazer','saco','chaqueta','campera','parka','tapado','trench','piloto','poncho','sobretodo'].some(k=>l.includes(k))) return 'outer';
-  if(['vestido','mono','jardinero','body'].some(k=>l.includes(k))) return 'dress';
-  if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k))) return 'bottom';
-  if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k))) return 'shoes';
-  if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k))) return 'bag';
-  if(['gafas','lentes','anteojos','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k))) return 'acc';
-  return 'top';
+function getCatFromLabel(label){const l=label.toLowerCase();if(['blazer','saco','chaqueta','campera','parka','tapado','trench','piloto','poncho','sobretodo'].some(k=>l.includes(k)))return'outer';if(['vestido','mono','jardinero','body'].some(k=>l.includes(k)))return'dress';if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k)))return'bottom';if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k)))return'shoes';if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k)))return'bag';if(['gafas','lentes','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k)))return'acc';return'top';}
+
+function renderCollage(board,pieces){
+  const card=board.closest('.outfit-card');const occ=card.querySelector('.outfit-number')?.nextElementSibling?.textContent||'';const temp=card.querySelector('.outfit-number')?.textContent?.match(/\d+/)?.[0]||'';const scheme=card.querySelector('.outfit-scheme-label')?.textContent||'';const tip=card.querySelector('.outfit-tip')?.textContent?.replace('💡 ','')||'';const swatches=[...card.querySelectorAll('.harmony-swatch')];const colors=swatches.map(s=>s.style.background);
+  const cardEl=board.closest('.collage-card');if(!cardEl)return;
+  cardEl.querySelector('.collage-card-header').innerHTML=`<div class="collage-card-title">Outfit del día</div><div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>`;
+  const W=board.offsetWidth||260,H=board.offsetHeight||346;
+  const slots=[{cat:'outer',x:0.02,y:0.02,w:0.52,h:0.48,rot:-3,z:3},{cat:'top',x:0.40,y:0.00,w:0.46,h:0.40,rot:3,z:2},{cat:'dress',x:0.10,y:0.02,w:0.58,h:0.64,rot:1,z:2},{cat:'bottom',x:0.20,y:0.36,w:0.55,h:0.60,rot:1.5,z:1},{cat:'shoes',x:0.02,y:0.72,w:0.52,h:0.26,rot:-2,z:4},{cat:'bag',x:0.63,y:0.50,w:0.35,h:0.32,rot:4,z:4},{cat:'acc',x:0.62,y:0.02,w:0.36,h:0.24,rot:5,z:5}];
+  let boardHtml='';pieces.forEach(p=>{if(!p.photo)return;const slot=slots.find(s=>s.cat===p.cat);if(!slot)return;const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};"><img src="${p.photo}" alt="${p.label}"/></div>`;});
+  board.innerHTML=boardHtml;
+  const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
+  const tipEl=cardEl.querySelector('.collage-tip');if(tipEl)tipEl.textContent=tip;
 }
 
-function renderCollage(board, pieces){
-  // board es .collage-board, su padre es .collage-card
-  // Necesitamos también datos del outfit — los leemos del card padre
-  const card = board.closest('.outfit-card');
-  const occ = card.querySelector('.outfit-number')?.nextElementSibling?.textContent || '';
-  const temp = card.querySelector('.outfit-number')?.textContent?.match(/\d+/)?.[0] || '';
-  const scheme = card.querySelector('.outfit-scheme-label')?.textContent || '';
-  const tip = card.querySelector('.outfit-tip')?.textContent?.replace('💡 ','') || '';
-  const swatches = [...card.querySelectorAll('.harmony-swatch')];
-  const colors = swatches.map(s=>s.style.background);
-
-  // Construir la card completa
-  const cardEl = board.closest('.collage-card');
-  if(!cardEl) return;
-
-  // Header
-  cardEl.querySelector('.collage-card-header').innerHTML = `
-    <div class="collage-card-title">Outfit del día</div>
-    <div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>
-  `;
-
-  const W = board.offsetWidth || 260;
-  const H = board.offsetHeight || 346;
-
-  const slots = [
-    {cat:'outer',  x:0.02, y:0.02, w:0.52, h:0.48, rot:-3,  z:3},
-    {cat:'top',    x:0.40, y:0.00, w:0.46, h:0.40, rot:3,   z:2},
-    {cat:'dress',  x:0.10, y:0.02, w:0.58, h:0.64, rot:1,   z:2},
-    {cat:'bottom', x:0.20, y:0.36, w:0.55, h:0.60, rot:1.5, z:1},
-    {cat:'shoes',  x:0.02, y:0.72, w:0.52, h:0.26, rot:-2,  z:4},
-    {cat:'bag',    x:0.63, y:0.50, w:0.35, h:0.32, rot:4,   z:4},
-    {cat:'acc',    x:0.62, y:0.02, w:0.36, h:0.24, rot:5,   z:5},
-  ];
-
-  let boardHtml = '';
-  pieces.forEach(p=>{
-    if(!p.photo) return;
-    const slot = slots.find(s=>s.cat===p.cat);
-    if(!slot) return;
-    const x = Math.round(slot.x * W);
-    const y = Math.round(slot.y * H);
-    const w = Math.round(slot.w * W);
-    const h = Math.round(slot.h * H);
-    boardHtml += `<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};">
-      <img src="${p.photo}" alt="${p.label}"/>
-    </div>`;
-  });
-  board.innerHTML = boardHtml;
-
-  // Paleta de colores
-  const paletteEl = cardEl.querySelector('.collage-palette');
-  if(paletteEl){
-    paletteEl.innerHTML = colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')
-      + `<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
-  }
-
-  // Tip
-  const tipEl = cardEl.querySelector('.collage-tip');
-  if(tipEl) tipEl.textContent = tip;
-}
-
-function toggleView(view, uid, btn){
-  const prendas = document.getElementById(`view-prendas-${uid}`);
-  const avatar = document.getElementById(`view-avatar-${uid}`);
-  const btns = btn.parentElement.querySelectorAll('button');
-  btns.forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(view==='prendas'){
-    prendas.style.display='block';
-    avatar.style.display='none';
-  } else {
-    prendas.style.display='none';
-    avatar.style.display='block';
-    // Dibujar si el SVG está vacío
-    const svg = avatar.querySelector('svg');
-    if(svg && !svg.innerHTML.trim()){
-      // Obtener piezas del outfit desde el DOM padre
-      const card = btn.closest('.outfit-card');
-      const pieces = [];
-      card.querySelectorAll('.outfit-piece').forEach(p=>{
-        const lbl = p.querySelector('.piece-label')?.textContent||'';
-        const strip = p.querySelector('.piece-color-strip');
-        const hex = strip ? strip.style.background : '#aaa';
-        pieces.push({label:lbl, hex});
-      });
-      drawAvatarSVG(svg, pieces);
-    }
-  }
-}
-
-function drawAvatarSVG(svg, pieces){
-  // Detectar tipos de prendas y colores
-  const findPiece = (keywords) => pieces.find(p=>keywords.some(k=>p.label.toLowerCase().includes(k)));
-  const top    = findPiece(['blusa','camisa','remera','top','musculosa','polera','buzo','hoodie','suéter','cárdigan','chaleco']);
-  const outer  = findPiece(['blazer','saco','chaqueta','campera','parka','tapado','poncho','trench','gabardina']);
-  const bot    = findPiece(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger']);
-  const dress  = findPiece(['vestido','mono','jardinero','body']);
-  const shoe   = findPiece(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis']);
-  const bag    = findPiece(['cartera','bolso','mochila','clutch','riñonera','tote']);
-
-  const tc = (outer||top)?.hex || '#C4957A';
-  const td = dk(tc,30);
-  const bc = bot?.hex || '#1A2E5A';
-  const bd = dk(bc,30);
-  const sc = shoe?.hex || '#1C1C1A';
-  const sd = dk(sc,25);
-  const skin = '#F5D5B0';
-
-  // Figura femenina: viewBox 160x400
-  // Cabeza: cx=80, cy=28, r~14x17
-  // Cuello: y45-60, Hombros: y60, ancho 50-110
-  // Torso: hasta y175, Cadera: y175, Piernas: hasta y385, Pies: y385-398
-  let h = `
-    <ellipse cx="80" cy="28" rx="13" ry="17" fill="${skin}"/>
-    <rect x="75" y="44" width="10" height="16" rx="4" fill="${skin}"/>
-  `;
-
-  // VESTIDO
-  if(dress && !bot){
-    h += `
-      <path d="M50 60 Q42 70 40 90 Q37 118 36 150 Q34 188 33 228 Q31 268 30 308 Q29 342 30 385 L130 385 Q131 342 130 308 Q129 268 128 228 Q127 188 126 150 Q125 118 122 90 Q120 70 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
-      <path d="M50 60 L63 82 L80 72 L97 82 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.2"/>
-      <path d="M66 58 L80 76 L94 58" fill="none" stroke="${td}" stroke-width="1.1" opacity="0.4"/>
-      <path d="M36 150 Q80 138 126 150" fill="none" stroke="${td}" stroke-width="0.7" opacity="0.2"/>
-      <path d="M33 228 Q80 215 127 228" fill="none" stroke="${td}" stroke-width="0.6" opacity="0.15"/>
-      <path d="M30 308 Q80 294 130 308" fill="none" stroke="${td}" stroke-width="0.5" opacity="0.12"/>
-    `;
-  } else {
-    const isBlz = outer || (top && ['blazer','saco','chaqueta'].some(k=>top.label.toLowerCase().includes(k)));
-    if(isBlz){
-      const inn='#FAFAF7';
-      h += `
-        <path d="M50 60 Q42 70 40 90 Q38 114 38 162 L122 162 Q122 114 120 90 Q118 70 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
-        <path d="M50 60 L63 80 L80 72 L97 80 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.2"/>
-        <path d="M50 60 L40 74 L38 118 L54 112 L60 162 L38 162" fill="${td}" opacity="0.1"/>
-        <path d="M110 60 L120 74 L122 118 L106 112 L100 162 L122 162" fill="${td}" opacity="0.1"/>
-        <path d="M63 60 L71 80 L80 72 L89 80 L97 60 L95 54 L80 56 L65 54Z" fill="${inn}"/>
-        <path d="M71 66 L80 82 L89 66" fill="none" stroke="${tc}" stroke-width="1.1"/>
-        <circle cx="58" cy="110" r="2.2" fill="${td}" opacity="0.5"/>
-        <circle cx="58" cy="123" r="2.2" fill="${td}" opacity="0.5"/>
-        <circle cx="58" cy="136" r="2.2" fill="${td}" opacity="0.5"/>
-        <circle cx="58" cy="149" r="2.2" fill="${td}" opacity="0.5"/>
-      `;
-    } else {
-      h += `
-        <path d="M50 60 Q42 68 40 86 Q38 110 38 162 L122 162 Q122 110 120 86 Q118 68 110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${tc}"/>
-        <path d="M50 60 L63 78 L80 70 L97 78 L110 60 Q96 52 80 54 Q64 52 50 60Z" fill="${td}" opacity="0.17"/>
-        <path d="M68 60 L80 76 L92 60" fill="none" stroke="${td}" stroke-width="1" opacity="0.5"/>
-        <line x1="80" y1="76" x2="80" y2="162" stroke="${td}" stroke-width="0.8" opacity="0.32"/>
-        <circle cx="80" cy="92" r="1.8" fill="${td}" opacity="0.42"/>
-        <circle cx="80" cy="106" r="1.8" fill="${td}" opacity="0.42"/>
-        <circle cx="80" cy="120" r="1.8" fill="${td}" opacity="0.42"/>
-        <circle cx="80" cy="136" r="1.8" fill="${td}" opacity="0.42"/>
-        <circle cx="80" cy="150" r="1.8" fill="${td}" opacity="0.42"/>
-      `;
-    }
-
-    // BOTTOM — figura femenina más estrecha en piernas
-    const isJean = bot && bot.label.toLowerCase().includes('jean');
-    h += `
-      <path d="M40 160 L37 272 L62 272 L80 222 L98 272 L123 272 L120 160 Z" fill="${bc}"/>
-      <path d="M37 272 L34 385 L64 385 L72 312 L80 380 L88 312 L96 385 L126 385 L123 272 Z" fill="${bc}"/>
-    `;
-    if(isJean){
-      h += `
-        <path d="M40 160 L44 174 L116 174 L120 162" fill="${dk(bc,15)}" opacity="0.4"/>
-        <line x1="76" y1="162" x2="74" y2="270" stroke="${bd}" stroke-width="1" opacity="0.42"/>
-        <line x1="84" y1="162" x2="86" y2="270" stroke="${bd}" stroke-width="1" opacity="0.42"/>
-      `;
-    } else {
-      h += `
-        <line x1="55" y1="162" x2="53" y2="270" stroke="${bd}" stroke-width="0.6" opacity="0.28"/>
-        <line x1="105" y1="162" x2="107" y2="270" stroke="${bd}" stroke-width="0.6" opacity="0.28"/>
-      `;
-    }
-  }
-
-  // ZAPATOS
-  const isTaco = shoe && ['zapato','bota','botín','oxford','mule'].some(k=>shoe.label.toLowerCase().includes(k));
-  if(isTaco){
-    h += `
-      <path d="M34 385 Q25 388 22 393 Q19 398 23 401 Q28 404 50 402 L54 385 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
-      <rect x="46" y="398" width="5" height="9" rx="1" fill="${sd}"/>
-      <path d="M106 385 Q115 388 118 393 Q121 398 117 401 Q112 404 90 402 L86 385 Z" fill="${sc}" stroke="${sd}" stroke-width="0.8"/>
-      <rect x="109" y="398" width="5" height="9" rx="1" fill="${sd}"/>
-    `;
-  } else {
-    const sx = sc==='#F5F0E8'||sc==='#FFFFFF'?'#ccc':sd;
-    h += `
-      <path d="M34 385 Q23 387 19 393 Q16 398 22 401 Q30 404 54 402 L56 385 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
-      <path d="M106 385 L108 402 Q132 404 138 401 Q144 398 141 393 Q137 387 126 385 Z" fill="${sc}" stroke="${sx}" stroke-width="1"/>
-    `;
-  }
-
-  // CARTERA
-  if(bag){
-    const bagC = bag.hex;
-    const bagD = dk(bagC, 25);
-    h += `
-      <rect x="124" y="195" width="32" height="26" rx="4" fill="${bagC}" stroke="${bagD}" stroke-width="1"/>
-      <path d="M131 195 Q140 185 152 195" fill="none" stroke="${bagD}" stroke-width="1.4"/>
-      <rect x="136" y="204" width="10" height="7" rx="2" fill="${bagD}" opacity="0.5"/>
-    `;
-  }
-
-  // BRAZOS — más pegados al cuerpo femenino
-  const sleeveEnd = (dress && !bot) ? 275 : 195;
-  h += `
-    <path d="M40 64 Q28 100 26 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
-    <ellipse cx="26" cy="${sleeveEnd+7}" rx="7" ry="5" fill="${skin}"/>
-    <path d="M120 64 Q132 100 134 ${sleeveEnd}" fill="${tc}" stroke="${td}" stroke-width="0.8"/>
-    <ellipse cx="134" cy="${sleeveEnd+7}" rx="7" ry="5" fill="${skin}"/>
-  `;
-
-  svg.innerHTML = h;
-}
-
-function dk(hex, a){
-  let c=hex.replace('#','');
-  if(c.length===3)c=c.split('').map(x=>x+x).join('');
-  return '#'+[0,2,4].map(i=>Math.max(0,parseInt(c.substr(i,2),16)-a).toString(16).padStart(2,'0')).join('');
-}
-
-function useOutfit(ids,occasion){
-  const dateStr=new Date().toISOString().split('T')[0];
-  ids.forEach(id=>{const g=garments.find(g=>g.id===id);if(g)g.usageCount=(g.usageCount||0)+1;});
-  history.unshift({date:dateStr,garmentIds:ids,occasion,timestamp:Date.now()});
-  save();renderGarments();showToast('✓ Look registrado');
-}
+function useOutfit(ids,occasion){const dateStr=new Date().toISOString().split('T')[0];ids.forEach(id=>{const g=garments.find(g=>g.id===id);if(g)g.usageCount=(g.usageCount||0)+1;});history.unshift({date:dateStr,garmentIds:ids,occasion,timestamp:Date.now()});save();renderGarments();showToast('✓ Look registrado');}
 
 function renderHistory(){
   const list=document.getElementById('history-list');if(!list)return;
   if(!history.length){list.innerHTML='<div class="empty-state"><div class="icon">📅</div><p>Todavía no registraste ningún outfit</p></div>';return;}
-  list.innerHTML=history.slice(0,20).map(h=>{
-    const pieces=h.garmentIds.map(id=>garments.find(g=>g.id===id)).filter(Boolean);
-    const d=new Date(h.date+'T12:00:00');
-    return`<div class="history-item">
-      <div class="history-date">${d.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div>
-      <div class="history-pieces">${pieces.map(g=>`<span class="history-piece-chip"><span class="dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</span>`).join('')}</div>
-      <span class="history-occasion-badge">${h.occasion}</span>
-    </div>`;
-  }).join('');
+  list.innerHTML=history.slice(0,20).map(h=>{const pieces=h.garmentIds.map(id=>garments.find(g=>g.id===id)).filter(Boolean);const d=new Date(h.date+'T12:00:00');return`<div class="history-item"><div class="history-date">${d.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div><div class="history-pieces">${pieces.map(g=>`<span class="history-piece-chip"><span class="dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</span>`).join('')}</div><span class="history-occasion-badge">${h.occasion}</span></div>`;}).join('');
 }
 
 function renderStats(){
   const grid=document.getElementById('stats-grid');if(!grid)return;
-  const unused=garments.filter(g=>g.usageCount===0).length;
-  const most=garments.length?garments.reduce((a,b)=>a.usageCount>b.usageCount?a:b,garments[0]):null;
-  grid.innerHTML=`
-    <div class="stat-card"><div class="stat-label">Total prendas</div><div class="stat-value">${garments.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Looks usados</div><div class="stat-value">${history.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Sin usar</div><div class="stat-value">${unused}</div><div class="stat-sub">nunca usadas</div></div>
-    ${most?`<div class="stat-card"><div class="stat-label">Más usada</div><div class="stat-value">${CAT_EMOJI[most.cat]||'✨'}</div><div class="stat-sub">${most.type} · ${most.usageCount}×</div></div>`:''}`;
+  const unused=garments.filter(g=>g.usageCount===0).length;const most=garments.length?garments.reduce((a,b)=>a.usageCount>b.usageCount?a:b,garments[0]):null;
+  grid.innerHTML=`<div class="stat-card"><div class="stat-label">Total prendas</div><div class="stat-value">${garments.length}</div></div><div class="stat-card"><div class="stat-label">Looks usados</div><div class="stat-value">${history.length}</div></div><div class="stat-card"><div class="stat-label">Sin usar</div><div class="stat-value">${unused}</div><div class="stat-sub">nunca usadas</div></div>${most?`<div class="stat-card"><div class="stat-label">Más usada</div><div class="stat-value">${CAT_EMOJI[most.cat]||'✨'}</div><div class="stat-sub">${most.type} · ${most.usageCount}×</div></div>`:''}`;
 }
 
 function renderCalendar(){
   const grid=document.getElementById('calendar-grid');if(!grid)return;
-  const today=new Date();const y=today.getFullYear(),m=today.getMonth();
-  const days=new Date(y,m+1,0).getDate();
-  const offset=((new Date(y,m,1).getDay()+6)%7);
+  const today=new Date();const y=today.getFullYear(),m=today.getMonth();const days=new Date(y,m+1,0).getDate();const offset=((new Date(y,m,1).getDay()+6)%7);
   let html=['Lu','Ma','Mi','Ju','Vi','Sá','Do'].map(d=>`<div class="calendar-day-header">${d}</div>`).join('');
   for(let i=0;i<offset;i++)html+='<div></div>';
-  for(let d=1;d<=days;d++){
-    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const has=history.some(h=>h.date===ds);const isT=d===today.getDate();
-    html+=`<div class="calendar-day ${has?'has-outfit':''} ${isT?'today':''}"><span>${d}</span>${has?'<span class="day-dot"></span>':''}</div>`;
-  }
+  for(let d=1;d<=days;d++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const has=history.some(h=>h.date===ds);const isT=d===today.getDate();html+=`<div class="calendar-day ${has?'has-outfit':''} ${isT?'today':''}"><span>${d}</span>${has?'<span class="day-dot"></span>':''}</div>`;}
   grid.innerHTML=html;
 }
 
-function exportData(){
-  const data={garments,history,exportedAt:new Date().toISOString(),version:4};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download=`guardarropas_backup_${new Date().toISOString().split('T')[0]}.json`;
-  a.click();URL.revokeObjectURL(url);
-  showToast('✓ Backup exportado');
-}
-
-function importData(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    try{
-      const data=JSON.parse(ev.target.result);
-      if(!data.garments||!Array.isArray(data.garments))throw new Error('inválido');
-      if(!confirm(`Importar ${data.garments.length} prendas y ${(data.history||[]).length} looks? Reemplaza los datos actuales.`))return;
-      garments=data.garments;history=data.history||[];
-      save();renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();
-      showToast(`✓ ${garments.length} prendas importadas`);
-    }catch(err){showToast('⚠️ Archivo inválido');}
-  };
-  reader.readAsText(file);e.target.value='';
-}
-
-function clearAllData(){
-  if(!confirm('¿Borrar TODOS los datos? No se puede deshacer.'))return;
-  if(!confirm('¿Estás segura? Se pierden todas las prendas y el historial.'))return;
-  garments=[];history=[];
-  save();renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();
-  showToast('Datos borrados');
-}
-
-function updateDataSummary(){
-  const el=document.getElementById('data-summary');if(!el)return;
-  el.textContent=`${garments.length} prendas · ${history.length} looks registrados`;
-}
+function exportData(){const data={garments,history,exportedAt:new Date().toISOString(),version:5};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`guardarropas_backup_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(url);showToast('✓ Backup exportado');}
+function importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!data.garments||!Array.isArray(data.garments))throw new Error('inválido');if(!confirm(`Importar ${data.garments.length} prendas y ${(data.history||[]).length} looks? Reemplaza los datos actuales.`))return;garments=data.garments;history=data.history||[];save();renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();showToast(`✓ ${garments.length} prendas importadas`);}catch(err){showToast('⚠️ Archivo inválido');}};reader.readAsText(file);e.target.value='';}
+function clearAllData(){if(!confirm('¿Borrar TODOS los datos? No se puede deshacer.'))return;if(!confirm('¿Estás segura? Se pierden todas las prendas y el historial.'))return;garments=[];history=[];save();renderGarments();renderStats();renderCalendar();renderHistory();updateDataSummary();showToast('Datos borrados');}
+function updateDataSummary(){const el=document.getElementById('data-summary');if(!el)return;el.textContent=`${garments.length} prendas · ${history.length} looks registrados`;}
 
 function openDetail(id){
-  const g=garments.find(x=>x.id===id);
-  if(!g)return;
+  const g=garments.find(x=>x.id===id);if(!g)return;
   const catNames={top:'Parte superior',bottom:'Parte inferior',dress:'Vestido / Mono',outer:'Abrigo',shoes:'Calzado',bag:'Cartera',acc:'Accesorio'};
-  document.getElementById('detail-content').innerHTML=`
-    ${g.photo?`<img src="${g.photo}" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}
-    <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div>
-    <div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div>
-    <div class="detail-section">
-      <div class="detail-section-title">Color</div>
-      <span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>
-      ${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}
-    </div>
-    ${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}
-    <div class="detail-section">
-      <div class="detail-section-title">Temporada</div>
-      ${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Ocasión</div>
-      ${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}
-    </div>
-    ${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}
-    <div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div>
-    <div class="detail-actions">
-      <button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button>
-      <button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button>
-    </div>`;
-  document.getElementById('detail-overlay').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.getElementById('detail-content').innerHTML=`${g.photo?`<img src="${g.photo}" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}<div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div><div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div><div class="detail-section"><div class="detail-section-title">Color</div><span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}</div>${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}<div class="detail-section"><div class="detail-section-title">Temporada</div>${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}</div><div class="detail-section"><div class="detail-section-title">Ocasión</div>${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}</div>${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}<div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div><div class="detail-actions"><button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button><button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button></div>`;
+  document.getElementById('detail-overlay').classList.add('open');document.body.style.overflow='hidden';
 }
+function closeDetail(e){if(e&&e.target!==document.getElementById('detail-overlay'))return;document.getElementById('detail-overlay').classList.remove('open');document.body.style.overflow='';}
 
-function closeDetail(e){
-  if(e&&e.target!==document.getElementById('detail-overlay'))return;
-  document.getElementById('detail-overlay').classList.remove('open');
-  document.body.style.overflow='';
-}
+const SKETCHES={"zapatos_bajos_frente":`<rect width="100%" height="100%" fill="none"/><path d="M250 820 Q255 700 320 640 Q380 585 485 570 Q560 565 598 615 Q618 645 615 690 Q610 770 570 820 L450 865 Q335 880 285 850 Q255 835 250 820 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M300 812 Q350 840 445 840 Q520 840 555 805" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><path d="M330 705 Q380 725 430 708 Q470 695 502 720" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><path d="M290 770 Q350 758 430 760 Q515 762 575 775" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" /><path d="M585 690 Q582 645 602 615 Q640 565 715 570 Q820 585 880 640 Q945 700 950 820 Q945 835 915 850 Q865 880 750 865 L630 820 Q590 770 585 690 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M645 805 Q680 840 755 840 Q850 840 900 812" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><path d="M698 720 Q730 695 770 708 Q820 725 870 705" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><path d="M625 775 Q685 762 770 760 Q850 758 910 770" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />`,"zapatillas_frente":`<rect width="100%" height="100%" fill="none"/><path d="M205 855 Q205 710 285 645 Q365 580 505 570 Q595 565 635 620 Q665 660 665 730 Q665 810 625 855 L520 920 Q355 950 265 910 Q210 885 205 855 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M250 845 Q325 885 470 885 Q560 885 610 845" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><line x1="315" y1="770" x2="515" y2="770" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="300" y1="740" x2="530" y2="740" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="290" y1="710" x2="540" y2="710" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="355" y1="665" x2="385" y2="630" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="405" y1="650" x2="435" y2="615" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="455" y1="640" x2="485" y2="605" stroke="black" stroke-width="4" stroke-linecap="round"/><path d="M535 730 Q535 660 565 620 Q605 565 695 570 Q835 580 915 645 Q995 710 995 855 Q990 885 935 910 Q845 950 680 920 L575 855 Q535 810 535 730 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M590 845 Q640 885 730 885 Q875 885 950 845" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" /><line x1="665" y1="770" x2="865" y2="770" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="650" y1="740" x2="880" y2="740" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="640" y1="710" x2="890" y2="710" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="715" y1="605" x2="745" y2="640" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="765" y1="615" x2="795" y2="650" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="815" y1="630" x2="845" y2="665" stroke="black" stroke-width="4" stroke-linecap="round"/>`,"vestido_largo":`<rect width="100%" height="100%" fill="none"/><path d="M405 1030 Q488 1065 600 1055 Q712 1065 795 1030 L765 585 Q750 470 735 395 L880 180 Q755 110 600 95 Q445 110 320 180 L465 395 Q450 470 435 585 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="430,185 280,260 215,555 390,600 445,430" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="770,185 920,260 985,555 810,600 755,430" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"jean_recto":`<rect width="100%" height="100%" fill="none"/><path d="M345 125 Q600 50 855 125 L785 1050 Q760 1098 705 1110 L495 1110 Q440 1098 415 1050 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" /><path d="M600 130 L600 1110" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" /><path d="M415 1048 L785 1048" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />`,"pantalon_vestir_recto":`<rect width="100%" height="100%" fill="none"/><path d="M360 120 Q600 55 840 120 L770 1045 Q750 1090 705 1102 L632 1102 L600 1035 L568 1102 L495 1102 Q450 1090 430 1045 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" /><path d="M600 115 L600 1102" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" /><path d="M430 1045 L770 1045" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />`,"remera_manga_corta":`<rect width="100%" height="100%" fill="none"/><path d="M380 1030 Q475 1058 600 1050 Q725 1058 820 1030 L790 365 Q770 225 685 145 Q645 105 600 98 Q555 105 515 145 Q430 225 410 365 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="410,220 255,280 195,555 375,605 430,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="790,220 945,280 1005,555 825,605 770,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"blazer_mujer":`<rect width="100%" height="100%" fill="none"/><path d="M315 1030 Q425 1095 600 1080 Q775 1095 885 1030 L845 370 Q835 295 815 230 Q785 135 690 105 L610 95 Q600 94 590 95 L510 105 Q415 135 385 230 Q365 295 355 370 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" /><polygon points="385,210 260,305 170,1010 350,1040 395,690" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" /><polygon points="815,210 940,305 1030,1010 850,1040 805,690" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />`,"blusa_manga_corta":`<rect width="100%" height="100%" fill="none"/><path d="M355 1025 Q455 1065 600 1055 Q745 1065 845 1025 L810 355 Q790 215 700 130 Q650 92 600 85 Q550 92 500 130 Q410 215 390 355 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="400,185 255,250 190,560 360,600 410,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="800,185 945,250 1010,560 840,600 790,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"vestido_corto":`<rect width="100%" height="100%" fill="none"/><path d="M400 1030 Q485 1065 600 1055 Q715 1065 800 1030 L760 560 Q748 470 720 395 L845 235 Q738 125 600 110 Q462 125 355 235 L480 395 Q452 470 440 560 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="430,190 280,265 215,560 390,605 445,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="770,190 920,265 985,560 810,605 755,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"camisa_mujer":`<rect width="100%" height="100%" fill="none"/><path d="M345 1040 Q445 1080 600 1068 Q755 1080 855 1040 L820 340 Q810 250 760 180 Q705 110 620 95 L580 95 Q495 110 440 180 Q390 250 380 340 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="425,185 285,275 210,1010 370,1040 408,680" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="775,185 915,275 990,1010 830,1040 792,680" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"botas_altas_frente":`<rect width="100%" height="100%" fill="none"/><path d="M315 1080 L295 185 Q298 115 365 95 L490 95 Q540 105 552 165 L575 1015 Q565 1060 515 1080 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M625 1015 L648 165 Q660 105 710 95 L835 95 Q902 115 905 185 L885 1080 L685 1080 Q635 1060 625 1015 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"botinetas_frente":`<rect width="100%" height="100%" fill="none"/><path d="M255 1040 L255 470 Q265 375 325 340 L455 330 Q520 340 540 400 L540 920 Q535 995 480 1030 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><path d="M660 920 L660 400 Q680 340 745 330 L875 340 Q935 375 945 470 L945 1040 L720 1030 Q665 995 660 920 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"blusa_manga_larga":`<rect width="100%" height="100%" fill="none"/><path d="M355 1030 Q455 1070 600 1060 Q745 1070 845 1030 L808 360 Q790 220 700 135 Q650 95 600 88 Q550 95 500 135 Q410 220 392 360 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="410,175 270,260 195,1005 365,1035 405,700" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="790,175 930,260 1005,1005 835,1035 795,700" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`,"cartera_rigida":`<rect width="100%" height="100%" fill="none"/><rect x="255" y="365" width="690" height="480" rx="42" ry="42" fill="FILL_COLOR" stroke="black" stroke-width="10"/><path d="M410 365 Q430 210 600 210 Q770 210 790 365" fill="none" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" /><rect x="535" y="525" width="130" height="80" rx="14" ry="14" fill="FILL_COLOR" stroke="black" stroke-width="7"/>`,"chaleco_traje_corto":`<rect width="100%" height="100%" fill="none"/><path d="M365 860 Q450 900 600 890 Q750 900 835 860 L790 260 Q775 185 720 135 Q670 95 610 85 L590 85 Q530 95 480 135 Q425 185 410 260 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" /><polygon points="480,100 420,180 500,245 600,510 700,245 780,180 720,100 600,75" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />`};
 
-const SKETCHES = {
-  "zapatos_bajos_frente": `<rect width="100%" height="100%" fill="none"/>
-<path d="M250 820 Q255 700 320 640 Q380 585 485 570 Q560 565 598 615 Q618 645 615 690 Q610 770 570 820 L450 865 Q335 880 285 850 Q255 835 250 820 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M300 812 Q350 840 445 840 Q520 840 555 805" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M330 705 Q380 725 430 708 Q470 695 502 720" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M290 770 Q350 758 430 760 Q515 762 575 775" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M585 690 Q582 645 602 615 Q640 565 715 570 Q820 585 880 640 Q945 700 950 820 Q945 835 915 850 Q865 880 750 865 L630 820 Q590 770 585 690 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M645 805 Q680 840 755 840 Q850 840 900 812" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M698 720 Q730 695 770 708 Q820 725 870 705" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M625 775 Q685 762 770 760 Q850 758 910 770" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />`,
-  "zapatillas_frente": `<rect width="100%" height="100%" fill="none"/>
-<path d="M205 855 Q205 710 285 645 Q365 580 505 570 Q595 565 635 620 Q665 660 665 730 Q665 810 625 855 L520 920 Q355 950 265 910 Q210 885 205 855 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M250 845 Q325 885 470 885 Q560 885 610 845" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="315" y1="770" x2="515" y2="770" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="300" y1="740" x2="530" y2="740" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="290" y1="710" x2="540" y2="710" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="355" y1="665" x2="385" y2="630" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="405" y1="650" x2="435" y2="615" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="455" y1="640" x2="485" y2="605" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<path d="M535 730 Q535 660 565 620 Q605 565 695 570 Q835 580 915 645 Q995 710 995 855 Q990 885 935 910 Q845 950 680 920 L575 855 Q535 810 535 730 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M590 845 Q640 885 730 885 Q875 885 950 845" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="665" y1="770" x2="865" y2="770" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="650" y1="740" x2="880" y2="740" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="640" y1="710" x2="890" y2="710" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="715" y1="605" x2="745" y2="640" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="765" y1="615" x2="795" y2="650" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="815" y1="630" x2="845" y2="665" stroke="black" stroke-width="4" stroke-linecap="round"/>`,
-  "vestido_largo": `<rect width="100%" height="100%" fill="none"/>
-<path d="M495 95 Q600 175 705 95" fill="none" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M405 1030 Q488 1065 600 1055 Q712 1065 795 1030 L765 585 Q750 470 735 395 L880 180 Q755 110 600 95 Q445 110 320 180 L465 395 Q450 470 435 585 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="430,185 280,260 215,555 390,600 445,430" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="770,185 920,260 985,555 810,600 755,430" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M470 395 Q600 430 730 395" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M430 820 Q600 860 770 820" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />`,
-  "jean_recto": `<rect width="100%" height="100%" fill="none"/>
-<path d="M345 125 Q600 50 855 125 L785 1050 Q760 1098 705 1110 L495 1110 Q440 1098 415 1050 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M600 130 L600 1110" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M345 125 Q425 215 515 270" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M855 125 Q775 215 685 270" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M415 1048 L785 1048" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M470 185 Q540 205 600 195 Q660 205 730 185" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M500 295 Q555 312 590 278" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M700 295 Q645 312 610 278" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="515" y1="275" x2="515" y2="205" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="685" y1="275" x2="685" y2="205" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="470" y1="830" x2="545" y2="830" stroke="black" stroke-width="5" stroke-linecap="round"/>
-<line x1="655" y1="830" x2="730" y2="830" stroke="black" stroke-width="5" stroke-linecap="round"/>`,
-  "pantalon_vestir_recto": `<rect width="100%" height="100%" fill="none"/>
-<path d="M360 120 Q600 55 840 120 L770 1045 Q750 1090 705 1102 L632 1102 L600 1035 L568 1102 L495 1102 Q450 1090 430 1045 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M600 115 L600 1102" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M362 120 Q430 205 500 255" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M838 120 Q770 205 700 255" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M430 1045 L770 1045" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M490 285 Q545 305 585 275" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M710 285 Q655 305 615 275" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M460 150 L460 220" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M740 150 L740 220" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />`,
-  "remera_manga_corta": `<rect width="100%" height="100%" fill="none"/>
-<path d="M380 1030 Q475 1058 600 1050 Q725 1058 820 1030 L790 365 Q770 225 685 145 Q645 105 600 98 Q555 105 515 145 Q430 225 410 365 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M510 98 Q600 165 690 98" fill="none" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="410,220 255,280 195,555 375,605 430,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="790,220 945,280 1005,555 825,605 770,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M515 255 Q600 275 685 255" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />`,
-  "blazer_mujer": `<rect width="100%" height="100%" fill="none"/>
-<path d="M315 1030 Q425 1095 600 1080 Q775 1095 885 1030 L845 370 Q835 295 815 230 Q785 135 690 105 L610 95 Q600 94 590 95 L510 105 Q415 135 385 230 Q365 295 355 370 Z" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="455,110 385,210 485,280 600,600 715,280 815,210 745,110 600,90" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="480,100 440,180 520,170 555,122" fill="FILL_COLOR" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="720,100 645,122 680,170 760,180" fill="FILL_COLOR" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="385,210 260,305 170,1010 350,1040 395,690" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="815,210 940,305 1030,1010 850,1040 805,690" fill="FILL_COLOR" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M600 600 L600 1035" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<circle cx="575" cy="690" r="16" fill="FILL_COLOR" stroke="black" stroke-width="7"/>
-<circle cx="575" cy="835" r="16" fill="FILL_COLOR" stroke="black" stroke-width="7"/>
-<path d="M250 690 Q320 680 390 690 Q372 735 312 730" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M810 690 Q880 680 950 690 Q888 730 828 735" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M770 405 Q733 558 790 742" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M430 405 Q467 558 410 742" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />`,
-  "blusa_manga_corta": `<rect width="100%" height="100%" fill="none"/>
-<path d="M355 1025 Q455 1065 600 1055 Q745 1065 845 1025 L810 355 Q790 215 700 130 Q650 92 600 85 Q550 92 500 130 Q410 215 390 355 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M470 93 Q600 175 730 93" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="400,185 255,250 190,560 360,600 410,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="800,185 945,250 1010,560 840,600 790,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M487 255 Q600 285 713 255" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />`,
-  "vestido_corto": `<rect width="100%" height="100%" fill="none"/>
-<path d="M495 98 Q600 175 705 98" fill="none" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M400 1030 Q485 1065 600 1055 Q715 1065 800 1030 L760 560 Q748 470 720 395 L845 235 Q738 125 600 110 Q462 125 355 235 L480 395 Q452 470 440 560 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="430,190 280,265 215,560 390,605 445,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="770,190 920,265 985,560 810,605 755,435" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M485 395 Q600 425 715 395" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M460 760 Q600 790 740 760" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />`,
-  "camisa_mujer": `<rect width="100%" height="100%" fill="none"/>
-<path d="M345 1040 Q445 1080 600 1068 Q755 1080 855 1040 L820 340 Q810 250 760 180 Q705 110 620 95 L580 95 Q495 110 440 180 Q390 250 380 340 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="500,95 425,185 500,260 600,470 700,260 775,185 700,95 600,70" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="425,185 285,275 210,1010 370,1040 408,680" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="775,185 915,275 990,1010 830,1040 792,680" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M600 470 L600 1055" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<circle cx="600" cy="555" r="11" fill="FILL_COLOR" stroke="black" stroke-width="5"/>
-<circle cx="600" cy="635" r="11" fill="FILL_COLOR" stroke="black" stroke-width="5"/>
-<circle cx="600" cy="715" r="11" fill="FILL_COLOR" stroke="black" stroke-width="5"/>
-<circle cx="600" cy="795" r="11" fill="FILL_COLOR" stroke="black" stroke-width="5"/>
-<circle cx="600" cy="875" r="11" fill="FILL_COLOR" stroke="black" stroke-width="5"/>
-<path d="M245 1000 Q305 1035 375 1025" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M955 1000 Q895 1035 825 1025" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="505" y1="95" x2="695" y2="95" stroke="black" stroke-width="4" stroke-linecap="round"/>`,
-  "botas_altas_frente": `<rect width="100%" height="100%" fill="none"/>
-<path d="M315 1080 L295 185 Q298 115 365 95 L490 95 Q540 105 552 165 L575 1015 Q565 1060 515 1080 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M325 260 Q395 240 475 245 Q520 248 565 260" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M305 1010 Q380 990 490 995 Q535 997 570 1010" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M625 1015 L648 165 Q660 105 710 95 L835 95 Q902 115 905 185 L885 1080 L685 1080 Q635 1060 625 1015 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M635 260 Q680 248 725 245 Q805 240 875 260" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M630 1010 Q665 997 710 995 Q820 990 895 1010" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />`,
-  "botinetas_frente": `<rect width="100%" height="100%" fill="none"/>
-<path d="M255 1040 L255 470 Q265 375 325 340 L455 330 Q520 340 540 400 L540 920 Q535 995 480 1030 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M285 470 Q355 445 455 445 Q500 445 535 460" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M305 980 Q360 965 430 970 Q475 972 520 985" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="320" y1="560" x2="320" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="360" y1="550" x2="360" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="400" y1="545" x2="400" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<path d="M660 920 L660 400 Q680 340 745 330 L875 340 Q935 375 945 470 L945 1040 L720 1030 Q665 995 660 920 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M665 460 Q700 445 745 445 Q845 445 915 470" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M680 985 Q725 972 770 970 Q840 965 895 980" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
-<line x1="740" y1="545" x2="740" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="780" y1="550" x2="780" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>
-<line x1="820" y1="560" x2="820" y2="900" stroke="black" stroke-width="4" stroke-linecap="round"/>`,
-  "blusa_manga_larga": `<rect width="100%" height="100%" fill="none"/>
-<path d="M355 1030 Q455 1070 600 1060 Q745 1070 845 1030 L808 360 Q790 220 700 135 Q650 95 600 88 Q550 95 500 135 Q410 220 392 360 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M470 95 Q600 180 730 95" fill="none" stroke="black" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="410,175 270,260 195,1005 365,1035 405,700" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="790,175 930,260 1005,1005 835,1035 795,700" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M250 995 Q310 1025 368 1018" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M950 995 Q890 1025 832 1018" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M480 250 Q600 290 720 250" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />`,
-  "cartera_rigida": `<rect width="100%" height="100%" fill="none"/>
-<rect x="255" y="365" width="690" height="480" rx="42" ry="42" fill="FILL_COLOR" stroke="black" stroke-width="10"/>
-<path d="M410 365 Q430 210 600 210 Q770 210 790 365" fill="none" stroke="black" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" />
-<rect x="535" y="525" width="130" height="80" rx="14" ry="14" fill="FILL_COLOR" stroke="black" stroke-width="7"/>
-<line x1="600" y1="365" x2="600" y2="525" stroke="black" stroke-width="6" stroke-linecap="round"/>
-<path d="M330 430 Q600 470 870 430" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />`,
-  "chaleco_traje_corto": `<rect width="100%" height="100%" fill="none"/>
-<path d="M365 860 Q450 900 600 890 Q750 900 835 860 L790 260 Q775 185 720 135 Q670 95 610 85 L590 85 Q530 95 480 135 Q425 185 410 260 Z" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<polygon points="480,100 420,180 500,245 600,510 700,245 780,180 720,100 600,75" fill="FILL_COLOR" stroke="black" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M600 510 L600 870" fill="none" stroke="black" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" />
-<circle cx="575" cy="605" r="14" fill="FILL_COLOR" stroke="black" stroke-width="6"/>
-<circle cx="575" cy="720" r="14" fill="FILL_COLOR" stroke="black" stroke-width="6"/>
-<path d="M445 655 Q505 645 550 655" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M650 655 Q695 645 755 655" fill="none" stroke="black" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" />
-<path d="M465 100 Q600 150 735 100" fill="none" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />`,
-};
+const SKETCH_MAP={'Blazer':'blazer_mujer','Saco':'blazer_mujer','Chaqueta':'blazer_mujer','Chaleco de punto':'chaleco_traje_corto','Chaleco largo':'chaleco_traje_corto','Chaleco estructurado':'chaleco_traje_corto','Chaleco acolchado':'chaleco_traje_corto','Remera / Camiseta':'remera_manga_corta','Top':'remera_manga_corta','Musculosa / Tank top':'remera_manga_corta','Blusa':'blusa_manga_corta','Camisa':'camisa_mujer','Polera / Cuello alto':'blusa_manga_larga','Buzo / Sudadera':'blusa_manga_larga','Hoodie':'blusa_manga_larga','Suéter / Pullover':'blusa_manga_larga','Cárdigan':'blusa_manga_larga','Pantalón de vestir':'pantalon_vestir_recto','Pantalón casual':'pantalon_vestir_recto','Pantalón cargo':'pantalon_vestir_recto','Jogger':'pantalon_vestir_recto','Jean recto':'jean_recto','Jean skinny':'jean_recto','Jean wide leg':'jean_recto','Jean mom':'jean_recto','Jean boyfriend':'jean_recto','Jean bootcut':'jean_recto','Leggings / Calzas':'pantalon_vestir_recto','Shorts':'pantalon_vestir_recto','Bermuda':'pantalon_vestir_recto','Pollera / Falda':'pantalon_vestir_recto','Falda mini':'pantalon_vestir_recto','Falda midi':'pantalon_vestir_recto','Falda maxi':'pantalon_vestir_recto','Falda plisada':'pantalon_vestir_recto','Vestido corto':'vestido_corto','Vestido midi':'vestido_largo','Vestido largo':'vestido_largo','Vestido de noche':'vestido_largo','Mono / Enterito':'vestido_largo','Jardinero / Overol':'vestido_largo','Body':'remera_manga_corta','Campera':'blazer_mujer','Parka':'blazer_mujer','Trench coat / Gabardina':'blazer_mujer','Tapado / Abrigo largo':'blazer_mujer','Campera de cuero':'blazer_mujer','Campera inflable (puffer)':'blazer_mujer','Piloto / Impermeable':'blazer_mujer','Sobretodo':'blazer_mujer','Poncho':'blazer_mujer','Zapatillas':'zapatillas_frente','Tenis / Sneakers':'zapatillas_frente','Zapatos de taco':'zapatos_bajos_frente','Zapatos planos':'zapatos_bajos_frente','Botas altas':'botas_altas_frente','Botines':'botinetas_frente','Sandalias':'zapatos_bajos_frente','Ojotas':'zapatos_bajos_frente','Mocasines':'zapatos_bajos_frente','Oxfords':'zapatos_bajos_frente','Mules':'zapatos_bajos_frente','Cartera estructurada':'cartera_rigida','Cartera informal':'cartera_rigida','Bolso':'cartera_rigida','Mochila':'cartera_rigida','Clutch / Sobre':'cartera_rigida','Riñonera':'cartera_rigida','Tote bag':'cartera_rigida'};
 
-// Mapeo: tipo de prenda -> sketch key
-const SKETCH_MAP = {
-  // Tops
-  'Blazer': 'blazer_mujer',
-  'Saco': 'blazer_mujer',
-  'Chaqueta': 'blazer_mujer',
-  'Chaleco de punto': 'chaleco_traje_corto',
-  'Chaleco largo': 'chaleco_traje_corto',
-  'Chaleco estructurado': 'chaleco_traje_corto',
-  'Chaleco acolchado': 'chaleco_traje_corto',
-  'Remera / Camiseta': 'remera_manga_corta',
-  'Top': 'remera_manga_corta',
-  'Musculosa / Tank top': 'remera_manga_corta',
-  'Blusa': 'blusa_manga_corta',
-  'Camisa': 'camisa_mujer',
-  'Polera / Cuello alto': 'blusa_manga_larga',
-  'Buzo / Sudadera': 'blusa_manga_larga',
-  'Hoodie': 'blusa_manga_larga',
-  'Suéter / Pullover': 'blusa_manga_larga',
-  'Cárdigan': 'blusa_manga_larga',
-  // Bottoms
-  'Pantalón de vestir': 'pantalon_vestir_recto',
-  'Pantalón casual': 'pantalon_vestir_recto',
-  'Pantalón cargo': 'pantalon_vestir_recto',
-  'Jogger': 'pantalon_vestir_recto',
-  'Jean recto': 'jean_recto',
-  'Jean skinny': 'jean_recto',
-  'Jean wide leg': 'jean_recto',
-  'Jean mom': 'jean_recto',
-  'Jean boyfriend': 'jean_recto',
-  'Jean bootcut': 'jean_recto',
-  'Leggings / Calzas': 'pantalon_vestir_recto',
-  'Shorts': 'pantalon_vestir_recto',
-  'Bermuda': 'pantalon_vestir_recto',
-  'Pollera / Falda': 'pantalon_vestir_recto',
-  'Falda mini': 'pantalon_vestir_recto',
-  'Falda midi': 'pantalon_vestir_recto',
-  'Falda maxi': 'pantalon_vestir_recto',
-  'Falda plisada': 'pantalon_vestir_recto',
-  // Dresses
-  'Vestido corto': 'vestido_corto',
-  'Vestido midi': 'vestido_largo',
-  'Vestido largo': 'vestido_largo',
-  'Vestido de noche': 'vestido_largo',
-  'Mono / Enterito': 'vestido_largo',
-  'Jardinero / Overol': 'vestido_largo',
-  'Body': 'remera_manga_corta',
-  // Outer
-  'Campera': 'blazer_mujer',
-  'Parka': 'blazer_mujer',
-  'Trench coat / Gabardina': 'blazer_mujer',
-  'Tapado / Abrigo largo': 'blazer_mujer',
-  'Campera de cuero': 'blazer_mujer',
-  'Campera inflable (puffer)': 'blazer_mujer',
-  'Piloto / Impermeable': 'blazer_mujer',
-  'Sobretodo': 'blazer_mujer',
-  'Poncho': 'blazer_mujer',
-  // Shoes
-  'Zapatillas': 'zapatillas_frente',
-  'Tenis / Sneakers': 'zapatillas_frente',
-  'Zapatos de taco': 'zapatos_bajos_frente',
-  'Zapatos planos': 'zapatos_bajos_frente',
-  'Botas altas': 'botas_altas_frente',
-  'Botines': 'botinetas_frente',
-  'Sandalias': 'zapatos_bajos_frente',
-  'Ojotas': 'zapatos_bajos_frente',
-  'Mocasines': 'zapatos_bajos_frente',
-  'Oxfords': 'zapatos_bajos_frente',
-  'Mules': 'zapatos_bajos_frente',
-  // Bags
-  'Cartera estructurada': 'cartera_rigida',
-  'Cartera informal': 'cartera_rigida',
-  'Bolso': 'cartera_rigida',
-  'Mochila': 'cartera_rigida',
-  'Clutch / Sobre': 'cartera_rigida',
-  'Riñonera': 'cartera_rigida',
-  'Tote bag': 'cartera_rigida',
-};
-
-function getSketchSVG(type, color) {
-  const key = SKETCH_MAP[type];
-  if(!key || !SKETCHES[key]) return null;
-  // Reemplazar FILL_COLOR con el color real
-  return SKETCHES[key].replace(/FILL_COLOR/g, color);
-}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
+function getSketchSVG(type,color){const key=SKETCH_MAP[type];if(!key||!SKETCHES[key])return null;return SKETCHES[key].replace(/FILL_COLOR/g,color);}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 </script>
 </body>
 </html>
