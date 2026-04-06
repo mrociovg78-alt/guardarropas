@@ -701,7 +701,7 @@ function deleteGarment(id,e){
 
 function editGarment(id,e){
   e.stopPropagation();const g=garments.find(x=>x.id==id);if(!g)return;
-  editingId=id;editingPhotoUrl=g.photoUrl||'';resetForm();
+  editingId=id;resetForm();editingPhotoUrl=g.photoUrl||'';
   document.querySelector('.modal-title span').textContent='Editar prenda';
   if(g.photoUrl){
     currentPhotoData=null;currentPhotoBase64=null;
@@ -804,7 +804,18 @@ function generateOutfits(){
   }
 
   const tops=getStrict('top'),bottoms=getStrict('bottom'),dresses=getStrict('dress');
-  const outers=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
+  const outersRaw=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
+  // Ordenar abrigos por peso según temperatura: más frío = prendas más abrigadas primero
+  const lightOuters=['Trench coat / Gabardina','Piloto / Impermeable','Chaqueta','Blazer','Saco'];
+  const outers = (cat==='muyfrio'||cat==='frio')
+    ? outersRaw.slice().sort(function(a,b){
+        const aLight=lightOuters.some(function(t){return a.type.includes(t.split('/')[0].trim());});
+        const bLight=lightOuters.some(function(t){return b.type.includes(t.split('/')[0].trim());});
+        if(aLight&&!bLight)return 1;
+        if(!aLight&&bLight)return -1;
+        return 0;
+      })
+    : outersRaw;
   const shoes=getStrict('shoes'),bags=getStrict('bag');
   const forceSmooth=schemeKey==='monocromatico'||schemeKey==='clasicos';
   const combos=[];
@@ -856,20 +867,11 @@ function generateOutfits(){
       </div>
       <div class="color-harmony-row">${colors.map(c=>`<div class="harmony-swatch" style="background:${c.hex}" title="${c.name}"></div>`).join('')}<span class="harmony-label">${o.scheme.name.toLowerCase()}</span></div>
       <div class="avatar-toggle">
-        <button class="active" onclick="toggleSketch('foto','${uid}',this)">Prendas</button>
-        <button onclick="showCollage('${uid}',this)">Collage</button>
+        <button class="active" onclick="togglePrendasCollage('prendas','${uid}',this)">Fotos</button>
+        <button onclick="togglePrendasCollage('collage','${uid}',this)">Collage</button>
       </div>
       <div id="view-prendas-${uid}">
-        <div class="avatar-toggle" style="margin-bottom:0.6rem;">
-          <button class="active" onclick="toggleSketch('foto','${uid}',this)">Fotos</button>
-          <button onclick="toggleSketch('sketch','${uid}',this)">Sketches</button>
-        </div>
-        <div id="sketch-fotos-${uid}">
-          <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
-        </div>
-        <div id="sketch-view-${uid}" style="display:none;">
-          <div class="outfit-pieces">${o.pieces.map(g=>{const sketchSVG=getSketchSVG(g.type,g.colorPrimary.hex);return`<div class="outfit-piece"><div class="piece-img" style="background:white;">${sketchSVG?`<svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">${sketchSVG}</svg>`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`;}).join('')}</div>
-        </div>
+        <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
       </div>
       <div id="view-collage-${uid}" style="display:none;">
         <div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-${uid}"></div><div class="collage-palette"></div><div class="collage-tip"></div></div>
@@ -880,10 +882,35 @@ function generateOutfits(){
   }).join('');
 }
 
-function toggleSketch(view,uid,btn){
-  const fotos=document.getElementById(`sketch-fotos-${uid}`);const collage=document.getElementById(`view-collage-${uid}`);
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  fotos.style.display='block';if(collage)collage.style.display='none';
+function togglePrendasCollage(view,uid,btn){
+  const prendas=document.getElementById('view-prendas-'+uid);
+  const collage=document.getElementById('view-collage-'+uid);
+  btn.parentElement.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  if(view==='prendas'){
+    if(prendas)prendas.style.display='block';
+    if(collage)collage.style.display='none';
+  } else {
+    if(prendas)prendas.style.display='none';
+    if(collage){
+      collage.style.display='block';
+      const board=document.getElementById('collage-board-'+uid);
+      if(board&&!board.innerHTML.trim()){
+        const card=btn.closest('.outfit-card');
+        const pieces=[];
+        card.querySelectorAll('.outfit-piece').forEach(function(p){
+          const img=p.querySelector('img');
+          const label=p.querySelector('.piece-label')?p.querySelector('.piece-label').textContent:'';
+          const strip=p.querySelector('.piece-color-strip');
+          const color=strip?strip.style.background:'#aaa';
+          const photo=img?img.src:null;
+          const cat=getCatFromLabel(label);
+          pieces.push({photo:photo,label:label,color:color,cat:cat});
+        });
+        renderCollage(board,pieces);
+      }
+    }
+  }
 }
 
 function showCollage(uid,btn){
