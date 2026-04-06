@@ -462,7 +462,7 @@ const SCHEME_TIPS={neutro_acento:'Base neutra + un solo color acento en una pren
 const STYLES_BY_CAT={top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico','Sin mangas / Chaleco','Largo / Maxi'],bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],acc:[]};
 const CAT_EMOJI={top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDaLhUG0OA8mYjeRkoIJKvh6ukbOwjPV7zOQZmVwiByxWsbsSiBUS3Yzm_v8b5nrt5/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxkaaW08IscaWKh8TaTHz7DQVkZDy-GoP-sJtFUOGyi6p9ftzRhsg3RF8hmMSgq01KI/exec';
 
 let garments=[],history=[],currentFilter='all';
 let selectedColorPrimary=null,selectedColorSecondary=null;
@@ -471,6 +471,19 @@ let editingId=null,editingPhotoUrl=null;
 
 function gasPost(payload){
   return fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)}).then(function(r){return r.json();});
+}
+
+var photoCache={};
+
+function resolvePhoto(photoUrl,imgEl){
+  if(!photoUrl)return;
+  if(!photoUrl.startsWith('fileId:')){imgEl.src=photoUrl;return;}
+  var fileId=photoUrl.replace('fileId:','');
+  if(photoCache[fileId]){imgEl.src=photoCache[fileId];return;}
+  fetch(GAS_URL+'?action=servePhoto&fileId='+fileId)
+    .then(function(r){return r.json();})
+    .then(function(res){if(res.dataUrl){photoCache[fileId]=res.dataUrl;imgEl.src=res.dataUrl;}})
+    .catch(function(){});
 }
 
 function initApp(){
@@ -674,7 +687,7 @@ function saveGarment(){
     showToast('⏳ Subiendo foto...');
     var ext=currentPhotoMime==='image/png'?'png':'jpg';
     gasPost({action:'uploadPhoto',base64:currentPhotoBase64,mimeType:currentPhotoMime||'image/jpeg',filename:'prenda_'+Date.now()+'.'+ext})
-      .then(function(res){finish(res.url||editingPhotoUrl||'');})
+      .then(function(res){finish(res.fileId?('fileId:'+res.fileId):(res.url||editingPhotoUrl||''));})
       .catch(function(){btn.textContent='Guardar prenda';btn.disabled=false;showToast('⚠️ Error subiendo foto');});
   }else{
     finish(editingPhotoUrl||'');
@@ -685,7 +698,8 @@ function renderGarments(){
   const grid=document.getElementById('garments-grid');
   const filtered=currentFilter==='all'?garments:garments.filter(g=>g.cat===currentFilter);
   if(!filtered.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="icon">${garments.length===0?'👗':CAT_EMOJI[currentFilter]||'👗'}</div><p>${garments.length===0?'Tocá "+ Agregar prenda" para empezar':'Sin prendas en esta categoría'}</p></div>`;return;}
-  grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarmentBtn(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
+  grid.innerHTML=filtered.map(g=>`<div class="garment-card" onclick="openDetail(${g.id})"><div class="img-wrap">${g.photoUrl?`<img id="gimg-${g.id}" alt="${g.type}">`:`<div class="img-placeholder">${CAT_EMOJI[g.cat]||'✨'}</div>`}${g.usageCount>0?`<span class="usage-badge">×${g.usageCount}</span>`:''}</div><div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</div>${g.style?`<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">${g.style}</div>`:''}</div><div class="card-actions"><button class="card-edit-btn" onclick="editGarment(${g.id},event)" title="Editar">✎</button><button class="delete-btn" onclick="deleteGarmentBtn(${g.id},event)" title="Eliminar">✕</button></div></div>`).join('');
+  filtered.forEach(function(g){if(g.photoUrl){var el=document.getElementById('gimg-'+g.id);if(el)resolvePhoto(g.photoUrl,el);}});
 }
 
 function deleteGarment(id,e){
@@ -871,7 +885,7 @@ function generateOutfits(){
         <button onclick="togglePrendasCollage('collage','${uid}',this)">Collage</button>
       </div>
       <div id="view-prendas-${uid}">
-        <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img src="${g.photoUrl}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
+        <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img id="pimg-${g.id}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
       </div>
       <div id="view-collage-${uid}" style="display:none;">
         <div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-${uid}"></div><div class="collage-palette"></div><div class="collage-tip"></div></div>
@@ -880,6 +894,8 @@ function generateOutfits(){
       <button class="btn-use" onclick="useOutfitBtn(${JSON.stringify(o.pieces.map(g=>g.id))},'${occLabel}')">✓ Usar este look</button>
     </div>`;
   }).join('');
+  // Resolver fotos de outfit
+  garments.forEach(function(g){if(g.photoUrl){var el=document.getElementById('pimg-'+g.id);if(el)resolvePhoto(g.photoUrl,el);}});
 }
 
 function togglePrendasCollage(view,uid,btn){
@@ -1005,8 +1021,9 @@ function updateDataSummary(){const el=document.getElementById('data-summary');if
 function openDetail(id){
   const g=garments.find(x=>x.id==id);if(!g)return;
   const catNames={top:'Parte superior',bottom:'Parte inferior',dress:'Vestido / Mono',outer:'Abrigo',shoes:'Calzado',bag:'Cartera',acc:'Accesorio'};
-  document.getElementById('detail-content').innerHTML=`${g.photoUrl?`<img src="${g.photoUrl}" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}<div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div><div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div><div class="detail-section"><div class="detail-section-title">Color</div><span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}</div>${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}<div class="detail-section"><div class="detail-section-title">Temporada</div>${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}</div><div class="detail-section"><div class="detail-section-title">Ocasión</div>${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}</div>${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}<div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div><div class="detail-actions"><button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button><button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button></div>`;
+  document.getElementById('detail-content').innerHTML=`${g.photoUrl?`<img id="detail-img-main" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}<div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div><div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div><div class="detail-section"><div class="detail-section-title">Color</div><span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}</div>${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}<div class="detail-section"><div class="detail-section-title">Temporada</div>${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}</div><div class="detail-section"><div class="detail-section-title">Ocasión</div>${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}</div>${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}<div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div><div class="detail-actions"><button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button><button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button></div>`;
   document.getElementById('detail-overlay').classList.add('open');document.body.style.overflow='hidden';
+  if(g.photoUrl){var di=document.getElementById('detail-img-main');if(di)resolvePhoto(g.photoUrl,di);}
 }
 function closeDetail(e){if(e&&e.target!==document.getElementById('detail-overlay'))return;document.getElementById('detail-overlay').classList.remove('open');document.body.style.overflow='';}
 
