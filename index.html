@@ -840,7 +840,13 @@ function generateOutfits(){
     if(outers.length){const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true);if(o)pieces.push(o);}
     if(shoes.length){const s=pickBestCompatible(shoes,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
     if(bags.length){const b=pickBestCompatible(bags,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
-    if(pieces.length>=1){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
+    if(pieces.length>=1){
+      const shoeP2=pieces.find(p=>p.cat==='shoes');
+      const bagP2=pieces.find(p=>p.cat==='bag');
+      if(!(shoeP2&&bagP2&&scoreColorPair(shoeP2.colorPrimary,bagP2.colorPrimary,schemeKey)<30)){
+        const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});
+      }
+    }
   }
 
   const topPool=forceSmooth?tops.filter(g=>!isPattern(g)):tops;
@@ -853,6 +859,13 @@ function generateOutfits(){
     if(shoes.length){const s=pickBestCompatible(shoes,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
     if(bags.length){const b=pickBestCompatible(bags,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
     const patternPieces=pieces.filter(p=>isPattern(p));if(patternPieces.length>1)continue;
+    // Regla: zapatos y cartera deben ser compatibles entre sí
+    const shoeP=pieces.find(p=>p.cat==='shoes');
+    const bagP=pieces.find(p=>p.cat==='bag');
+    if(shoeP&&bagP){
+      const sc2=scoreColorPair(shoeP.colorPrimary,bagP.colorPrimary,schemeKey);
+      if(sc2<30)continue; // incompatibles — descartar combo
+    }
     const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});
   }
 
@@ -885,7 +898,7 @@ function generateOutfits(){
         <button onclick="togglePrendasCollage('collage','${uid}',this)">Collage</button>
       </div>
       <div id="view-prendas-${uid}">
-        <div class="outfit-pieces">${o.pieces.map(g=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img id="pimg-${g.id}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
+        <div class="outfit-pieces">${o.pieces.map((g,pi)=>`<div class="outfit-piece"><div class="piece-img">${g.photoUrl?`<img id="pimg-${uid}-${pi}" data-photo="${g.photoUrl}" alt="${g.type}">`:`<span class="piece-emoji">${CAT_EMOJI[g.cat]||'✨'}</span>`}</div><div class="piece-color-strip" style="background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">${g.type}</div></div>`).join('')}</div>
       </div>
       <div id="view-collage-${uid}" style="display:none;">
         <div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-${uid}"></div><div class="collage-palette"></div><div class="collage-tip"></div></div>
@@ -895,7 +908,7 @@ function generateOutfits(){
     </div>`;
   }).join('');
   // Resolver fotos de outfit
-  garments.forEach(function(g){if(g.photoUrl){var el=document.getElementById('pimg-'+g.id);if(el)resolvePhoto(g.photoUrl,el);}});
+  document.querySelectorAll('[data-photo]').forEach(function(el){resolvePhoto(el.getAttribute('data-photo'),el);});
 }
 
 function togglePrendasCollage(view,uid,btn){
