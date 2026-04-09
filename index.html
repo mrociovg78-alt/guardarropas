@@ -835,8 +835,13 @@ function pickBestCompatible(arr,baseColor,schemeKey,excl=[],currentPieces=[],str
   let available=arr.filter(g=>!excl.includes(g.id));if(!available.length)return null;
   if(isMono){const lisas=available.filter(g=>!isPattern(g));if(lisas.length)available=lisas;else if(strict)return null;}
   else if(alreadyHasPattern){const noPattern=available.filter(g=>!isPattern(g));if(noPattern.length)available=noPattern;}
-  const scored=available.map(g=>({g,score:scoreColorPair(baseColor,g.colorPrimary,schemeKey)}));
-  scored.sort((a,b)=>b.score-a.score||a.g.usageCount-b.g.usageCount);
+  const scored=available.map(g=>{
+    const sc=scoreColorPair(baseColor,g.colorPrimary,schemeKey);
+    const hueDiff=Math.abs(baseColor.hue-g.colorPrimary.hue);
+    const hueProx=Math.min(hueDiff,360-hueDiff);
+    return {g,score:sc,hueProx};
+  });
+  scored.sort((a,b)=>b.score-a.score||a.hueProx-b.hueProx);
   if(strict){const best=scored.find(x=>x.score>0);return best?best.g:null;}
   return scored[0]?.g||null;
 }
