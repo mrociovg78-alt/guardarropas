@@ -285,7 +285,16 @@
     <div class="outfit-setup">
       <div class="form-group">
         <label>Elegí una prenda base</label>
-        <div id="desde-prenda-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem;max-height:320px;overflow-y:auto;"></div>
+        <div class="filter-chips" style="margin-top:0.5rem;margin-bottom:0.75rem;" id="desde-cat-chips">
+          <span class="chip active" onclick="setDesdeFilter('top',this)">Tops</span>
+          <span class="chip" onclick="setDesdeFilter('bottom',this)">Bottoms</span>
+          <span class="chip" onclick="setDesdeFilter('outer',this)">Abrigos</span>
+          <span class="chip" onclick="setDesdeFilter('dress',this)">Vestidos</span>
+          <span class="chip" onclick="setDesdeFilter('shoes',this)">Calzado</span>
+          <span class="chip" onclick="setDesdeFilter('bag',this)">Carteras</span>
+          <span class="chip" onclick="setDesdeFilter('acc',this)">Accesorios</span>
+        </div>
+        <div id="desde-prenda-grid" class="garments-grid" style="margin-top:0;"></div>
       </div>
       <div id="desde-seleccionada" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--cream);border-radius:8px;border:1.5px solid var(--dusty-rose);">
         <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--mocha);margin-bottom:0.4rem;">Prenda seleccionada</div>
@@ -1103,18 +1112,37 @@ function setOutfitTab(tab, el) {
 }
 
 var desdePrendaSeleccionada = null;
+var desdeCatFilter = 'top';
+
+function setDesdeFilter(cat, el) {
+  desdeCatFilter = cat;
+  document.querySelectorAll('#desde-cat-chips .chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  renderDesdePrendaGrid();
+}
 
 function renderDesdePrendaGrid() {
   var grid = document.getElementById('desde-prenda-grid');
-  if(!garments.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--mocha);font-size:0.82rem;padding:1rem;">No hay prendas cargadas</div>';return;}
-  grid.innerHTML = garments.map(function(g) {
-    return '<div onclick="seleccionarPrendaBase('+g.id+')" style="cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid var(--border);background:var(--warm-white);aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;" id="desde-card-'+g.id+'">'
-      + (g.photoUrl ? '<img id="desde-img-'+g.id+'" style="width:100%;height:80%;object-fit:cover;" alt="'+g.type+'">' : '<span style="font-size:1.5rem;">'+( CAT_EMOJI[g.cat]||'✨')+'</span>')
-      + '<div style="font-size:0.6rem;text-align:center;padding:2px 4px;color:var(--mocha);">'+g.type+'</div>'
-      + '</div>';
+  if(!garments.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--mocha);font-size:0.82rem;padding:1rem;">No hay prendas cargadas</div>';
+    return;
+  }
+  var filtered = garments.filter(function(g){return g.cat===desdeCatFilter;});
+  if(!filtered.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--mocha);font-size:0.82rem;padding:1rem;">Sin prendas en esta categoría</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(function(g) {
+    var isSelected = desdePrendaSeleccionada && desdePrendaSeleccionada.id==g.id;
+    return '<div class="garment-card" onclick="seleccionarPrendaBase('+g.id+')" id="desde-card-'+g.id+'" style="'+(isSelected?'outline:2.5px solid var(--dusty-rose);':'')+'">'
+      + '<div class="img-wrap">'
+      + (g.photoUrl ? '<img id="desde-img-'+g.id+'" alt="'+g.type+'">' : '<div class="img-placeholder">'+(CAT_EMOJI[g.cat]||'✨')+'</div>')
+      + '</div>'
+      + '<div class="card-info"><div class="card-type"><span class="card-color-dot" style="background:'+g.colorPrimary.hex+'"></span>'+g.type+'</div>'
+      + (g.style ? '<div style="font-size:0.62rem;color:#aaa;margin-top:1px;">'+g.style+'</div>' : '')
+      + '</div></div>';
   }).join('');
-  // Resolver fotos
-  garments.forEach(function(g){
+  filtered.forEach(function(g){
     if(g.photoUrl){var el=document.getElementById('desde-img-'+g.id);if(el)resolvePhoto(g.photoUrl,el);}
   });
 }
