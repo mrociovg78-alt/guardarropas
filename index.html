@@ -239,6 +239,11 @@
 
 <!-- OUTFIT -->
 <section id="outfit" class="section">
+  <div class="filter-chips" style="margin-bottom:1rem;">
+    <span class="chip active" onclick="setOutfitTab('auto',this)">Armar outfit</span>
+    <span class="chip" onclick="setOutfitTab('desde',this)">Desde una prenda</span>
+  </div>
+  <div id="outfit-tab-auto">
   <div class="outfit-setup">
     <div class="form-group">
       <label>Temperatura aproximada</label>
@@ -273,6 +278,41 @@
     <button class="btn-accent" onclick="generateOutfits()" style="margin-top:0.85rem;">Generar outfits ✦</button>
   </div>
   <div id="outfit-result"></div>
+  </div><!-- end outfit-tab-auto -->
+
+  <!-- TAB: Desde una prenda -->
+  <div id="outfit-tab-desde" style="display:none;">
+    <div class="outfit-setup">
+      <div class="form-group">
+        <label>Elegí una prenda base</label>
+        <div id="desde-prenda-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem;max-height:320px;overflow-y:auto;"></div>
+      </div>
+      <div id="desde-seleccionada" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--cream);border-radius:8px;border:1.5px solid var(--dusty-rose);">
+        <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--mocha);margin-bottom:0.4rem;">Prenda seleccionada</div>
+        <div id="desde-prenda-nombre" style="font-weight:500;font-size:0.9rem;"></div>
+      </div>
+      <div class="form-group" style="margin-top:0.85rem;">
+        <label>Ocasión</label>
+        <select id="desde-occasion">
+          <option value="trabajo">Trabajo / Oficina</option>
+          <option value="casual">Casual / Salida diurna</option>
+          <option value="salida">Salida nocturna</option>
+          <option value="evento">Evento formal</option>
+          <option value="sport">Sport / Fin de semana</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Temperatura aproximada</label>
+        <div class="temp-row">
+          <input type="range" id="desde-temp-slider" min="-5" max="45" value="20" oninput="updateDesdeTemp()">
+          <span class="temp-value" id="desde-temp-display">20°C</span>
+        </div>
+        <div class="temp-label" id="desde-temp-label">🌤 Templado</div>
+      </div>
+      <button class="btn-accent" onclick="generateDesde()" style="margin-top:0.85rem;">Armar look ✦</button>
+    </div>
+    <div id="desde-result"></div>
+  </div>
 </section>
 
 <!-- HISTORIAL -->
@@ -839,7 +879,11 @@ function generateOutfits(){
     const pieces=[d];
     if(outers.length){const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true);if(o)pieces.push(o);}
     if(shoes.length){const s=pickBestCompatible(shoes,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
-    if(bags.length){const b=pickBestCompatible(bags,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
+    if(bags.length){
+      const shoe=pieces.find(p=>p.cat==='shoes');
+      const bagBase=shoe?shoe.colorPrimary:d.colorPrimary;
+      const b=pickBestCompatible(bags,bagBase,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);
+    }
     if(pieces.length>=1){
       const shoeP2=pieces.find(p=>p.cat==='shoes');
       const bagP2=pieces.find(p=>p.cat==='bag');
@@ -857,7 +901,11 @@ function generateOutfits(){
     const pieces=[top,bot];
     if(outers.length){const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true);if(o&&o.cat==='outer')pieces.push(o);}
     if(shoes.length){const s=pickBestCompatible(shoes,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
-    if(bags.length){const b=pickBestCompatible(bags,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);}
+    if(bags.length){
+      const shoe=pieces.find(p=>p.cat==='shoes');
+      const bagBase=shoe?shoe.colorPrimary:top.colorPrimary;
+      const b=pickBestCompatible(bags,bagBase,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);
+    }
     const patternPieces=pieces.filter(p=>isPattern(p));if(patternPieces.length>1)continue;
     // Regla: zapatos y cartera deben ser compatibles entre sí
     const shoeP=pieces.find(p=>p.cat==='shoes');
@@ -1045,6 +1093,138 @@ const SKETCHES={"zapatos_bajos_frente":`<rect width="100%" height="100%" fill="n
 const SKETCH_MAP={'Blazer':'blazer_mujer','Saco':'blazer_mujer','Chaqueta':'blazer_mujer','Chaleco de punto':'chaleco_traje_corto','Chaleco largo':'chaleco_traje_corto','Chaleco estructurado':'chaleco_traje_corto','Chaleco acolchado':'chaleco_traje_corto','Remera / Camiseta':'remera_manga_corta','Top':'remera_manga_corta','Musculosa / Tank top':'remera_manga_corta','Blusa':'blusa_manga_corta','Camisa':'camisa_mujer','Polera / Cuello alto':'blusa_manga_larga','Buzo / Sudadera':'blusa_manga_larga','Hoodie':'blusa_manga_larga','Suéter / Pullover':'blusa_manga_larga','Cárdigan':'blusa_manga_larga','Pantalón de vestir':'pantalon_vestir_recto','Pantalón casual':'pantalon_vestir_recto','Pantalón cargo':'pantalon_vestir_recto','Jogger':'pantalon_vestir_recto','Jean recto':'jean_recto','Jean skinny':'jean_recto','Jean wide leg':'jean_recto','Jean mom':'jean_recto','Jean boyfriend':'jean_recto','Jean bootcut':'jean_recto','Leggings / Calzas':'pantalon_vestir_recto','Shorts':'pantalon_vestir_recto','Bermuda':'pantalon_vestir_recto','Pollera / Falda':'pantalon_vestir_recto','Falda mini':'pantalon_vestir_recto','Falda midi':'pantalon_vestir_recto','Falda maxi':'pantalon_vestir_recto','Falda plisada':'pantalon_vestir_recto','Vestido corto':'vestido_corto','Vestido midi':'vestido_largo','Vestido largo':'vestido_largo','Vestido de noche':'vestido_largo','Mono / Enterito':'vestido_largo','Jardinero / Overol':'vestido_largo','Body':'remera_manga_corta','Campera':'blazer_mujer','Parka':'blazer_mujer','Trench coat / Gabardina':'blazer_mujer','Tapado / Abrigo largo':'blazer_mujer','Campera de cuero':'blazer_mujer','Campera inflable (puffer)':'blazer_mujer','Piloto / Impermeable':'blazer_mujer','Sobretodo':'blazer_mujer','Poncho':'blazer_mujer','Zapatillas':'zapatillas_frente','Tenis / Sneakers':'zapatillas_frente','Zapatos de taco':'zapatos_bajos_frente','Zapatos planos':'zapatos_bajos_frente','Botas altas':'botas_altas_frente','Botines':'botinetas_frente','Sandalias':'zapatos_bajos_frente','Ojotas':'zapatos_bajos_frente','Mocasines':'zapatos_bajos_frente','Oxfords':'zapatos_bajos_frente','Mules':'zapatos_bajos_frente','Cartera estructurada':'cartera_rigida','Cartera informal':'cartera_rigida','Bolso':'cartera_rigida','Mochila':'cartera_rigida','Clutch / Sobre':'cartera_rigida','Riñonera':'cartera_rigida','Tote bag':'cartera_rigida'};
 
 function getSketchSVG(type,color){const key=SKETCH_MAP[type];if(!key||!SKETCHES[key])return null;return SKETCHES[key].replace(/FILL_COLOR/g,color);}
+
+function setOutfitTab(tab, el) {
+  document.querySelectorAll('.filter-chips .chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('outfit-tab-auto').style.display = tab==='auto' ? 'block' : 'none';
+  document.getElementById('outfit-tab-desde').style.display = tab==='desde' ? 'block' : 'none';
+  if(tab==='desde') renderDesdePrendaGrid();
+}
+
+var desdePrendaSeleccionada = null;
+
+function renderDesdePrendaGrid() {
+  var grid = document.getElementById('desde-prenda-grid');
+  if(!garments.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--mocha);font-size:0.82rem;padding:1rem;">No hay prendas cargadas</div>';return;}
+  grid.innerHTML = garments.map(function(g) {
+    return '<div onclick="seleccionarPrendaBase('+g.id+')" style="cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid var(--border);background:var(--warm-white);aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;" id="desde-card-'+g.id+'">'
+      + (g.photoUrl ? '<img id="desde-img-'+g.id+'" style="width:100%;height:80%;object-fit:cover;" alt="'+g.type+'">' : '<span style="font-size:1.5rem;">'+( CAT_EMOJI[g.cat]||'✨')+'</span>')
+      + '<div style="font-size:0.6rem;text-align:center;padding:2px 4px;color:var(--mocha);">'+g.type+'</div>'
+      + '</div>';
+  }).join('');
+  // Resolver fotos
+  garments.forEach(function(g){
+    if(g.photoUrl){var el=document.getElementById('desde-img-'+g.id);if(el)resolvePhoto(g.photoUrl,el);}
+  });
+}
+
+function seleccionarPrendaBase(id) {
+  desdePrendaSeleccionada = garments.find(function(g){return g.id==id;});
+  if(!desdePrendaSeleccionada) return;
+  // Highlight seleccionada
+  document.querySelectorAll('[id^="desde-card-"]').forEach(function(c){c.style.borderColor='var(--border)';c.style.borderWidth='2px';});
+  var card = document.getElementById('desde-card-'+id);
+  if(card){card.style.borderColor='var(--dusty-rose)';card.style.borderWidth='2.5px';}
+  document.getElementById('desde-seleccionada').style.display='block';
+  document.getElementById('desde-prenda-nombre').textContent = desdePrendaSeleccionada.type + ' · ' + desdePrendaSeleccionada.colorPrimary.name;
+}
+
+function updateDesdeTemp(){
+  var v=parseInt(document.getElementById('desde-temp-slider').value);
+  document.getElementById('desde-temp-display').textContent=v+'°C';
+  var labels=[[-5,5,'🥶 Muy frío'],[6,12,'🧥 Frío'],[13,18,'🍂 Fresco'],[19,26,'🌤 Templado'],[27,32,'☀️ Cálido'],[33,45,'🔥 Muy caluroso']];
+  var found=labels.find(function(l){return v>=l[0]&&v<=l[1];});
+  document.getElementById('desde-temp-label').textContent=found?found[2]:'';
+}
+
+function generateDesde() {
+  if(!desdePrendaSeleccionada){showToast('Primero elegí una prenda');return;}
+  var base = desdePrendaSeleccionada;
+  var occ = document.getElementById('desde-occasion').value;
+  var occLabel = OCC_MAP[occ];
+  var temp = parseInt(document.getElementById('desde-temp-slider').value);
+  var season = getSeason(temp);
+  var cat = tempCat(temp);
+
+  // Determinar esquema automático según la prenda base
+  var schemeKey = SCHEME_BY_OCC[occ] ? SCHEME_BY_OCC[occ].key : 'neutro_acento';
+  var scheme = {key:schemeKey, name:({neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',tonal:'Tonal tierra',complementario:'Complementario',triadico:'Triádico',clasicos:'Clásicos infalibles'})[schemeKey]||schemeKey};
+
+  function getPool(role) {
+    if(role===base.cat) return []; // no repetir la categoría de la base
+    var r = garments.filter(function(g){
+      if(g.cat!==role||g.id==base.id) return false;
+      var sAll=g.seasons.includes('Todo')||g.seasons.includes('Todo el año');
+      if(!sAll&&!g.seasons.includes(season)) return false;
+      return occasionCompatible(g.occasions||[], occLabel);
+    });
+    if(!r.length) r = garments.filter(function(g){return g.cat===role&&g.id!=base.id&&occasionCompatible(g.occasions||[],occLabel);});
+    return r;
+  }
+
+  var pieces = [base];
+  var excl = [base.id];
+
+  // Completar según categoría de la prenda base
+  if(base.cat==='top'||base.cat==='outer'){
+    var bot=pickBestCompatible(getPool('bottom'),base.colorPrimary,schemeKey,excl,pieces,true);
+    if(bot){pieces.push(bot);excl.push(bot.id);}
+  } else if(base.cat==='bottom'){
+    var top=pickBestCompatible(getPool('top'),base.colorPrimary,schemeKey,excl,pieces,true);
+    if(top){pieces.push(top);excl.push(top.id);}
+  } else if(base.cat==='dress'){
+    // dress ya completo por sí solo
+  } else if(base.cat==='shoes'||base.cat==='bag'){
+    var top2=pickBestCompatible(getPool('top'),base.colorPrimary,schemeKey,excl,pieces,true);
+    if(top2){pieces.push(top2);excl.push(top2.id);}
+    var bot2=pickBestCompatible(getPool('bottom'),base.colorPrimary,schemeKey,excl,pieces,true);
+    if(bot2){pieces.push(bot2);excl.push(bot2.id);}
+  }
+
+  // Agregar abrigo si hace frío y la base no es outer
+  if(cat!=='calido'&&cat!=='muycalido'&&base.cat!=='outer'){
+    var outerPool=getPool('outer');
+    var lightOuters=['Trench coat / Gabardina','Piloto / Impermeable','Chaqueta','Blazer','Saco'];
+    if(cat==='muyfrio'||cat==='frio') outerPool=outerPool.slice().sort(function(a,b){var aL=lightOuters.some(function(t){return a.type.includes(t.split('/')[0].trim());});var bL=lightOuters.some(function(t){return b.type.includes(t.split('/')[0].trim());});return aL&&!bL?1:!aL&&bL?-1:0;});
+    var o=pickBestCompatible(outerPool,base.colorPrimary,schemeKey,excl,pieces,false);
+    if(o){pieces.push(o);excl.push(o.id);}
+  }
+
+  // Zapatos (si la base no es zapatos)
+  if(base.cat!=='shoes'){
+    var s=pickBestCompatible(getPool('shoes'),base.colorPrimary,schemeKey,excl,pieces,false);
+    if(s){pieces.push(s);excl.push(s.id);}
+  }
+
+  // Cartera compatible con zapatos
+  if(base.cat!=='bag'){
+    var shoe=pieces.find(function(p){return p.cat==='shoes';});
+    var bagBase=shoe?shoe.colorPrimary:base.colorPrimary;
+    var b=pickBestCompatible(getPool('bag'),bagBase,schemeKey,excl,pieces,false);
+    if(b){pieces.push(b);excl.push(b.id);}
+  }
+
+  var colors=pieces.map(function(p){return p.colorPrimary;}).filter(function(c,idx,arr){return arr.findIndex(function(x){return x.hex===c.hex;})===idx;});
+  var uid='desde-'+Date.now();
+
+  document.getElementById('desde-result').innerHTML = '<div class="outfit-card">'
+    + '<div class="outfit-header"><div><div class="outfit-number">Look · '+temp+'°C</div><div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">'+occLabel+'</div></div>'
+    + '<div style="text-align:right;"><span class="outfit-scheme-label">'+scheme.name+'</span></div></div>'
+    + '<div class="color-harmony-row">'+colors.map(function(c){return '<div class="harmony-swatch" style="background:'+c.hex+'" title="'+c.name+'"></div>';}).join('')+'<span class="harmony-label">'+scheme.name.toLowerCase()+'</span></div>'
+    + '<div class="avatar-toggle"><button class="active" onclick="togglePrendasCollage(&quot;prendas&quot;,&quot;'+uid+'&quot;,this)">Fotos</button><button onclick="togglePrendasCollage(&quot;collage&quot;,&quot;'+uid+'&quot;,this)">Collage</button></div>'
+    + '<div id="view-prendas-'+uid+'"><div class="outfit-pieces">'
+    + pieces.map(function(g,pi){return '<div class="outfit-piece"><div class="piece-img">'+(g.photoUrl?'<img id="pimg-'+uid+'-'+pi+'" data-photo="'+g.photoUrl+'" alt="'+g.type+'">':'<span class="piece-emoji">'+(CAT_EMOJI[g.cat]||'✨')+'</span>')+'</div><div class="piece-color-strip" style="background:'+g.colorPrimary.hex+';border:1px solid rgba(0,0,0,0.08)"></div><div class="piece-label">'+g.type+'</div></div>';}).join('')
+    + '</div></div>'
+    + '<div id="view-collage-'+uid+'" style="display:none;"><div class="collage-card"><div class="collage-card-header"></div><div class="collage-board" id="collage-board-'+uid+'"></div><div class="collage-palette"></div><div class="collage-tip"></div></div></div>'
+    + '<div class="outfit-tip">💡 '+SCHEME_TIPS[scheme.key]+'</div>'
+    + '<button class="btn-use" onclick="useOutfitBtn('+JSON.stringify(pieces.map(function(g){return g.id;}))+',' + "'"+occLabel+"'" + ')">✓ Usar este look</button>'
+    + '</div>';
+
+  // Resolver fotos
+  document.querySelectorAll('[data-photo]').forEach(function(el){resolvePhoto(el.getAttribute('data-photo'),el);});
+}
+
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 </script>
 </body>
