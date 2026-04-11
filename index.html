@@ -900,7 +900,9 @@ function generateOutfits(){
 
   const tops=getStrict('top'),knits=getStrict('knit'),jackets=getStrict('jacket'),bottoms=getStrict('bottom'),dresses=getStrict('dress');
   const outers=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
-  const shoes=getStrict('shoes'),bags=getStrict('bag');
+  // Zapatos y carteras sin filtro de temporada (siempre disponibles)
+  const shoes=garments.filter(g=>g.cat==='shoes'&&occasionCompatible(g.occasions||[],occLabel));
+  const bags=garments.filter(g=>g.cat==='bag'&&occasionCompatible(g.occasions||[],occLabel));
   const forceSmooth=schemeKey==='monocromatico'||schemeKey==='clasicos';
   const combos=[];
 
@@ -1143,8 +1145,12 @@ function renderCollage(board,pieces){
   if(hasOuter)  visibleUpperCats.push('outer');
   if(hasJacket) visibleUpperCats.push('jacket');
   if(hasKnit)   visibleUpperCats.push('knit');
-  // Top aparece si no hay knit (el knit ya lo cubre visualmente)
-  if(hasTop && !hasKnit) visibleUpperCats.push('top');
+  // Top aparece si:
+  // - no hay knit, O
+  // - el knit es abierto/cárdigan (no cubre el torso)
+  var knitPiece = pieces.find(p=>p.cat==='knit');
+  var knitIsOpen = knitPiece && getStyleArr(knitPiece).some(s=>s.includes('Abierto')||s.includes('Cárdigan'));
+  if(hasTop && (!hasKnit || knitIsOpen)) visibleUpperCats.push('top');
   // Máximo 3
   visibleUpperCats = visibleUpperCats.slice(0,3);
   // Fallback: si no hay ninguna capa visible pero hay top, mostrarlo
@@ -1152,21 +1158,21 @@ function renderCollage(board,pieces){
 
   const upperN = visibleUpperCats.length;
 
-  // Zona superior: y=0.01 a y=0.50 (49% del alto)
-  // Zona inferior: y=0.52 a y=1.00 (pantalón + accesorios)
-  // Layouts para 1, 2, 3 prendas superiores — sin overlap, todas visibles
+  // Zona superior (capas ropa): y=0.02 a y=0.44 — 42% del alto
+  // Zona inferior (pantalón+accesorios): y=0.46 a y=1.00 — 54% del alto
+  // Proporciones: inferior más grande que superior
   const UPPER_LAYOUTS = {
     1: [
-      {x:0.12, y:0.01, w:0.64, h:0.48, rot:1,  z:2}
+      {x:0.15, y:0.02, w:0.60, h:0.40, rot:1,  z:2}
     ],
     2: [
-      {x:0.01, y:0.03, w:0.50, h:0.46, rot:-3, z:2},
-      {x:0.47, y:0.01, w:0.50, h:0.46, rot:3,  z:3}
+      {x:0.01, y:0.03, w:0.48, h:0.38, rot:-3, z:2},
+      {x:0.49, y:0.02, w:0.48, h:0.38, rot:3,  z:3}
     ],
     3: [
-      {x:0.00, y:0.05, w:0.44, h:0.44, rot:-4, z:2},
-      {x:0.26, y:0.01, w:0.44, h:0.46, rot:0,  z:3},
-      {x:0.52, y:0.03, w:0.44, h:0.44, rot:4,  z:4}
+      {x:0.00, y:0.04, w:0.42, h:0.36, rot:-3, z:2},
+      {x:0.28, y:0.02, w:0.42, h:0.38, rot:0,  z:3},
+      {x:0.55, y:0.03, w:0.42, h:0.36, rot:4,  z:4}
     ]
   };
 
@@ -1176,12 +1182,12 @@ function renderCollage(board,pieces){
     return {cat:cat, x:pos.x, y:pos.y, w:pos.w, h:pos.h, rot:pos.rot, z:pos.z};
   });
 
-  // Fijos — proporciones balanceadas
+  // Fijos — zona inferior más grande y prominente
   const FIXED = [
-    {cat:'dress',  x:0.10, y:0.01, w:0.58, h:0.60, rot:1,  z:2},
-    {cat:'bottom', x:0.15, y:0.52, w:0.62, h:0.44, rot:1,  z:1},
-    {cat:'shoes',  x:0.02, y:0.76, w:0.38, h:0.22, rot:-2, z:6},
-    {cat:'bag',    x:0.58, y:0.74, w:0.40, h:0.24, rot:3,  z:6},
+    {cat:'dress',  x:0.10, y:0.02, w:0.58, h:0.56, rot:1,  z:2},
+    {cat:'bottom', x:0.12, y:0.46, w:0.66, h:0.48, rot:1,  z:1},
+    {cat:'shoes',  x:0.02, y:0.76, w:0.40, h:0.22, rot:-2, z:6},
+    {cat:'bag',    x:0.56, y:0.74, w:0.42, h:0.24, rot:3,  z:6},
     {cat:'acc',    x:0.66, y:0.02, w:0.30, h:0.16, rot:5,  z:7},
   ];
 
@@ -1428,17 +1434,19 @@ function generateDesde() {
     addLayerDesde(getPool('jacket'),'jacket');
   }
 
-  // Zapatos
+  // Zapatos — sin filtro estricto (todos los zapatos aplican)
   if(base.cat!=='shoes'&&!pieces.some(function(p){return p.cat==='shoes';})){
-    var s=pickBestCompatible(getPool('shoes'),base.colorPrimary,schemeKey,excl,pieces,false);
+    var allShoes=garments.filter(function(g){return g.cat==='shoes'&&g.id!=base.id;});
+    var s=pickBestCompatible(allShoes,base.colorPrimary,schemeKey,excl,pieces,false);
     if(s){pieces.push(s);excl.push(s.id);}
   }
 
-  // Cartera compatible con zapatos
+  // Cartera — sin filtro estricto
   if(base.cat!=='bag'&&!pieces.some(function(p){return p.cat==='bag';})){
+    var allBags=garments.filter(function(g){return g.cat==='bag'&&g.id!=base.id;});
     var shoe=pieces.find(function(p){return p.cat==='shoes';});
     var bagBase=shoe?shoe.colorPrimary:base.colorPrimary;
-    var b=pickBestCompatible(getPool('bag'),bagBase,schemeKey,excl,pieces,false);
+    var b=pickBestCompatible(allBags,bagBase,schemeKey,excl,pieces,false);
     if(b){pieces.push(b);excl.push(b.id);}
   }
 
