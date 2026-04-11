@@ -1102,9 +1102,12 @@ function togglePrendasCollage(view,uid,btn){
   }
 }
 
-function buildCollageFromMap(uid,board){
+function buildCollageFromMap(uid,board,attempt){
+  attempt=attempt||0;
   const savedPieces=outfitPiecesMap[uid];
   if(!savedPieces)return;
+
+  // Construir piezas con fotos del cache
   const pieces=savedPieces.map(function(g){
     var photo=null;
     if(g.photoUrl){
@@ -1115,14 +1118,33 @@ function buildCollageFromMap(uid,board){
         photo=g.photoUrl;
       }
     }
-    return {photo:photo,label:g.type,color:g.colorPrimary.hex,cat:g.cat};
+    return {photo:photo, label:g.type, color:g.colorPrimary.hex, cat:g.cat, photoUrl:g.photoUrl||''};
   });
-  // Si falta alguna foto, reintentar en 2 segundos
-  var missing=pieces.filter(function(p,i){return !p.photo&&savedPieces[i].photoUrl;});
-  if(missing.length>0){
-    setTimeout(function(){buildCollageFromMap(uid,board);},2000);
-    // Renderizar igual con lo que hay
+
+  const missing=pieces.filter(function(p){return !p.photo&&p.photoUrl;});
+
+  if(missing.length>0&&attempt<6){
+    // Pedir las fotos faltantes activamente
+    missing.forEach(function(p){
+      if(!p.photoUrl)return;
+      if(p.photoUrl.startsWith('fileId:')){
+        var fid=p.photoUrl.replace('fileId:','');
+        if(!photoCache[fid]){
+          // Crear un img temporal para triggerear resolvePhoto
+          var tmp=document.createElement('img');
+          tmp.style.display='none';
+          document.body.appendChild(tmp);
+          resolvePhoto(p.photoUrl,tmp);
+        }
+      }
+    });
+    // Reintentar con backoff: 1s, 2s, 3s...
+    setTimeout(function(){
+      buildCollageFromMap(uid,board,attempt+1);
+    },(attempt+1)*1000);
+    return;
   }
+
   renderCollage(board,pieces);
 }
 
@@ -1244,14 +1266,28 @@ function renderCollage(board,pieces){
 
   const allSlots = [...FIXED, ...upperSlots];
 
+  // Renderizar slots — usar photoUrl original para resolvePhoto
   let boardHtml='';
   pieces.forEach(function(p){
-    if(!p.photo)return;
     const slot=allSlots.find(function(s){return s.cat===p.cat;});
     if(!slot)return;
     const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);
-    boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};"><img src="${p.photo}" alt="${p.label}"/></div>`;
-  });  board.innerHTML=boardHtml;
+    const imgId='cimg-'+p.cat+'-'+Math.random().toString(36).slice(2,7);
+    const src=p.photo||'';
+    boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};">` +
+      `<img id="${imgId}" data-photo-url="${p.photoUrl||''}" src="${src}" alt="${p.label}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.18));"/></div>`;
+  });
+  board.innerHTML=boardHtml;
+  // Resolver fotos pendientes directamente sobre los imgs del collage
+  board.querySelectorAll('img[data-photo-url]').forEach(function(img){
+    var url=img.getAttribute('data-photo-url');
+    if(url&&!img.src) resolvePhoto(url,img);
+    else if(url&&url.startsWith('fileId:')){
+      var fid=url.replace('fileId:','');
+      if(photoCache[fid]) img.src=photoCache[fid];
+      else resolvePhoto(url,img);
+    }
+  });
   const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
   const tipEl=cardEl.querySelector('.collage-tip');if(tipEl)tipEl.textContent=tip;
 }
