@@ -1124,13 +1124,12 @@ function renderCollage(board,pieces){
   cardEl.querySelector('.collage-card-header').innerHTML=`<div class="collage-card-title">Outfit del día</div><div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>`;
   const W=board.offsetWidth||260,H=board.offsetHeight||346;
   // ============================================================
-  // COLLAGE LAYOUT — layouts fijos por escenario
-  // Prendas fijas siempre en el mismo lugar:
-  //   bottom: centro x=0.20 y=0.54 w=0.56 h=0.40
-  //   shoes:  abajo izq x=0.02 y=0.74 w=0.38 h=0.24
-  //   bag:    abajo der x=0.58 y=0.72 w=0.38 h=0.26
-  //   acc:    arriba der x=0.64 y=0.01 w=0.32 h=0.18
-  // Capas superiores ocupan zona y=0.00 a y=0.52
+  // COLLAGE LAYOUT v3
+  // Máximo 3 prendas superiores visibles
+  // Prioridad: outer > jacket > knit > top
+  // Si hay knit, top no aparece
+  // Si no hay knit ni jacket, top aparece
+  // Fijos: bottom grande centro, shoes abajo izq, bag abajo der
   // ============================================================
 
   const hasDress  = pieces.some(p=>p.cat==='dress');
@@ -1139,51 +1138,52 @@ function renderCollage(board,pieces){
   const hasKnit   = pieces.some(p=>p.cat==='knit');
   const hasTop    = pieces.some(p=>p.cat==='top');
 
-  // Prendas fijas (siempre igual)
-  const FIXED = [
-    {cat:'bottom', x:0.20, y:0.54, w:0.56, h:0.42, rot:1,  z:1},
-    {cat:'shoes',  x:0.02, y:0.74, w:0.38, h:0.24, rot:-2, z:6},
-    {cat:'bag',    x:0.58, y:0.72, w:0.38, h:0.26, rot:4,  z:6},
-    {cat:'acc',    x:0.64, y:0.01, w:0.30, h:0.18, rot:5,  z:7},
-    {cat:'dress',  x:0.12, y:0.01, w:0.60, h:0.62, rot:1,  z:2},
-  ];
+  // Determinar capas visibles (max 3, prioridad outer > jacket > knit > top)
+  var visibleUpperCats = [];
+  if(hasOuter)  visibleUpperCats.push('outer');
+  if(hasJacket) visibleUpperCats.push('jacket');
+  if(hasKnit)   visibleUpperCats.push('knit');
+  // Top aparece si no hay knit (el knit ya lo cubre visualmente)
+  if(hasTop && !hasKnit) visibleUpperCats.push('top');
+  // Máximo 3
+  visibleUpperCats = visibleUpperCats.slice(0,3);
+  // Fallback: si no hay ninguna capa visible pero hay top, mostrarlo
+  if(!visibleUpperCats.length && hasTop) visibleUpperCats = ['top'];
 
-  // Capas superiores — zona y=0.00 a y=0.52, ancho total=1.0
-  // Orden de capas de más externa a más interna: outer > jacket > knit > top
-  const upperCats = ['outer','jacket','knit','top'].filter(c=>pieces.some(p=>p.cat===c));
-  const upperN = upperCats.length;
+  const upperN = visibleUpperCats.length;
 
-  // Layouts predefinidos para 1, 2, 3, 4 capas superiores
-  // Cada layout es un array de {x,y,w,h,rot,z} en el mismo orden que upperCats
+  // Zona superior: y=0.01 a y=0.50 (49% del alto)
+  // Zona inferior: y=0.52 a y=1.00 (pantalón + accesorios)
+  // Layouts para 1, 2, 3 prendas superiores — sin overlap, todas visibles
   const UPPER_LAYOUTS = {
     1: [
-      {x:0.15, y:0.01, w:0.65, h:0.50, rot:2,  z:2},
+      {x:0.12, y:0.01, w:0.64, h:0.48, rot:1,  z:2}
     ],
     2: [
-      // outer/jacket: izquierda; knit/top: derecha — sin overlap
-      {x:0.01, y:0.02, w:0.50, h:0.48, rot:-3, z:2},
-      {x:0.47, y:0.01, w:0.50, h:0.48, rot:3,  z:3},
+      {x:0.01, y:0.03, w:0.50, h:0.46, rot:-3, z:2},
+      {x:0.47, y:0.01, w:0.50, h:0.46, rot:3,  z:3}
     ],
     3: [
-      // outer: fondo izq; jacket: centro; knit/top: frente der
-      {x:0.00, y:0.04, w:0.48, h:0.46, rot:-4, z:2},
-      {x:0.24, y:0.01, w:0.48, h:0.48, rot:1,  z:3},
-      {x:0.48, y:0.03, w:0.48, h:0.46, rot:4,  z:4},
-    ],
-    4: [
-      // outer: fondo izq; jacket: centro izq; knit: centro der; top: frente der
-      {x:0.00, y:0.06, w:0.42, h:0.44, rot:-5, z:2},
-      {x:0.18, y:0.02, w:0.42, h:0.46, rot:-1, z:3},
-      {x:0.36, y:0.01, w:0.42, h:0.46, rot:2,  z:4},
-      {x:0.54, y:0.03, w:0.42, h:0.44, rot:5,  z:5},
-    ],
+      {x:0.00, y:0.05, w:0.44, h:0.44, rot:-4, z:2},
+      {x:0.26, y:0.01, w:0.44, h:0.46, rot:0,  z:3},
+      {x:0.52, y:0.03, w:0.44, h:0.44, rot:4,  z:4}
+    ]
   };
 
-  const upperLayout = UPPER_LAYOUTS[Math.min(upperN, 4)] || UPPER_LAYOUTS[1];
-  const upperSlots = upperCats.map(function(cat, i){
+  const upperLayout = UPPER_LAYOUTS[upperN] || UPPER_LAYOUTS[1];
+  const upperSlots = visibleUpperCats.map(function(cat, i){
     const pos = upperLayout[i] || upperLayout[upperLayout.length-1];
     return {cat:cat, x:pos.x, y:pos.y, w:pos.w, h:pos.h, rot:pos.rot, z:pos.z};
   });
+
+  // Fijos — proporciones balanceadas
+  const FIXED = [
+    {cat:'dress',  x:0.10, y:0.01, w:0.58, h:0.60, rot:1,  z:2},
+    {cat:'bottom', x:0.15, y:0.52, w:0.62, h:0.44, rot:1,  z:1},
+    {cat:'shoes',  x:0.02, y:0.76, w:0.38, h:0.22, rot:-2, z:6},
+    {cat:'bag',    x:0.58, y:0.74, w:0.40, h:0.24, rot:3,  z:6},
+    {cat:'acc',    x:0.66, y:0.02, w:0.30, h:0.16, rot:5,  z:7},
+  ];
 
   const allSlots = [...FIXED, ...upperSlots];
 
@@ -1194,8 +1194,7 @@ function renderCollage(board,pieces){
     if(!slot)return;
     const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);
     boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};"><img src="${p.photo}" alt="${p.label}"/></div>`;
-  });
-  board.innerHTML=boardHtml;
+  });  board.innerHTML=boardHtml;
   const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
   const tipEl=cardEl.querySelector('.collage-tip');if(tipEl)tipEl.textContent=tip;
 }
