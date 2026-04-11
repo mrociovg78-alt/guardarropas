@@ -536,6 +536,7 @@ function gasPost(payload){
 }
 
 var photoCache={};
+var outfitPiecesMap={}; // uid -> array de prendas del outfit
 
 function resolvePhoto(photoUrl,imgEl){
   if(!photoUrl)return;
@@ -1056,6 +1057,7 @@ function canLayer(inner, outer){
     const colors=o.pieces.map(p=>p.colorPrimary).filter((c,idx,arr)=>arr.findIndex(x=>x.hex===c.hex)===idx);
     const scoreBar=Math.round(o.score);
     const uid=`outfit-${i}-${Date.now()}`;
+    outfitPiecesMap[uid]=o.pieces; // guardar para el collage
     return`<div class="outfit-card">
       <div class="outfit-header">
         <div><div class="outfit-number">Look ${i+1} · ${temp}°C</div><div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">${occLabel}</div></div>
@@ -1094,21 +1096,34 @@ function togglePrendasCollage(view,uid,btn){
       collage.style.display='block';
       const board=document.getElementById('collage-board-'+uid);
       if(board&&!board.innerHTML.trim()){
-        const card=btn.closest('.outfit-card');
-        const pieces=[];
-        card.querySelectorAll('.outfit-piece').forEach(function(p){
-          const img=p.querySelector('img');
-          const label=p.querySelector('.piece-label')?p.querySelector('.piece-label').textContent:'';
-          const strip=p.querySelector('.piece-color-strip');
-          const color=strip?strip.style.background:'#aaa';
-          const photo=img?img.src:null;
-          const cat=getCatFromLabel(label);
-          pieces.push({photo:photo,label:label,color:color,cat:cat});
-        });
-        renderCollage(board,pieces);
+        buildCollageFromMap(uid,board);
       }
     }
   }
+}
+
+function buildCollageFromMap(uid,board){
+  const savedPieces=outfitPiecesMap[uid];
+  if(!savedPieces)return;
+  const pieces=savedPieces.map(function(g){
+    var photo=null;
+    if(g.photoUrl){
+      if(g.photoUrl.startsWith('fileId:')){
+        var fid=g.photoUrl.replace('fileId:','');
+        photo=photoCache[fid]||null;
+      } else {
+        photo=g.photoUrl;
+      }
+    }
+    return {photo:photo,label:g.type,color:g.colorPrimary.hex,cat:g.cat};
+  });
+  // Si falta alguna foto, reintentar en 2 segundos
+  var missing=pieces.filter(function(p,i){return !p.photo&&savedPieces[i].photoUrl;});
+  if(missing.length>0){
+    setTimeout(function(){buildCollageFromMap(uid,board);},2000);
+    // Renderizar igual con lo que hay
+  }
+  renderCollage(board,pieces);
 }
 
 function showCollage(uid,btn){
@@ -1395,7 +1410,8 @@ function updateDesdeTemp(){
 }
 
 function generateDesde() {
-  if(!garments||garments.length===0){showToast('⏳ Espera, cargando prendas...');return;}
+  try {
+  if(!garments||garments.length===0){showToast('⏳ Cargando prendas...');return;}
   if(!desdePrendaSeleccionada){showToast('Primero elegí una prenda');return;}
   var base = desdePrendaSeleccionada;
   var occ = document.getElementById('desde-occasion').value;
@@ -1489,6 +1505,7 @@ function generateDesde() {
 
   var colors=pieces.map(function(p){return p.colorPrimary;}).filter(function(c,idx,arr){return arr.findIndex(function(x){return x.hex===c.hex;})===idx;});
   var uid='desde-'+Date.now();
+  outfitPiecesMap[uid]=pieces; // guardar para el collage
 
   document.getElementById('desde-result').innerHTML = '<div class="outfit-card">'
     + '<div class="outfit-header"><div><div class="outfit-number">Look · '+temp+'°C</div><div style="font-size:0.7rem;color:var(--mocha);margin-top:0.15rem;">'+occLabel+'</div></div>'
@@ -1505,6 +1522,10 @@ function generateDesde() {
 
   // Resolver fotos
   document.querySelectorAll('[data-photo]').forEach(function(el){resolvePhoto(el.getAttribute('data-photo'),el);});
+  } catch(err) {
+    console.error('generateDesde error:', err);
+    showToast('⚠️ Error al armar look: ' + err.message);
+  }
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
