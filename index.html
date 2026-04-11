@@ -884,6 +884,47 @@ function occasionCompatible(garmentOccasions,requestedOcc){
   const allowed=compat[requestedOcc]||[requestedOcc];return garmentOccasions.some(o=>allowed.includes(o));
 }
 
+// ============================================================
+// FUNCIONES GLOBALES DE SUPERPOSICIÓN DE CAPAS
+// ============================================================
+
+// Leer style de una prenda siempre como array
+function getStyleArr(g){
+  if(!g||!g.style)return[];
+  return Array.isArray(g.style)?g.style:[g.style];
+}
+
+// ¿Puede 'inner' ir DEBAJO de 'outer'?
+function canLayer(inner, outer){
+  if(!inner||!outer)return true;
+  const si=getStyleArr(inner);
+  const so=getStyleArr(outer);
+
+  // R1: Cuello camisa / cuello V debajo de cuello alto/tortuga
+  if(si.some(s=>s.includes('Cuello V')||s.includes('Camisa')||s.includes('Off shoulder'))&&
+     so.some(s=>s.includes('Tortuga')||s.includes('Cuello alto'))) return false;
+
+  // R2: Oversize no va debajo de Corto o Slim/Entallado
+  if(si.some(s=>s.includes('Oversize'))&&
+     so.some(s=>s.includes('Corto')||s.includes('Slim')||s.includes('Entallado'))) return false;
+
+  // R3: Largo/Maxi no va debajo de Corto
+  if(si.some(s=>s.includes('Largo')||s.includes('Maxi'))&&
+     so.some(s=>s.includes('Corto'))) return false;
+
+  // R4: Blazer/saco no va debajo de campera sport/inflable/cuero/piloto
+  if(inner.cat==='jacket'&&outer.type&&
+    (outer.type.includes('inflable')||outer.type.includes('puffer')||
+     outer.type.includes('Campera de cuero')||outer.type.includes('Piloto'))) return false;
+
+  // R5: Knit de lana/punto grueso no va debajo de outer slim o corto
+  if(inner.cat==='knit'&&
+     inner.material&&(inner.material.includes('Lana')||inner.material.includes('Punto / Tejido'))&&
+     so.some(s=>s.includes('Slim')||s.includes('Entallado')||s.includes('Corto'))) return false;
+
+  return true;
+}
+
 function generateOutfits(){
   const temp=parseInt(document.getElementById('temp-slider').value);
   const occ=document.getElementById('outfit-occasion').value;
@@ -906,51 +947,6 @@ function generateOutfits(){
   const bags=garments.filter(g=>g.cat==='bag'&&occasionCompatible(g.occasions||[],occLabel));
   const forceSmooth=schemeKey==='monocromatico'||schemeKey==='clasicos';
   const combos=[];
-
-  // Helper para agregar capas y accesorios
-
-// Helper: leer style de una prenda siempre como array
-function getStyleArr(g){
-  if(!g||!g.style)return[];
-  return Array.isArray(g.style)?g.style:[g.style];
-}
-
-// Reglas de superposición: ¿puede 'inner' ir DEBAJO de 'outer'?
-// Devuelve true si la combinación es válida
-function canLayer(inner, outer){
-  const si=getStyleArr(inner);
-  const so=getStyleArr(outer);
-
-  // R1: Cuello camisa / cuello V debajo de cuello alto/tortuga
-  const innerNeck = si.some(s=>s.includes('Cuello V')||s.includes('Camisa')||s.includes('Off shoulder'));
-  const outerTurtle = so.some(s=>s.includes('Tortuga')||s.includes('Cuello alto'));
-  if(innerNeck && outerTurtle) return false;
-
-  // R2: Oversize no va debajo de Corto o Slim
-  const innerOversize = si.some(s=>s.includes('Oversize'));
-  const outerShortSlim = so.some(s=>s.includes('Corto')||s.includes('Slim')||s.includes('Entallado'));
-  if(innerOversize && outerShortSlim) return false;
-
-  // R3: Largo no va debajo de Corto
-  const innerLong = si.some(s=>s.includes('Largo')||s.includes('Maxi'));
-  const outerShort = so.some(s=>s.includes('Corto')||s.includes('Mini'));
-  if(innerLong && outerShort) return false;
-
-  // R4: Blazer/saco no va debajo de campera sport/inflable
-  if(inner.cat==='jacket'){
-    const outerSport = outer.type&&(outer.type.includes('inflable')||outer.type.includes('puffer')||outer.type.includes('Campera de cuero')||outer.type.includes('Piloto'));
-    if(outerSport) return false;
-  }
-
-  // R5: Knit con volumen/grueso no va debajo de outer slim o corto
-  if(inner.cat==='knit'){
-    const innerBulky = inner.material&&(inner.material.includes('Lana')||inner.material.includes('Punto / Tejido'));
-    const outerSlimShort = so.some(s=>s.includes('Slim')||s.includes('Entallado')||s.includes('Corto'));
-    if(innerBulky && outerSlimShort) return false;
-  }
-
-  return true;
-}
 
   function buildCombo(base, baseColor, extraPieces){
     const pieces=[...extraPieces];
@@ -1266,27 +1262,21 @@ function renderCollage(board,pieces){
 
   const allSlots = [...FIXED, ...upperSlots];
 
-  // Renderizar slots — usar photoUrl original para resolvePhoto
+  // Renderizar slots — siempre resolver fotos via resolvePhoto
   let boardHtml='';
   pieces.forEach(function(p){
     const slot=allSlots.find(function(s){return s.cat===p.cat;});
     if(!slot)return;
     const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);
     const imgId='cimg-'+p.cat+'-'+Math.random().toString(36).slice(2,7);
-    const src=p.photo||'';
     boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};">` +
-      `<img id="${imgId}" data-photo-url="${p.photoUrl||''}" src="${src}" alt="${p.label}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.18));"/></div>`;
+      `<img id="${imgId}" data-photo-url="${p.photoUrl||''}" alt="${p.label}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.18));"/></div>`;
   });
   board.innerHTML=boardHtml;
-  // Resolver fotos pendientes directamente sobre los imgs del collage
+  // Resolver cada foto directamente — mismo mecanismo que la sección Fotos
   board.querySelectorAll('img[data-photo-url]').forEach(function(img){
-    var url=img.getAttribute('data-photo-url');
-    if(url&&!img.src) resolvePhoto(url,img);
-    else if(url&&url.startsWith('fileId:')){
-      var fid=url.replace('fileId:','');
-      if(photoCache[fid]) img.src=photoCache[fid];
-      else resolvePhoto(url,img);
-    }
+    const url=img.getAttribute('data-photo-url');
+    if(url) resolvePhoto(url,img);
   });
   const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
   const tipEl=cardEl.querySelector('.collage-tip');if(tipEl)tipEl.textContent=tip;
