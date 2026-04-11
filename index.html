@@ -948,13 +948,16 @@ function generateOutfits(){
     if(pieces){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
   }
 
-  // Combos knit+bottom (base: knit como capa 2, sin top visible)
+  // Combos knit+bottom: siempre con un top debajo del knit
   const knitPool=forceSmooth?knits.filter(g=>!isPattern(g)):knits;
   for(const k of knitPool){
     const bottomPool=isPattern(k)?bottoms.filter(g=>!isPattern(g)):bottoms;
     if(!bottomPool.length)continue;
     const bot=pickBestCompatible(bottomPool,k.colorPrimary,schemeKey,[k.id],[k],true);if(!bot)continue;
-    const pieces=buildCombo(k,k.colorPrimary,[k,bot]);
+    // Agregar top debajo del knit
+    const topUnder=pickBestCompatible(tops,k.colorPrimary,schemeKey,[k.id,bot.id],[k,bot],false);
+    const startPieces=topUnder?[topUnder,k,bot]:[k,bot];
+    const pieces=buildCombo(k,k.colorPrimary,startPieces);
     if(pieces){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
   }
 
@@ -1045,7 +1048,30 @@ function renderCollage(board,pieces){
   const cardEl=board.closest('.collage-card');if(!cardEl)return;
   cardEl.querySelector('.collage-card-header').innerHTML=`<div class="collage-card-title">Outfit del día</div><div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>`;
   const W=board.offsetWidth||260,H=board.offsetHeight||346;
-  const slots=[{cat:'outer',x:0.02,y:0.00,w:0.50,h:0.50,rot:-3,z:5},{cat:'jacket',x:0.44,y:0.02,w:0.46,h:0.44,rot:3,z:4},{cat:'knit',x:0.08,y:0.06,w:0.42,h:0.38,rot:2,z:3},{cat:'top',x:0.42,y:0.04,w:0.44,h:0.38,rot:3,z:2},{cat:'dress',x:0.10,y:0.02,w:0.58,h:0.64,rot:1,z:2},{cat:'bottom',x:0.18,y:0.38,w:0.58,h:0.58,rot:1.5,z:1},{cat:'shoes',x:0.04,y:0.72,w:0.44,h:0.26,rot:-2,z:6},{cat:'bag',x:0.55,y:0.55,w:0.38,h:0.30,rot:4,z:6},{cat:'acc',x:0.60,y:0.02,w:0.36,h:0.22,rot:5,z:7}];
+  // Detectar qué categorías de capas superiores hay para ajustar posiciones
+  const hasOuter=pieces.some(p=>p.cat==='outer');
+  const hasJacket=pieces.some(p=>p.cat==='jacket');
+  const hasKnit=pieces.some(p=>p.cat==='knit');
+  const hasDress=pieces.some(p=>p.cat==='dress');
+
+  // Posición dinámica de bottom y accesorios según capas presentes
+  const topLayerHeight = hasOuter ? 0.48 : hasJacket ? 0.44 : hasKnit ? 0.40 : 0.38;
+  const bottomY = hasDress ? 0.38 : topLayerHeight + 0.02;
+  const bottomH = hasDress ? 0.58 : 0.96 - bottomY - 0.24;
+  const shoesY = bottomY + bottomH - 0.04;
+  const bagY = bottomY + (bottomH * 0.5);
+
+  const slots=[
+    {cat:'outer',   x:0.02, y:0.00,         w:0.50, h:0.50,         rot:-3, z:5},
+    {cat:'jacket',  x:0.44, y:0.02,         w:0.46, h:0.44,         rot:3,  z:4},
+    {cat:'knit',    x:0.06, y:0.04,         w:0.44, h:0.38,         rot:2,  z:3},
+    {cat:'top',     x:0.42, y:0.02,         w:0.44, h:0.38,         rot:3,  z:2},
+    {cat:'dress',   x:0.10, y:0.02,         w:0.58, h:0.64,         rot:1,  z:2},
+    {cat:'bottom',  x:0.18, y:bottomY,      w:0.58, h:bottomH,      rot:1.5,z:1},
+    {cat:'shoes',   x:0.04, y:shoesY,       w:0.44, h:0.24,         rot:-2, z:6},
+    {cat:'bag',     x:0.55, y:bagY,         w:0.38, h:0.28,         rot:4,  z:6},
+    {cat:'acc',     x:0.60, y:0.02,         w:0.36, h:0.22,         rot:5,  z:7},
+  ];
   let boardHtml='';pieces.forEach(p=>{if(!p.photo)return;const slot=slots.find(s=>s.cat===p.cat);if(!slot)return;const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};"><img src="${p.photo}" alt="${p.label}"/></div>`;});
   board.innerHTML=boardHtml;
   const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
