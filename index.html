@@ -1115,7 +1115,43 @@ function showCollage(uid,btn){
   const fotos=document.getElementById(`sketch-fotos-${uid}`);const collage=document.getElementById(`view-collage-${uid}`);
   btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   if(fotos)fotos.style.display='none';
-  if(collage){collage.style.display='block';const board=document.getElementById(`collage-board-${uid}`);if(board&&!board.innerHTML.trim()){const card=btn.closest('.outfit-card');const pieces=[];card.querySelectorAll('.outfit-piece').forEach(p=>{const img=p.querySelector('img');const label=p.querySelector('.piece-label')?.textContent||'';const strip=p.querySelector('.piece-color-strip');const color=strip?strip.style.background:'#aaa';const photo=img?img.src:null;const cat=getCatFromLabel(label);pieces.push({photo,label,color,cat});});renderCollage(board,pieces);}}
+  if(collage){collage.style.display='block';const board=document.getElementById(`collage-board-${uid}`);if(board&&!board.innerHTML.trim()){const card=btn.closest('.outfit-card');const pieces=[];card.querySelectorAll('.outfit-piece').forEach(p=>{const img=p.querySelector('img');const label=p.querySelector('.piece-label')?.textContent||'';const strip=p.querySelector('.piece-color-strip');const color=strip?strip.style.background:'#aaa';
+      // Obtener foto: primero del cache, luego del src actual
+      let photo=null;
+      if(img){
+        const dataPhoto=img.getAttribute('data-photo');
+        if(dataPhoto){
+          if(dataPhoto.startsWith('fileId:')){
+            const fid=dataPhoto.replace('fileId:','');
+            photo=photoCache[fid]||img.src||null;
+          } else {
+            photo=dataPhoto;
+          }
+        } else {
+          photo=img.src||null;
+        }
+      }
+      const cat=getCatFromLabel(label);pieces.push({photo,label,color,cat});});
+    // Si hay prendas sin foto resuelta, esperar y reintentar
+    const pending=pieces.filter(p=>p.photo&&p.photo.startsWith('http')&&p.photo.includes('drive.google'));
+    if(pending.length>0){
+      setTimeout(function(){
+        pieces.forEach(function(p){
+          const imgs=card.querySelectorAll('img[data-photo]');
+          imgs.forEach(function(img){
+            const dp=img.getAttribute('data-photo');
+            if(dp&&dp.startsWith('fileId:')){
+              const fid=dp.replace('fileId:','');
+              if(photoCache[fid]) p.photo=photoCache[fid];
+            }
+          });
+        });
+        renderCollage(board,pieces);
+      },1500);
+    } else {
+      renderCollage(board,pieces);
+    }
+  }}
 }
 
 function getCatFromLabel(label){const l=label.toLowerCase();if(['blazer','saco'].some(k=>l.includes(k)))return'jacket';if(['suéter','buzo','hoodie','cárdigan','cardigan','chaleco de punto'].some(k=>l.includes(k)))return'knit';if(['campera','parka','tapado','trench','piloto','poncho','sobretodo','chaqueta'].some(k=>l.includes(k)))return'outer';if(['vestido','mono','jardinero','body'].some(k=>l.includes(k)))return'dress';if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k)))return'bottom';if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k)))return'shoes';if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k)))return'bag';if(['gafas','lentes','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k)))return'acc';return'top';}
@@ -1124,7 +1160,7 @@ function renderCollage(board,pieces){
   const card=board.closest('.outfit-card');const occ=card.querySelector('.outfit-number')?.nextElementSibling?.textContent||'';const temp=card.querySelector('.outfit-number')?.textContent?.match(/\d+/)?.[0]||'';const scheme=card.querySelector('.outfit-scheme-label')?.textContent||'';const tip=card.querySelector('.outfit-tip')?.textContent?.replace('💡 ','')||'';const swatches=[...card.querySelectorAll('.harmony-swatch')];const colors=swatches.map(s=>s.style.background);
   const cardEl=board.closest('.collage-card');if(!cardEl)return;
   cardEl.querySelector('.collage-card-header').innerHTML=`<div class="collage-card-title">Outfit del día</div><div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>`;
-  const W=board.offsetWidth||260,H=board.offsetHeight||346;
+  const W=board.offsetWidth||board.parentElement?.offsetWidth||280; const H=Math.round(W*4/3)||373;
   // ============================================================
   // COLLAGE LAYOUT v3
   // Máximo 3 prendas superiores visibles
@@ -1359,6 +1395,7 @@ function updateDesdeTemp(){
 }
 
 function generateDesde() {
+  if(!garments||garments.length===0){showToast('⏳ Espera, cargando prendas...');return;}
   if(!desdePrendaSeleccionada){showToast('Primero elegí una prenda');return;}
   var base = desdePrendaSeleccionada;
   var occ = document.getElementById('desde-occasion').value;
