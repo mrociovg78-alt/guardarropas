@@ -227,6 +227,8 @@
   <div class="filter-chips">
     <span class="chip active" onclick="setFilter('all',this)">Todas</span>
     <span class="chip" onclick="setFilter('top',this)">Tops</span>
+    <span class="chip" onclick="setFilter('knit',this)">Punto</span>
+    <span class="chip" onclick="setFilter('jacket',this)">Sacos</span>
     <span class="chip" onclick="setFilter('bottom',this)">Bottoms</span>
     <span class="chip" onclick="setFilter('outer',this)">Abrigos</span>
     <span class="chip" onclick="setFilter('dress',this)">Vestidos</span>
@@ -287,6 +289,8 @@
         <label>Elegí una prenda base</label>
         <div class="filter-chips" style="margin-top:0.5rem;margin-bottom:0.75rem;" id="desde-cat-chips">
           <span class="chip active" onclick="setDesdeFilter('top',this)">Tops</span>
+          <span class="chip" onclick="setDesdeFilter('knit',this)">Punto</span>
+          <span class="chip" onclick="setDesdeFilter('jacket',this)">Sacos</span>
           <span class="chip" onclick="setDesdeFilter('bottom',this)">Bottoms</span>
           <span class="chip" onclick="setDesdeFilter('outer',this)">Abrigos</span>
           <span class="chip" onclick="setDesdeFilter('dress',this)">Vestidos</span>
@@ -302,7 +306,7 @@
       </div>
       <div class="form-group" style="margin-top:0.85rem;">
         <label>Ocasión</label>
-        <select id="desde-occasion">
+        <select id="desde-occasion" onchange="updateDesdeScheme()">
           <option value="trabajo">Trabajo / Oficina</option>
           <option value="casual">Casual / Salida diurna</option>
           <option value="salida">Salida nocturna</option>
@@ -317,6 +321,18 @@
           <span class="temp-value" id="desde-temp-display">20°C</span>
         </div>
         <div class="temp-label" id="desde-temp-label">🌤 Templado</div>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Esquema de color <span id="desde-scheme-label" style="font-weight:300;opacity:0.6;font-size:0.68rem;text-transform:none;letter-spacing:0;">· sugerido</span></label>
+        <select id="desde-scheme" onchange="document.getElementById('desde-scheme-label').textContent='· modificado'">
+          <option value="neutro_acento">Neutros + acento</option>
+          <option value="analogo">Análogo</option>
+          <option value="monocromatico">Monocromático</option>
+          <option value="complementario">Complementario</option>
+          <option value="triadico">Triádico</option>
+          <option value="tonal">Tonal tierra</option>
+          <option value="clasicos">Clásicos infalibles ✓</option>
+        </select>
       </div>
       <button class="btn-accent" onclick="generateDesde()" style="margin-top:0.85rem;">Armar look ✦</button>
     </div>
@@ -381,7 +397,9 @@
         <label>Categoría *</label>
         <select id="f-category" onchange="updateTypeOptions(); updateStyleOptions()">
           <option value="">Seleccioná</option>
-          <option value="top">Parte superior</option>
+          <option value="top">Tops (remeras, camisas, blusas)</option>
+          <option value="knit">Punto (suéteres, buzos, cárdigans)</option>
+          <option value="jacket">Sacos y blazers</option>
           <option value="bottom">Parte inferior</option>
           <option value="dress">Vestido / Mono</option>
           <option value="outer">Abrigo / Campera</option>
@@ -476,10 +494,12 @@
 
 <script>
 const TYPES_BY_CAT = {
-  top:['Remera / Camiseta','Blusa','Camisa','Top','Musculosa / Tank top','Polera / Cuello alto','Buzo / Sudadera','Hoodie','Suéter / Pullover','Cárdigan','Chaleco de punto','Chaleco largo','Chaleco estructurado','Chaleco acolchado'],
+  top:['Remera / Camiseta','Blusa','Camisa','Top','Musculosa / Tank top','Polera / Cuello alto','Body'],
+  knit:['Suéter / Pullover','Buzo / Sudadera','Hoodie','Cárdigan','Chaleco de punto','Chaleco largo'],
+  jacket:['Blazer','Saco'],
   bottom:['Pantalón de vestir','Pantalón casual','Pantalón cargo','Jogger','Jean recto','Jean skinny','Jean wide leg','Jean mom','Jean boyfriend','Jean bootcut','Leggings / Calzas','Shorts','Bermuda','Pollera / Falda','Falda mini','Falda midi','Falda maxi','Falda plisada'],
-  dress:['Vestido corto','Vestido midi','Vestido largo','Vestido de noche','Mono / Enterito','Jardinero / Overol','Body'],
-  outer:['Blazer','Saco','Chaqueta','Campera','Parka','Trench coat / Gabardina','Tapado / Abrigo largo','Poncho','Campera de cuero','Campera inflable (puffer)','Piloto / Impermeable','Sobretodo'],
+  dress:['Vestido corto','Vestido midi','Vestido largo','Vestido de noche','Mono / Enterito','Jardinero / Overol'],
+  outer:['Campera','Parka','Trench coat / Gabardina','Tapado / Abrigo largo','Poncho','Campera de cuero','Campera inflable (puffer)','Piloto / Impermeable','Sobretodo','Chaqueta'],
   shoes:['Zapatillas','Tenis / Sneakers','Zapatos de taco','Zapatos planos','Botas altas','Botines','Sandalias','Ojotas','Mocasines','Oxfords','Mules'],
   bag:['Cartera estructurada','Cartera informal','Bolso','Mochila','Clutch / Sobre','Riñonera','Tote bag'],
   acc:['Cinturón','Bufanda / Pañuelo','Gorra','Sombrero','Guantes','Joyería / Bijou','Lentes de sol','Reloj','Otro accesorio']
@@ -508,8 +528,8 @@ const MONO_GROUPS=[['Blanco','Crudo','Crema','Beige','Gris perla','Camel'],['Gri
 const CLASSIC_COMBOS=[['Blanco','Negro'],['Negro','Camel'],['Azul marino','Blanco'],['Azul marino','Beige'],['Gris','Blanco'],['Gris','Negro'],['Crudo','Marrón'],['Beige','Blanco'],['Bordo','Camel'],['Verde oliva','Beige'],['Negro','Crudo'],['Azul marino','Mostaza'],['Gris','Bordo'],['Azul petróleo','Camel'],['Verde botella','Beige'],['Ciruela','Beige'],['Marrón','Crudo','Verde oliva'],['Negro','Blanco','Rojo'],['Beige','Crudo','Verde oliva'],['Celeste','Blanco','Azul marino'],['Gris','Rosa palo','Blanco']];
 const SCHEME_BY_OCC={trabajo:{name:'Neutros + acento',key:'neutro_acento'},casual:{name:'Análogo',key:'analogo'},salida:{name:'Monocromático',key:'monocromatico'},evento:{name:'Clásicos infalibles',key:'clasicos'},sport:{name:'Tonal tierra',key:'tonal'}};
 const SCHEME_TIPS={neutro_acento:'Base neutra + un solo color acento en una prenda o accesorio. La fórmula más segura para la oficina.',analogo:'Colores vecinos en el círculo cromático — coherencia visual sin esfuerzo. Ideal para looks refinados.',monocromatico:'Un solo color en distintas intensidades. Varía texturas para que no quede plano.',neutro_oscuro:'Neutros puros: imagen prolija y sobria. Dejá que el fit y los accesorios sean los protagonistas.',tonal:'Tonos tierra que nunca fallan: camel, crudo, marrón, oliva. Cálidos y atemporales.',complementario:'Colores opuestos en versiones apagadas — uno domina, el otro complementa. Un solo acento basta.',triadico:'Tres colores: 60% principal, 30% secundario, 10% acento. Proporción es la clave.',clasicos:'Combinaciones que nunca fallan. Resolvé rápido y quedá bien siempre.'};
-const STYLES_BY_CAT={top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico','Sin mangas / Chaleco','Largo / Maxi'],bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],acc:[]};
-const CAT_EMOJI={top:'👕',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
+const STYLES_BY_CAT={top:['Recto / Regular','Slim / Entallado','Oversize','Crop','Sin mangas','Manga corta','Manga larga','Cuello V','Cuello redondo','Off shoulder','Asimétrico','Largo / Maxi'],knit:['Recto / Regular','Slim / Entallado','Oversize','Crop','Cuello V','Cuello redondo','Cuello alto / Tortuga','Largo / Maxi','Abierto / Cárdigan'],jacket:['Recto / Regular','Slim / Entallado','Oversize','Cruzado','Largo','Corto'],bottom:['Recto / Regular','Slim / Entallado','Skinny','Wide leg / Palazzo','Mom fit','Boyfriend','Bootcut','Baggy','Flare / Acampanado','A-line','Mini','Midi','Maxi','Plisado'],dress:['Mini','Midi','Maxi','Recto','Ajustado','Oversize','Wrap','A-line','Flare','Off shoulder','Asimétrico'],outer:['Recto / Regular','Slim / Entallado','Oversize','Corto','Largo','Abotonado','Abierto'],shoes:['Taco alto','Taco bajo','Plana','Puntera fina','Puntera redonda','Bota alta','Bota al tobillo','Abierto','Cerrado'],bag:['Estructurada','Soft / Sin estructura','Grande','Mediana','Pequeña','Con asa corta','Con asa larga','Bandolera'],acc:[]};
+const CAT_EMOJI={top:'👕',knit:'🧶',jacket:'🥼',bottom:'👖',dress:'👗',outer:'🧥',shoes:'👠',bag:'👜',acc:'💍'};
 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyUP46pG4mQUOiFQh3QhAjbyQa0gjaexq-Gi8LoCm_PXaP4DBnbL57d4dYA8hlRZN4U/exec';
 
@@ -653,7 +673,7 @@ async function analyzeWithAI(){
   document.getElementById('ai-analyze-btn').classList.remove('visible');
   const status=document.getElementById('ai-status');status.classList.add('visible');status.textContent='🔍 Analizando la prenda...';
   try{
-    const prompt=`Analizá esta imagen de una prenda de ropa. Respondé SOLO con JSON válido, sin markdown ni texto extra:\n{"categoria":"top|bottom|dress|outer|shoes|bag|acc","tipo":"tipo específico en español","color_nombre":"uno de: Blanco|Crudo|Crema|Beige|Gris perla|Gris claro|Gris|Gris oscuro|Negro|Azul marino|Camel|Marrón|Terracota|Coral|Verde oliva|Rojo|Bordo|Ciruela|Rosa palo|Rosa|Naranja|Mostaza|Amarillo|Lavanda|Violeta|Verde agua|Verde claro|Verde botella|Azul petróleo|Celeste|Azul","material":"uno de: Liso / Algodón|Estampado|Denim|Cuero / Eco-cuero|Punto / Tejido|Satinado / Seda|Lino|Lana|Gamuza|Técnico / Deportivo|Encaje|Otro","estilo":"uno de: Recto / Regular|Slim / Entallado|Oversize|Crop|Flare / Acampanado|Skinny|Wide leg / Palazzo|Mom fit|Boyfriend|Bootcut|Baggy|A-line|Wrap|Mini|Midi|Maxi","ocasion":["Trabajo","Casual","Salida nocturna","Evento formal","Sport"],"temporada":["Verano","Primavera","Otoño","Invierno","Todo"],"notas":"observación breve si corresponde, sino cadena vacía"}`;
+    const prompt=`Analizá esta imagen de una prenda de ropa. Respondé SOLO con JSON válido, sin markdown ni texto extra:\n{"categoria":"top|knit|jacket|bottom|dress|outer|shoes|bag|acc","tipo":"tipo específico en español","color_nombre":"uno de: Blanco|Crudo|Crema|Beige|Gris perla|Gris claro|Gris|Gris oscuro|Negro|Azul marino|Camel|Marrón|Terracota|Coral|Verde oliva|Rojo|Bordo|Ciruela|Rosa palo|Rosa|Naranja|Mostaza|Amarillo|Lavanda|Violeta|Verde agua|Verde claro|Verde botella|Azul petróleo|Celeste|Azul","material":"uno de: Liso / Algodón|Estampado|Denim|Cuero / Eco-cuero|Punto / Tejido|Satinado / Seda|Lino|Lana|Gamuza|Técnico / Deportivo|Encaje|Otro","estilo":"uno de: Recto / Regular|Slim / Entallado|Oversize|Crop|Flare / Acampanado|Skinny|Wide leg / Palazzo|Mom fit|Boyfriend|Bootcut|Baggy|A-line|Wrap|Mini|Midi|Maxi","ocasion":["Trabajo","Casual","Salida nocturna","Evento formal","Sport"],"temporada":["Verano","Primavera","Otoño","Invierno","Todo"],"notas":"observación breve si corresponde, sino cadena vacía"}`;
     const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:600,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:currentPhotoData.startsWith('data:image/png')?'image/png':'image/jpeg',data:currentPhotoBase64}},{type:'text',text:prompt}]}]})});
     if(!response.ok){const err=await response.json();throw new Error(err.error?.message||'Error API');}
     const data=await response.json();
@@ -871,64 +891,71 @@ function generateOutfits(){
     return r;
   }
 
-  const tops=getStrict('top'),bottoms=getStrict('bottom'),dresses=getStrict('dress');
-  const outersRaw=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
-  // Ordenar abrigos por peso según temperatura: más frío = prendas más abrigadas primero
-  const lightOuters=['Trench coat / Gabardina','Piloto / Impermeable','Chaqueta','Blazer','Saco'];
-  const outers = (cat==='muyfrio'||cat==='frio')
-    ? outersRaw.slice().sort(function(a,b){
-        const aLight=lightOuters.some(function(t){return a.type.includes(t.split('/')[0].trim());});
-        const bLight=lightOuters.some(function(t){return b.type.includes(t.split('/')[0].trim());});
-        if(aLight&&!bLight)return 1;
-        if(!aLight&&bLight)return -1;
-        return 0;
-      })
-    : outersRaw;
+  const tops=getStrict('top'),knits=getStrict('knit'),jackets=getStrict('jacket'),bottoms=getStrict('bottom'),dresses=getStrict('dress');
+  const outers=(cat!=='calido'&&cat!=='muycalido')?getStrict('outer'):[];
   const shoes=getStrict('shoes'),bags=getStrict('bag');
   const forceSmooth=schemeKey==='monocromatico'||schemeKey==='clasicos';
   const combos=[];
 
-  const dressPool=forceSmooth?dresses.filter(g=>!isPattern(g)):dresses;
-  for(const d of dressPool){
-    const pieces=[d];
-    if(outers.length){const o=pickBestCompatible(outers,d.colorPrimary,schemeKey,[d.id],pieces,true);if(o)pieces.push(o);}
-    if(shoes.length){const s=pickBestCompatible(shoes,d.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
-    if(bags.length){
+  // Helper para agregar capas y accesorios
+  function buildCombo(base, baseColor, extraPieces){
+    const pieces=[...extraPieces];
+    // Capas según temperatura
+    if(cat==='muyfrio'||cat==='frio'){
+      if(!pieces.some(p=>p.cat==='knit')){const k=pickBestCompatible(knits,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(k)pieces.push(k);}
+      if(!pieces.some(p=>p.cat==='jacket')){const j=pickBestCompatible(jackets,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(j)pieces.push(j);}
+      if(!pieces.some(p=>p.cat==='outer')){const o=pickBestCompatible(outers,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(o)pieces.push(o);}
+    } else if(cat==='fresco'){
+      if(!pieces.some(p=>p.cat==='knit')){const k=pickBestCompatible(knits,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(k)pieces.push(k);}
+      if(!pieces.some(p=>p.cat==='jacket')){const j=pickBestCompatible(jackets,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(j)pieces.push(j);}
+    } else if(cat==='templado'){
+      if(!pieces.some(p=>p.cat==='jacket')){const j=pickBestCompatible(jackets,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(j)pieces.push(j);}
+    }
+    // Zapatos
+    if(shoes.length&&!pieces.some(p=>p.cat==='shoes')){const s=pickBestCompatible(shoes,baseColor,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
+    // Cartera compatible con zapatos
+    if(bags.length&&!pieces.some(p=>p.cat==='bag')){
       const shoe=pieces.find(p=>p.cat==='shoes');
-      const bagBase=shoe?shoe.colorPrimary:d.colorPrimary;
+      const bagBase=shoe?shoe.colorPrimary:baseColor;
       const b=pickBestCompatible(bags,bagBase,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);
     }
-    if(pieces.length>=1){
-      const shoeP2=pieces.find(p=>p.cat==='shoes');
-      const bagP2=pieces.find(p=>p.cat==='bag');
-      if(!(shoeP2&&bagP2&&scoreColorPair(shoeP2.colorPrimary,bagP2.colorPrimary,schemeKey)<30)){
-        const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});
-      }
+    // Validar zapatos+cartera compatibles
+    const shoeP=pieces.find(p=>p.cat==='shoes');
+    const bagP=pieces.find(p=>p.cat==='bag');
+    if(shoeP&&bagP&&scoreColorPair(shoeP.colorPrimary,bagP.colorPrimary,schemeKey)<30)return null;
+    // Validar estampados
+    if(pieces.filter(p=>isPattern(p)).length>1)return null;
+    return pieces;
+  }
+
+  // Combos dress
+  const dressPool=forceSmooth?dresses.filter(g=>!isPattern(g)):dresses;
+  for(const d of dressPool){
+    const pieces=buildCombo(d,d.colorPrimary,[d]);
+    if(pieces&&pieces.length>=1){
+      const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);
+      combos.push({pieces:[...pieces],score:sc,scheme});
     }
   }
 
+  // Combos top+bottom (base: top como capa 1)
   const topPool=forceSmooth?tops.filter(g=>!isPattern(g)):tops;
   for(const top of topPool){
     const bottomPool=isPattern(top)?bottoms.filter(g=>!isPattern(g)):bottoms;
     if(!bottomPool.length&&isPattern(top))continue;
     const bot=pickBestCompatible(bottomPool,top.colorPrimary,schemeKey,[top.id],[top],true);if(!bot)continue;
-    const pieces=[top,bot];
-    if(outers.length){const o=pickBestCompatible(outers,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,true);if(o&&o.cat==='outer')pieces.push(o);}
-    if(shoes.length){const s=pickBestCompatible(shoes,top.colorPrimary,schemeKey,pieces.map(p=>p.id),pieces,false);if(s)pieces.push(s);}
-    if(bags.length){
-      const shoe=pieces.find(p=>p.cat==='shoes');
-      const bagBase=shoe?shoe.colorPrimary:top.colorPrimary;
-      const b=pickBestCompatible(bags,bagBase,schemeKey,pieces.map(p=>p.id),pieces,false);if(b)pieces.push(b);
-    }
-    const patternPieces=pieces.filter(p=>isPattern(p));if(patternPieces.length>1)continue;
-    // Regla: zapatos y cartera deben ser compatibles entre sí
-    const shoeP=pieces.find(p=>p.cat==='shoes');
-    const bagP=pieces.find(p=>p.cat==='bag');
-    if(shoeP&&bagP){
-      const sc2=scoreColorPair(shoeP.colorPrimary,bagP.colorPrimary,schemeKey);
-      if(sc2<30)continue; // incompatibles — descartar combo
-    }
-    const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});
+    const pieces=buildCombo(top,top.colorPrimary,[top,bot]);
+    if(pieces){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
+  }
+
+  // Combos knit+bottom (base: knit como capa 2, sin top visible)
+  const knitPool=forceSmooth?knits.filter(g=>!isPattern(g)):knits;
+  for(const k of knitPool){
+    const bottomPool=isPattern(k)?bottoms.filter(g=>!isPattern(g)):bottoms;
+    if(!bottomPool.length)continue;
+    const bot=pickBestCompatible(bottomPool,k.colorPrimary,schemeKey,[k.id],[k],true);if(!bot)continue;
+    const pieces=buildCombo(k,k.colorPrimary,[k,bot]);
+    if(pieces){const sc=scoreOutfit(pieces,schemeKey,occLabel,cat);combos.push({pieces:[...pieces],score:sc,scheme});}
   }
 
   if(!combos.length){document.getElementById('outfit-result').innerHTML='<div class="empty-state"><div class="icon">🤷‍♀️</div><p>No hay combinaciones posibles para esta ocasión y esquema. Intentá cambiar el esquema o agregá más prendas.</p></div>';return;}
@@ -937,9 +964,9 @@ function generateOutfits(){
   const chosen=[];const usedMains=new Set();const usedIds=new Set();
   for(const combo of combos){
     if(chosen.length>=3)break;
-    const mainPieces=combo.pieces.filter(p=>['top','bottom','dress'].includes(p.cat));
+    const mainPieces=combo.pieces.filter(p=>['top','knit','jacket','bottom','dress'].includes(p.cat));
     const mainKey=mainPieces.map(p=>p.id).sort().join('-');if(usedMains.has(mainKey))continue;
-    if(chosen.length>0){const topId=mainPieces.find(p=>p.cat==='top'||p.cat==='dress')?.id;if(topId&&usedIds.has(topId))continue;}
+    if(chosen.length>0){const topId=mainPieces.find(p=>['top','knit','dress'].includes(p.cat))?.id;if(topId&&usedIds.has(topId))continue;}
     usedMains.add(mainKey);combo.pieces.forEach(p=>usedIds.add(p.id));chosen.push(combo);
   }
 
@@ -1011,14 +1038,14 @@ function showCollage(uid,btn){
   if(collage){collage.style.display='block';const board=document.getElementById(`collage-board-${uid}`);if(board&&!board.innerHTML.trim()){const card=btn.closest('.outfit-card');const pieces=[];card.querySelectorAll('.outfit-piece').forEach(p=>{const img=p.querySelector('img');const label=p.querySelector('.piece-label')?.textContent||'';const strip=p.querySelector('.piece-color-strip');const color=strip?strip.style.background:'#aaa';const photo=img?img.src:null;const cat=getCatFromLabel(label);pieces.push({photo,label,color,cat});});renderCollage(board,pieces);}}
 }
 
-function getCatFromLabel(label){const l=label.toLowerCase();if(['blazer','saco','chaqueta','campera','parka','tapado','trench','piloto','poncho','sobretodo'].some(k=>l.includes(k)))return'outer';if(['vestido','mono','jardinero','body'].some(k=>l.includes(k)))return'dress';if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k)))return'bottom';if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k)))return'shoes';if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k)))return'bag';if(['gafas','lentes','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k)))return'acc';return'top';}
+function getCatFromLabel(label){const l=label.toLowerCase();if(['blazer','saco'].some(k=>l.includes(k)))return'jacket';if(['suéter','buzo','hoodie','cárdigan','cardigan','chaleco de punto'].some(k=>l.includes(k)))return'knit';if(['campera','parka','tapado','trench','piloto','poncho','sobretodo','chaqueta'].some(k=>l.includes(k)))return'outer';if(['vestido','mono','jardinero','body'].some(k=>l.includes(k)))return'dress';if(['pantalón','jean','legging','shorts','bermuda','pollera','falda','jogger'].some(k=>l.includes(k)))return'bottom';if(['zapato','zapatilla','bota','botín','sandalia','ojota','mocasín','oxford','mule','tenis'].some(k=>l.includes(k)))return'shoes';if(['cartera','bolso','mochila','clutch','riñonera','tote'].some(k=>l.includes(k)))return'bag';if(['gafas','lentes','pañuelo','bufanda','cinturón','sombrero','gorra'].some(k=>l.includes(k)))return'acc';return'top';}
 
 function renderCollage(board,pieces){
   const card=board.closest('.outfit-card');const occ=card.querySelector('.outfit-number')?.nextElementSibling?.textContent||'';const temp=card.querySelector('.outfit-number')?.textContent?.match(/\d+/)?.[0]||'';const scheme=card.querySelector('.outfit-scheme-label')?.textContent||'';const tip=card.querySelector('.outfit-tip')?.textContent?.replace('💡 ','')||'';const swatches=[...card.querySelectorAll('.harmony-swatch')];const colors=swatches.map(s=>s.style.background);
   const cardEl=board.closest('.collage-card');if(!cardEl)return;
   cardEl.querySelector('.collage-card-header').innerHTML=`<div class="collage-card-title">Outfit del día</div><div class="collage-card-sub">${occ} · ${temp}°C · ${scheme}</div>`;
   const W=board.offsetWidth||260,H=board.offsetHeight||346;
-  const slots=[{cat:'outer',x:0.02,y:0.02,w:0.52,h:0.48,rot:-3,z:3},{cat:'top',x:0.40,y:0.00,w:0.46,h:0.40,rot:3,z:2},{cat:'dress',x:0.10,y:0.02,w:0.58,h:0.64,rot:1,z:2},{cat:'bottom',x:0.20,y:0.36,w:0.55,h:0.60,rot:1.5,z:1},{cat:'shoes',x:0.02,y:0.72,w:0.52,h:0.26,rot:-2,z:4},{cat:'bag',x:0.63,y:0.50,w:0.35,h:0.32,rot:4,z:4},{cat:'acc',x:0.62,y:0.02,w:0.36,h:0.24,rot:5,z:5}];
+  const slots=[{cat:'outer',x:0.02,y:0.00,w:0.50,h:0.50,rot:-3,z:5},{cat:'jacket',x:0.44,y:0.02,w:0.46,h:0.44,rot:3,z:4},{cat:'knit',x:0.08,y:0.06,w:0.42,h:0.38,rot:2,z:3},{cat:'top',x:0.42,y:0.04,w:0.44,h:0.38,rot:3,z:2},{cat:'dress',x:0.10,y:0.02,w:0.58,h:0.64,rot:1,z:2},{cat:'bottom',x:0.18,y:0.38,w:0.58,h:0.58,rot:1.5,z:1},{cat:'shoes',x:0.04,y:0.72,w:0.44,h:0.26,rot:-2,z:6},{cat:'bag',x:0.55,y:0.55,w:0.38,h:0.30,rot:4,z:6},{cat:'acc',x:0.60,y:0.02,w:0.36,h:0.22,rot:5,z:7}];
   let boardHtml='';pieces.forEach(p=>{if(!p.photo)return;const slot=slots.find(s=>s.cat===p.cat);if(!slot)return;const x=Math.round(slot.x*W),y=Math.round(slot.y*H),w=Math.round(slot.w*W),h=Math.round(slot.h*H);boardHtml+=`<div class="collage-piece" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${slot.rot}deg);z-index:${slot.z};"><img src="${p.photo}" alt="${p.label}"/></div>`;});
   board.innerHTML=boardHtml;
   const paletteEl=cardEl.querySelector('.collage-palette');if(paletteEl)paletteEl.innerHTML=colors.map(c=>`<div class="collage-pdot" style="background:${c}"></div>`).join('')+`<span class="collage-palette-label">${scheme.toLowerCase()}</span>`;
@@ -1095,7 +1122,7 @@ function updateDataSummary(){const el=document.getElementById('data-summary');if
 
 function openDetail(id){
   const g=garments.find(x=>x.id==id);if(!g)return;
-  const catNames={top:'Parte superior',bottom:'Parte inferior',dress:'Vestido / Mono',outer:'Abrigo',shoes:'Calzado',bag:'Cartera',acc:'Accesorio'};
+  const catNames={top:'Top / Camisa',knit:'Punto',jacket:'Saco / Blazer',bottom:'Parte inferior',dress:'Vestido / Mono',outer:'Abrigo',shoes:'Calzado',bag:'Cartera',acc:'Accesorio'};
   document.getElementById('detail-content').innerHTML=`${g.photoUrl?`<img id="detail-img-main" class="detail-img" alt="${g.type}">`:`<div style="height:160px;background:var(--light-mocha);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:1rem;">${CAT_EMOJI[g.cat]||'✨'}</div>`}<div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:0.25rem;">${g.type}</div><div style="font-size:0.8rem;color:var(--mocha);margin-bottom:1rem;">${catNames[g.cat]||g.cat}${g.style?' · '+g.style:''}</div><div class="detail-section"><div class="detail-section-title">Color</div><span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorPrimary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorPrimary.name}</span>${g.colorSecondary?`<span class="detail-tag"><span style="width:12px;height:12px;border-radius:50%;background:${g.colorSecondary.hex};border:1px solid rgba(0,0,0,0.1);display:inline-block;"></span>${g.colorSecondary.name}</span>`:''}</div>${g.material?`<div class="detail-section"><div class="detail-section-title">Material</div><span class="detail-tag">${g.material}</span>${g.texture?`<span class="detail-tag" style="margin-left:4px;background:${g.texture==='estampado'?'#F5E8E8':'#E8F0E8'}">${g.texture}</span>`:''}</div>`:''}<div class="detail-section"><div class="detail-section-title">Temporada</div>${(g.seasons||[]).map(s=>`<span class="detail-tag">${s}</span>`).join('')}</div><div class="detail-section"><div class="detail-section-title">Ocasión</div>${(g.occasions||[]).map(o=>`<span class="detail-tag">${o}</span>`).join('')}</div>${g.notes?`<div class="detail-section"><div class="detail-section-title">Notas</div><div style="font-size:0.82rem;color:var(--mocha);font-style:italic;padding:0.6rem 0.75rem;background:var(--cream);border-radius:8px;border-left:3px solid var(--gold);">${g.notes}</div></div>`:''}<div style="font-size:0.72rem;color:#bbb;margin-top:0.5rem;">Usado ${g.usageCount||0} ${g.usageCount===1?'vez':'veces'}</div><div class="detail-actions"><button class="btn-secondary" style="flex:1;" onclick="closeDetail();editGarment(${g.id},{stopPropagation:()=>{}})">✎ Editar</button><button class="btn-primary" style="flex:1;" onclick="closeDetail()">Cerrar</button></div>`;
   document.getElementById('detail-overlay').classList.add('open');document.body.style.overflow='hidden';
   if(g.photoUrl){var di=document.getElementById('detail-img-main');if(di)resolvePhoto(g.photoUrl,di);}
@@ -1163,6 +1190,13 @@ function seleccionarPrendaBase(id) {
   document.getElementById('desde-prenda-nombre').textContent = desdePrendaSeleccionada.type + ' · ' + desdePrendaSeleccionada.colorPrimary.name;
 }
 
+function updateDesdeScheme(){
+  var occ=document.getElementById('desde-occasion').value;
+  var scheme=SCHEME_BY_OCC[occ]||SCHEME_BY_OCC.casual;
+  document.getElementById('desde-scheme').value=scheme.key;
+  document.getElementById('desde-scheme-label').textContent='· sugerido';
+}
+
 function updateDesdeTemp(){
   var v=parseInt(document.getElementById('desde-temp-slider').value);
   document.getElementById('desde-temp-display').textContent=v+'°C';
@@ -1181,7 +1215,7 @@ function generateDesde() {
   var cat = tempCat(temp);
 
   // Determinar esquema automático según la prenda base
-  var schemeKey = SCHEME_BY_OCC[occ] ? SCHEME_BY_OCC[occ].key : 'neutro_acento';
+  var schemeKey = document.getElementById('desde-scheme') ? document.getElementById('desde-scheme').value : (SCHEME_BY_OCC[occ]?SCHEME_BY_OCC[occ].key:'neutro_acento');
   var scheme = {key:schemeKey, name:({neutro_acento:'Neutros + acento',analogo:'Análogo',monocromatico:'Monocromático',tonal:'Tonal tierra',complementario:'Complementario',triadico:'Triádico',clasicos:'Clásicos infalibles'})[schemeKey]||schemeKey};
 
   function getPool(role) {
@@ -1200,14 +1234,16 @@ function generateDesde() {
   var excl = [base.id];
 
   // Completar según categoría de la prenda base
-  if(base.cat==='top'||base.cat==='outer'){
-    var bot=pickBestCompatible(getPool('bottom'),base.colorPrimary,schemeKey,excl,pieces,true);
-    if(bot){pieces.push(bot);excl.push(bot.id);}
+  if(base.cat==='top'||base.cat==='knit'||base.cat==='jacket'||base.cat==='outer'){
+    if(!pieces.some(function(p){return p.cat==='bottom';})){
+      var bot=pickBestCompatible(getPool('bottom'),base.colorPrimary,schemeKey,excl,pieces,true);
+      if(bot){pieces.push(bot);excl.push(bot.id);}
+    }
   } else if(base.cat==='bottom'){
     var top=pickBestCompatible(getPool('top'),base.colorPrimary,schemeKey,excl,pieces,true);
     if(top){pieces.push(top);excl.push(top.id);}
   } else if(base.cat==='dress'){
-    // dress ya completo por sí solo
+    // dress completo por sí solo
   } else if(base.cat==='shoes'||base.cat==='bag'){
     var top2=pickBestCompatible(getPool('top'),base.colorPrimary,schemeKey,excl,pieces,true);
     if(top2){pieces.push(top2);excl.push(top2.id);}
@@ -1215,23 +1251,44 @@ function generateDesde() {
     if(bot2){pieces.push(bot2);excl.push(bot2.id);}
   }
 
-  // Agregar abrigo si hace frío y la base no es outer
-  if(cat!=='calido'&&cat!=='muycalido'&&base.cat!=='outer'){
-    var outerPool=getPool('outer');
-    var lightOuters=['Trench coat / Gabardina','Piloto / Impermeable','Chaqueta','Blazer','Saco'];
-    if(cat==='muyfrio'||cat==='frio') outerPool=outerPool.slice().sort(function(a,b){var aL=lightOuters.some(function(t){return a.type.includes(t.split('/')[0].trim());});var bL=lightOuters.some(function(t){return b.type.includes(t.split('/')[0].trim());});return aL&&!bL?1:!aL&&bL?-1:0;});
-    var o=pickBestCompatible(outerPool,base.colorPrimary,schemeKey,excl,pieces,false);
-    if(o){pieces.push(o);excl.push(o.id);}
+  // Agregar capas según temperatura
+  if(cat==='muyfrio'||cat==='frio'){
+    if(!pieces.some(function(p){return p.cat==='knit';})){
+      var k=pickBestCompatible(getPool('knit'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(k){pieces.push(k);excl.push(k.id);}
+    }
+    if(!pieces.some(function(p){return p.cat==='jacket';})){
+      var j=pickBestCompatible(getPool('jacket'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(j){pieces.push(j);excl.push(j.id);}
+    }
+    if(!pieces.some(function(p){return p.cat==='outer';})){
+      var o=pickBestCompatible(getPool('outer'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(o){pieces.push(o);excl.push(o.id);}
+    }
+  } else if(cat==='fresco'){
+    if(!pieces.some(function(p){return p.cat==='knit';})){
+      var k2=pickBestCompatible(getPool('knit'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(k2){pieces.push(k2);excl.push(k2.id);}
+    }
+    if(!pieces.some(function(p){return p.cat==='jacket';})){
+      var j2=pickBestCompatible(getPool('jacket'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(j2){pieces.push(j2);excl.push(j2.id);}
+    }
+  } else if(cat==='templado'){
+    if(!pieces.some(function(p){return p.cat==='jacket';})){
+      var j3=pickBestCompatible(getPool('jacket'),base.colorPrimary,schemeKey,excl,pieces,false);
+      if(j3){pieces.push(j3);excl.push(j3.id);}
+    }
   }
 
-  // Zapatos (si la base no es zapatos)
-  if(base.cat!=='shoes'){
+  // Zapatos
+  if(base.cat!=='shoes'&&!pieces.some(function(p){return p.cat==='shoes';})){
     var s=pickBestCompatible(getPool('shoes'),base.colorPrimary,schemeKey,excl,pieces,false);
     if(s){pieces.push(s);excl.push(s.id);}
   }
 
   // Cartera compatible con zapatos
-  if(base.cat!=='bag'){
+  if(base.cat!=='bag'&&!pieces.some(function(p){return p.cat==='bag';})){
     var shoe=pieces.find(function(p){return p.cat==='shoes';});
     var bagBase=shoe?shoe.colorPrimary:base.colorPrimary;
     var b=pickBestCompatible(getPool('bag'),bagBase,schemeKey,excl,pieces,false);
