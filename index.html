@@ -536,17 +536,43 @@ function gasPost(payload){
 }
 
 var photoCache={};
-var outfitPiecesMap={}; // uid -> array de prendas del outfit
+var outfitPiecesMap={};
+
+// Cola de requests de fotos — máximo 3 simultáneos
+var _photoQueue=[], _photoActive=0, _photoMaxActive=3;
+
+function _photoProcessQueue(){
+  while(_photoActive<_photoMaxActive && _photoQueue.length>0){
+    var item=_photoQueue.shift();
+    _photoActive++;
+    fetch(GAS_URL+'?action=servePhoto&fileId='+item.fileId)
+      .then(function(r){return r.json();})
+      .then(function(res){
+        if(res.dataUrl){
+          photoCache[item.fileId]=res.dataUrl;
+          // Actualizar todos los imgs esperando este fileId
+          document.querySelectorAll('img[data-waiting-fid="'+item.fileId+'"]').forEach(function(el){
+            el.src=res.dataUrl;
+            el.removeAttribute('data-waiting-fid');
+          });
+        }
+      })
+      .catch(function(){})
+      .finally(function(){_photoActive--;_photoProcessQueue();});
+  }
+}
 
 function resolvePhoto(photoUrl,imgEl){
-  if(!photoUrl)return;
+  if(!photoUrl||!imgEl)return;
   if(!photoUrl.startsWith('fileId:')){imgEl.src=photoUrl;return;}
   var fileId=photoUrl.replace('fileId:','');
   if(photoCache[fileId]){imgEl.src=photoCache[fileId];return;}
-  fetch(GAS_URL+'?action=servePhoto&fileId='+fileId)
-    .then(function(r){return r.json();})
-    .then(function(res){if(res.dataUrl){photoCache[fileId]=res.dataUrl;imgEl.src=res.dataUrl;}})
-    .catch(function(){});
+  // Marcar el img para recibirla cuando llegue
+  imgEl.setAttribute('data-waiting-fid',fileId);
+  // Si ya hay un request en curso para este fileId, no duplicar
+  if(_photoQueue.some(function(i){return i.fileId===fileId;}))return;
+  _photoQueue.push({fileId:fileId});
+  _photoProcessQueue();
 }
 
 function initApp(){
@@ -912,12 +938,19 @@ function canLayer(inner, outer){
   if(si.some(s=>s.includes('Largo')||s.includes('Maxi'))&&
      so.some(s=>s.includes('Corto'))) return false;
 
-  // R4: Blazer/saco no va debajo de campera sport/inflable/cuero/piloto
-  if(inner.cat==='jacket'&&outer.type&&
-    (outer.type.includes('inflable')||outer.type.includes('puffer')||
-     outer.type.includes('Campera de cuero')||outer.type.includes('Piloto'))) return false;
+  // R4: Jacket solo va debajo de tapado/trench/poncho/parka — nunca debajo de campera
+  if(inner.cat==='jacket'&&outer.cat==='outer'){
+    const outerOk=['Tapado / Abrigo largo','Trench coat / Gabardina','Poncho','Parka','Sobretodo'];
+    if(!outerOk.some(function(t){return outer.type&&outer.type.includes(t.split(' ')[0]);})) return false;
+  }
 
-  // R5: Knit de lana/punto grueso no va debajo de outer slim o corto
+  // R5: Knit largo no va debajo de jacket ni de outer
+  if(inner.cat==='knit'){
+    const knitLong=si.some(s=>s.includes('Largo')||s.includes('Maxi')||s.includes('Abierto')||s.includes('Cárdigan'));
+    if(knitLong&&(outer.cat==='jacket'||outer.cat==='outer')) return false;
+  }
+
+  // R5b: Knit de volumen debajo de outer slim o corto
   if(inner.cat==='knit'&&
      inner.material&&(inner.material.includes('Lana')||inner.material.includes('Punto / Tejido'))&&
      so.some(s=>s.includes('Slim')||s.includes('Entallado')||s.includes('Corto'))) return false;
@@ -1294,10 +1327,37 @@ function useOutfit(ids,occasion){
   renderGarments();showToast('✓ Look registrado');
 }
 
+function parseDate(dateStr){
+  if(!dateStr)return null;
+  // Formato ISO: 2026-04-12
+  if(/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return new Date(dateStr+'T12:00:00');
+  // Formato DD/MM/YYYY
+  if(/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)){
+    var p=dateStr.split('/');return new Date(p[2]+'-'+p[1]+'-'+p[0]+'T12:00:00');
+  }
+  // Formato timestamp numérico
+  if(/^\d{10,}$/.test(dateStr)) return new Date(parseInt(dateStr));
+  // Intentar parseo directo
+  var d=new Date(dateStr);
+  return isNaN(d.getTime())?null:d;
+}
+
+function formatDate(dateStr){
+  var d=parseDate(dateStr);
+  if(!d)return dateStr||'';
+  return d.toLocaleDateString('es-AR',{day:'numeric',month:'short'});
+}
+
+function toISODate(dateStr){
+  var d=parseDate(dateStr);
+  if(!d)return null;
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function renderHistory(){
   const list=document.getElementById('history-list');if(!list)return;
   if(!history.length){list.innerHTML='<div class="empty-state"><div class="icon">📅</div><p>Todavía no registraste ningún outfit</p></div>';return;}
-  list.innerHTML=history.slice(0,20).map(h=>{const pieces=h.garmentIds.map(id=>garments.find(g=>g.id===id)).filter(Boolean);const d=new Date(h.date+'T12:00:00');return`<div class="history-item"><div class="history-date">${d.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}</div><div class="history-pieces">${pieces.map(g=>`<span class="history-piece-chip"><span class="dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</span>`).join('')}</div><span class="history-occasion-badge">${h.occasion}</span></div>`;}).join('');
+  list.innerHTML=history.slice(0,20).map(h=>{const pieces=h.garmentIds.map(id=>garments.find(g=>g.id===id)).filter(Boolean);return`<div class="history-item"><div class="history-date">${formatDate(h.date)}</div><div class="history-pieces">${pieces.map(g=>`<span class="history-piece-chip"><span class="dot" style="background:${g.colorPrimary.hex}"></span>${g.type}</span>`).join('')}</div><span class="history-occasion-badge">${h.occasion}</span></div>`;}).join('');
 }
 
 function renderStats(){
@@ -1311,7 +1371,7 @@ function renderCalendar(){
   const today=new Date();const y=today.getFullYear(),m=today.getMonth();const days=new Date(y,m+1,0).getDate();const offset=((new Date(y,m,1).getDay()+6)%7);
   let html=['Lu','Ma','Mi','Ju','Vi','Sá','Do'].map(d=>`<div class="calendar-day-header">${d}</div>`).join('');
   for(let i=0;i<offset;i++)html+='<div></div>';
-  for(let d=1;d<=days;d++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const has=history.some(h=>h.date===ds);const isT=d===today.getDate();html+=`<div class="calendar-day ${has?'has-outfit':''} ${isT?'today':''}"><span>${d}</span>${has?'<span class="day-dot"></span>':''}</div>`;}
+  for(let d=1;d<=days;d++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const has=history.some(h=>toISODate(h.date)===ds);const isT=d===today.getDate();html+=`<div class="calendar-day ${has?'has-outfit':''} ${isT?'today':''}"><span>${d}</span>${has?'<span class="day-dot"></span>':''}</div>`;}
   grid.innerHTML=html;
 }
 
