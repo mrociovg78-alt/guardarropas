@@ -538,41 +538,15 @@ function gasPost(payload){
 var photoCache={};
 var outfitPiecesMap={};
 
-// Cola de requests de fotos — máximo 3 simultáneos
-var _photoQueue=[], _photoActive=0, _photoMaxActive=3;
-
-function _photoProcessQueue(){
-  while(_photoActive<_photoMaxActive && _photoQueue.length>0){
-    var item=_photoQueue.shift();
-    _photoActive++;
-    fetch(GAS_URL+'?action=servePhoto&fileId='+item.fileId)
-      .then(function(r){return r.json();})
-      .then(function(res){
-        if(res.dataUrl){
-          photoCache[item.fileId]=res.dataUrl;
-          // Actualizar todos los imgs esperando este fileId
-          document.querySelectorAll('img[data-waiting-fid="'+item.fileId+'"]').forEach(function(el){
-            el.src=res.dataUrl;
-            el.removeAttribute('data-waiting-fid');
-          });
-        }
-      })
-      .catch(function(){})
-      .finally(function(){_photoActive--;_photoProcessQueue();});
-  }
-}
-
 function resolvePhoto(photoUrl,imgEl){
   if(!photoUrl||!imgEl)return;
   if(!photoUrl.startsWith('fileId:')){imgEl.src=photoUrl;return;}
   var fileId=photoUrl.replace('fileId:','');
   if(photoCache[fileId]){imgEl.src=photoCache[fileId];return;}
-  // Marcar el img para recibirla cuando llegue
-  imgEl.setAttribute('data-waiting-fid',fileId);
-  // Si ya hay un request en curso para este fileId, no duplicar
-  if(_photoQueue.some(function(i){return i.fileId===fileId;}))return;
-  _photoQueue.push({fileId:fileId});
-  _photoProcessQueue();
+  fetch(GAS_URL+'?action=servePhoto&fileId='+fileId)
+    .then(function(r){return r.json();})
+    .then(function(res){if(res.dataUrl){photoCache[fileId]=res.dataUrl;imgEl.src=res.dataUrl;}})
+    .catch(function(){});
 }
 
 function initApp(){
